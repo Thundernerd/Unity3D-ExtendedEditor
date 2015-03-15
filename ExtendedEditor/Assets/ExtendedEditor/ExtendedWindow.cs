@@ -15,8 +15,8 @@ namespace TNRD {
 		public bool IsInitialized = false;
 
 		#region GUI.Window 
-		public Rect WindowRect = new Rect();
-		public GUIContent WindowContent = new GUIContent();
+		public GUIContent WindowContent;
+		public Rect WindowRect;
 		public GUIStyle WindowStyle;
 		#endregion
 
@@ -39,7 +39,7 @@ namespace TNRD {
 		private Dictionary<Type, List<ExtendedControl>> controlsDict;
 
 		[JsonProperty]
-		protected bool updateSizeInUpdate = false;
+		protected bool updateSizeInUpdate = true;
 		[JsonIgnore]
 		private long lastClick = 0;
 		[JsonIgnore]
@@ -49,6 +49,10 @@ namespace TNRD {
 			Controls = new List<ExtendedControl>();
 			ControlsToProcess = new List<ExtendedControl>();
 			controlsDict = new Dictionary<Type, List<ExtendedControl>>();
+
+			WindowContent = new GUIContent();
+			WindowRect = new Rect( 1, 0, Editor.position.size.x - 2, Editor.position.size.y );
+			WindowStyle = GUIStyle.none;
 		}
 		public ExtendedWindow( bool isBlocking ) : this() {
 			IsBlocking = isBlocking;
