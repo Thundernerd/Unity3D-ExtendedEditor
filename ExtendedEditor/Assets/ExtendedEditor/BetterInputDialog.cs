@@ -1,38 +1,39 @@
 ﻿#if UNITY_EDITOR
 using UnityEngine;
+namespace TNRD {
+	public class BetterInputDialog : BetterModalWindow {
 
-public class BetterInputDialog : BetterModalWindow {
+		public string Input = "";
 
-	public string Input = "";
+		private string message = "";
 
-	private string message = "";
+		public BetterInputDialog() : base() { }
 
-	public BetterInputDialog() : base() { }
+		public BetterInputDialog( string title, string message ) : this() {
+			this.Title = title;
+			this.message = message;
+		}
 
-	public BetterInputDialog( string title, string message ) : this() {
-		this.Title = title;
-		this.message = message;
-	}
+		protected override void Initialize() {
+			base.Initialize();
 
-	protected override void Initialize() {
-		base.Initialize();
+			showOKButton = true;
+			showCancelButton = true;
 
-		showOKButton = true;
-		showCancelButton = true;
+			IsDraggable = true;
+			alignToCenter = true;
 
-		IsDraggable = true;
-		alignToCenter = true;
+			WindowRect = new Rect( 0, 0, 350, 120 );
+		}
 
-		WindowRect = new Rect( 0, 0, 350, 120 );
-	}
+		public override void OnGUI( int id ) {
+			base.OnGUI( id );
 
-	public override void OnGUI( int id ) {
-		base.OnGUI( id );
+			GUI.Label( new Rect( 20, 35, WindowRect.width - 40, 20 ), message );
 
-		GUI.Label( new Rect( 20, 35, WindowRect.width - 40, 20 ), message );
-
-		var rect = new Rect( 20, 55, WindowRect.width - 40, 20 );
-		Input = GUI.TextField( rect, Input );
+			var rect = new Rect( 20, 55, WindowRect.width - 40, 20 );
+			Input = GUI.TextField( rect, Input );
+		}
 	}
 }
 #endif

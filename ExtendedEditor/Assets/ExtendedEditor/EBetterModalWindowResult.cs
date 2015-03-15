@@ -1,6 +1,8 @@
 ﻿#if UNITY_EDITOR
-public enum EBetterModalWindowResult {
-	OK,
-	Cancel
+namespace TNRD {
+	public enum EBetterModalWindowResult {
+		OK,
+		Cancel
+	}
 }
 #endif

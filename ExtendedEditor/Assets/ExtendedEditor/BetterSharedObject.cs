@@ -1,10 +1,10 @@
 ﻿#if UNITY_EDITOR
-using UnityEngine;
+namespace TNRD {
+	public class BetterSharedObject {
 
-public class BetterSharedObject {
+		public BetterSharedObject() { }
 
-	public BetterSharedObject() { }
-
-	public virtual void Update() { }
+		public virtual void Update() { }
+	}
 }
 #endif
