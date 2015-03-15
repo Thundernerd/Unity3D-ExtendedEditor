@@ -2,25 +2,25 @@
 using UnityEngine;
 
 namespace TNRD {
-	public class BetterDialogBox : BetterModalWindow {
+	public class ExtendedDialogBox : ExtendedModalWindow {
 
 		private string message = "";
 		private Vector2 messageSize = Vector2.zero;
 		private Rect messageRect = new Rect();
 		private GUIStyle messageStyle;
 
-		public BetterDialogBox() : base() { }
+		public ExtendedDialogBox() : base() { }
 
-		public BetterDialogBox( string title, string message ) : this() {
+		public ExtendedDialogBox( string title, string message ) : this() {
 			this.Title = title;
 			this.message = message;
 		}
 
-		public BetterDialogBox( string title, string message, string okButton ) : this( title, message ) {
+		public ExtendedDialogBox( string title, string message, string okButton ) : this( title, message ) {
 			textOKButton = okButton;
 		}
 
-		public BetterDialogBox( string title, string message, string okButton, string cancelButton ) : this( title, message, okButton ) {
+		public ExtendedDialogBox( string title, string message, string okButton, string cancelButton ) : this( title, message, okButton ) {
 			textCancelButton = cancelButton;
 			showCancelButton = true;
 		}

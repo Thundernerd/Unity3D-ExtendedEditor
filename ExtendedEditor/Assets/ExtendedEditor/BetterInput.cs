@@ -4,7 +4,7 @@ using UnityEditor;
 using System.Collections.Generic;
 
 namespace TNRD {
-	public static class BetterInput {
+	public static class ExtendedInput {
 
 		private static Dictionary<KeyCode, State<bool>> keyStates = new Dictionary<KeyCode, State<bool>>();
 		private static Dictionary<EMouseButton, State<bool>> mouseStates = new Dictionary<EMouseButton, State<bool>>();

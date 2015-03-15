@@ -1,14 +1,14 @@
 ﻿#if UNITY_EDITOR
 using System;
 namespace TNRD {
-	public class BetterModalWindowEventArgs : EventArgs {
+	public class ExtendedModalWindowEventArgs : EventArgs {
 
-		public BetterModalWindow Window { get; private set; }
-		public EBetterModalWindowResult Result { get; private set; }
+		public ExtendedModalWindow Window { get; private set; }
+		public EExtendedModalWindowResult Result { get; private set; }
 
-		public BetterModalWindowEventArgs() : base() { }
+		public ExtendedModalWindowEventArgs() : base() { }
 
-		public BetterModalWindowEventArgs( BetterModalWindow window, EBetterModalWindowResult result ) : this() {
+		public ExtendedModalWindowEventArgs( ExtendedModalWindow window, EExtendedModalWindowResult result ) : this() {
 			Window = window;
 			Result = result;
 		}

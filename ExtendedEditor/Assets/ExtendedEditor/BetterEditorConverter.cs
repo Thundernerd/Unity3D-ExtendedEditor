@@ -4,10 +4,10 @@ using Newtonsoft.Json.Converters;
 using System;
 
 namespace TNRD {
-	public class BetterEditorConverter : CustomCreationConverter<BetterEditor> {
+	public class ExtebdedEditorConverter : CustomCreationConverter<ExtendedEditor> {
 
-		public override BetterEditor Create( Type objectType ) {
-			return (BetterEditor)ScriptableObject.CreateInstance( objectType );
+		public override ExtendedEditor Create( Type objectType ) {
+			return (ExtendedEditor)ScriptableObject.CreateInstance( objectType );
 		}
 	}
 }

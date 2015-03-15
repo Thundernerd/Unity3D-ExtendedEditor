@@ -7,9 +7,9 @@ using UnityEditor;
 
 namespace TNRD {
 
-	public class BetterWindow {
+	public class ExtendedWindow {
 
-		public BetterEditor Editor;
+		public ExtendedEditor Editor;
 
 		public bool IsBlocking = true;
 		public bool IsInitialized = false;
@@ -32,11 +32,11 @@ namespace TNRD {
 		}
 
 		[JsonProperty]
-		protected List<BetterControl> Controls;
+		protected List<ExtendedControl> Controls;
 		[JsonIgnore]
-		protected List<BetterControl> ControlsToProcess;
+		protected List<ExtendedControl> ControlsToProcess;
 		[JsonProperty]
-		private Dictionary<Type, List<BetterControl>> controlsDict;
+		private Dictionary<Type, List<ExtendedControl>> controlsDict;
 
 		[JsonProperty]
 		protected bool updateSizeInUpdate = false;
@@ -45,12 +45,12 @@ namespace TNRD {
 		[JsonIgnore]
 		private int lastButton = -1;
 
-		public BetterWindow() {
-			Controls = new List<BetterControl>();
-			ControlsToProcess = new List<BetterControl>();
-			controlsDict = new Dictionary<Type, List<BetterControl>>();
+		public ExtendedWindow() {
+			Controls = new List<ExtendedControl>();
+			ControlsToProcess = new List<ExtendedControl>();
+			controlsDict = new Dictionary<Type, List<ExtendedControl>>();
 		}
-		public BetterWindow( bool isBlocking ) : this() {
+		public ExtendedWindow( bool isBlocking ) : this() {
 			IsBlocking = isBlocking;
 		}
 
@@ -70,7 +70,7 @@ namespace TNRD {
 		}
 
 		public virtual void Update() {
-			ControlsToProcess = new List<BetterControl>( Controls );
+			ControlsToProcess = new List<ExtendedControl>( Controls );
 
 			if ( updateSizeInUpdate ) {
 				var previousSize = WindowRect.size;
@@ -128,7 +128,7 @@ namespace TNRD {
 			}
 		}
 
-		public virtual void AddControl( BetterControl control ) {
+		public virtual void AddControl( ExtendedControl control ) {
 			if ( Controls.Contains( control ) ) return;
 
 			control.Window = this;
@@ -139,14 +139,14 @@ namespace TNRD {
 
 			var type = control.GetType();
 			if ( !controlsDict.ContainsKey( type ) ) {
-				controlsDict.Add( type, new List<BetterControl>() );
+				controlsDict.Add( type, new List<ExtendedControl>() );
 			}
 
 			controlsDict[type].Add( control );
 			Controls.Add( control );
 		}
 
-		public virtual void RemoveControl( BetterControl control ) {
+		public virtual void RemoveControl( ExtendedControl control ) {
 			if ( control.IsInitialized ) {
 				control.OnDestroy();
 			}
@@ -155,7 +155,7 @@ namespace TNRD {
 			Controls.Remove( control );
 		}
 
-		public List<T> GetControls<T>() where T : BetterControl {
+		public List<T> GetControls<T>() where T : ExtendedControl {
 			var type = typeof(T);
 			if ( controlsDict.ContainsKey( type ) ) {
 				var items = new List<T>();
@@ -168,11 +168,11 @@ namespace TNRD {
 			}
 		}
 
-		public List<BetterControl> GetControls( Type type ) {
+		public List<ExtendedControl> GetControls( Type type ) {
 			if ( controlsDict.ContainsKey( type ) ) {
 				return controlsDict[type];
 			} else {
-				return new List<BetterControl>();
+				return new List<ExtendedControl>();
 			}
 		}
 

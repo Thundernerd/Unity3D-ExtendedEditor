@@ -1,8 +1,8 @@
 ﻿#if UNITY_EDITOR
 namespace TNRD {
-	public class BetterSharedObject {
+	public class ExtendedSharedObject {
 
-		public BetterSharedObject() { }
+		public ExtendedSharedObject() { }
 
 		public virtual void Update() { }
 	}

@@ -1,15 +1,15 @@
 ﻿#if UNITY_EDITOR
 using UnityEngine;
 namespace TNRD {
-	public class BetterInputDialog : BetterModalWindow {
+	public class ExtendedInputDialog : ExtendedModalWindow {
 
 		public string Input = "";
 
 		private string message = "";
 
-		public BetterInputDialog() : base() { }
+		public ExtendedInputDialog() : base() { }
 
-		public BetterInputDialog( string title, string message ) : this() {
+		public ExtendedInputDialog( string title, string message ) : this() {
 			this.Title = title;
 			this.message = message;
 		}

@@ -3,9 +3,9 @@ using UnityEngine;
 using Newtonsoft.Json;
 
 namespace TNRD {
-	public class BetterControl {
+	public class ExtendedControl {
 
-		public BetterWindow Window;
+		public ExtendedWindow Window;
 
 		public bool IsInitialized;
 
@@ -18,7 +18,7 @@ namespace TNRD {
 			}
 		}
 
-		public BetterControl() { }
+		public ExtendedControl() { }
 
 		public virtual void OnInitialize() {
 			IsInitialized = true;

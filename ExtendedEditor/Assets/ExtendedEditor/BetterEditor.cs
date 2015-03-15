@@ -7,24 +7,24 @@ using Newtonsoft.Json;
 using System.IO;
 
 namespace TNRD {
-	public class BetterEditor : EditorWindow {
+	public class ExtendedEditor : EditorWindow {
 
 		[JsonProperty]
 		protected bool RepaintOnUpdate = false;
 
 		[JsonProperty]
-		protected Dictionary<string, BetterSharedObject> SharedObjects = new Dictionary<string, BetterSharedObject>();
+		protected Dictionary<string, ExtendedSharedObject> SharedObjects = new Dictionary<string, ExtendedSharedObject>();
 
 		[JsonProperty]
-		protected List<BetterWindow> Windows = new List<BetterWindow>();
+		protected List<ExtendedWindow> Windows = new List<ExtendedWindow>();
 		[JsonIgnore]
-		protected List<BetterWindow> WindowsToProcess = new List<BetterWindow>();
+		protected List<ExtendedWindow> WindowsToProcess = new List<ExtendedWindow>();
 		[JsonProperty]
-		private Dictionary<Type, List<BetterWindow>> windowsDict = new Dictionary<Type, List<BetterWindow>>();
+		private Dictionary<Type, List<ExtendedWindow>> windowsDict = new Dictionary<Type, List<ExtendedWindow>>();
 		[JsonIgnore]
-		private BetterModalWindow modalWindow;
+		private ExtendedModalWindow modalWindow;
 		[JsonIgnore]
-		private Action<BetterModalWindowEventArgs> modalWindowCallback;
+		private Action<ExtendedModalWindowEventArgs> modalWindowCallback;
 		[JsonIgnore]
 		private long lastClick = 0;
 		[JsonIgnore]
@@ -38,8 +38,8 @@ namespace TNRD {
 		protected virtual void OnInitialize() {
 			initializedCheck = new object();
 
-			Windows = new List<BetterWindow>();
-			WindowsToProcess = new List<BetterWindow>();
+			Windows = new List<ExtendedWindow>();
+			WindowsToProcess = new List<ExtendedWindow>();
 			modalWindow = null;
 			modalWindowCallback = null;
 
@@ -49,7 +49,7 @@ namespace TNRD {
 		protected virtual void Update() {
 			// The other 50 percent
 			if ( initializedCheck == null ) {
-				BetterInput.Initialize();
+				ExtendedInput.Initialize();
 				// Horribleeeee!
 				OnInitialize();
 			}
@@ -106,9 +106,9 @@ namespace TNRD {
 				}
 			}
 
-			BetterInput.OnGUI();
+			ExtendedInput.OnGUI();
 
-			WindowsToProcess = new List<BetterWindow>( Windows );
+			WindowsToProcess = new List<ExtendedWindow>( Windows );
 
 			BeginWindows();
 			for ( int i = WindowsToProcess.Count - 1; i >= 0; i-- ) {
@@ -140,7 +140,7 @@ namespace TNRD {
 					modalWindowCallback = null;
 
 					if ( callbackCopy != null ) {
-						callbackCopy.Invoke( new BetterModalWindowEventArgs( windowCopy, windowCopy.Result ) );
+						callbackCopy.Invoke( new ExtendedModalWindowEventArgs( windowCopy, windowCopy.Result ) );
 					}
 				}
 			}
@@ -148,7 +148,7 @@ namespace TNRD {
 		}
 
 		#region Window
-		public virtual void AddWindow( BetterWindow window ) {
+		public virtual void AddWindow( ExtendedWindow window ) {
 			if ( Windows.Contains( window ) ) return;
 
 			window.Editor = this;
@@ -159,14 +159,14 @@ namespace TNRD {
 
 			var type = window.GetType();
 			if ( !windowsDict.ContainsKey( type ) ) {
-				windowsDict.Add( type, new List<BetterWindow>() );
+				windowsDict.Add( type, new List<ExtendedWindow>() );
 			}
 
 			windowsDict[type].Add( window );
 			Windows.Add( window );
 		}
 
-		public virtual void RemoveWindow( BetterWindow window ) {
+		public virtual void RemoveWindow( ExtendedWindow window ) {
 			if ( window.IsInitialized ) {
 				window.OnDestroy();
 			}
@@ -175,7 +175,7 @@ namespace TNRD {
 			Windows.Remove( window );
 		}
 
-		public List<T> GetWindows<T>() where T : BetterWindow {
+		public List<T> GetWindows<T>() where T : ExtendedWindow {
 			var type = typeof(T);
 			if ( windowsDict.ContainsKey( type ) ) {
 				var items = new List<T>();
@@ -188,34 +188,34 @@ namespace TNRD {
 			}
 		}
 
-		public List<BetterWindow> GetWindows( Type type ) {
+		public List<ExtendedWindow> GetWindows( Type type ) {
 			if ( windowsDict.ContainsKey( type ) ) {
 				return windowsDict[type];
 			} else {
-				return new List<BetterWindow>();
+				return new List<ExtendedWindow>();
 			}
 		}
 		#endregion
 
 		#region Modal Window
-		public void ShowModalWindow( BetterModalWindow window, Action<BetterModalWindowEventArgs> callback ) {
+		public void ShowModalWindow( ExtendedModalWindow window, Action<ExtendedModalWindowEventArgs> callback ) {
 			modalWindow = window;
 			modalWindow.Editor = this;
 
 			modalWindowCallback = callback;
 		}
 
-		public void ShowModalWindow( BetterModalWindow window ) {
+		public void ShowModalWindow( ExtendedModalWindow window ) {
 			ShowModalWindow( window, null );
 		}
 		#endregion
 
 		#region Shared Object
-		public virtual void AddSharedObject( string key, BetterSharedObject value ) {
+		public virtual void AddSharedObject( string key, ExtendedSharedObject value ) {
 			AddSharedObject( key, value, true );
 		}
 
-		public virtual void AddSharedObject( string key, BetterSharedObject value, bool overwrite ) {
+		public virtual void AddSharedObject( string key, ExtendedSharedObject value, bool overwrite ) {
 			if ( SharedObjects.ContainsKey( key ) && !overwrite ) return;
 
 			if ( SharedObjects.ContainsKey( key ) ) {
@@ -225,7 +225,7 @@ namespace TNRD {
 			}
 		}
 
-		public BetterSharedObject GetSharedObject( string key ) {
+		public ExtendedSharedObject GetSharedObject( string key ) {
 			if ( SharedObjects.ContainsKey( key ) ) {
 				return SharedObjects[key];
 			} else {
@@ -233,7 +233,7 @@ namespace TNRD {
 			}
 		}
 
-		public T GetSharedObject<T>( string key ) where T : BetterSharedObject {
+		public T GetSharedObject<T>( string key ) where T : ExtendedSharedObject {
 			if ( SharedObjects.ContainsKey( key ) ) {
 				return SharedObjects[key] as T;
 			} else {
@@ -352,12 +352,12 @@ namespace TNRD {
 			}
 		}
 
-		public void Deserialize<T>( string value ) where T : BetterEditor {
+		public void Deserialize<T>( string value ) where T : ExtendedEditor {
 			var settings = new JsonSerializerSettings();
-			settings.Converters.Add( new BetterEditorConverter() );
+			settings.Converters.Add( new ExtebdedEditorConverter() );
 			settings.TypeNameHandling = TypeNameHandling.Auto;
 
-			BetterEditor deserialized = null;
+			ExtendedEditor deserialized = null;
 
 			try {
 				deserialized = JsonConvert.DeserializeObject<T>( value, settings );
@@ -374,7 +374,7 @@ namespace TNRD {
 
 				// Backward-compat
 				if ( windowsDict == null ) {
-					windowsDict = new Dictionary<Type, List<BetterWindow>>();
+					windowsDict = new Dictionary<Type, List<ExtendedWindow>>();
 				}
 
 				for ( int i = 0; i < Windows.Count; i++ ) {
@@ -386,7 +386,7 @@ namespace TNRD {
 					var t = w.GetType();
 
 					if ( !windowsDict.ContainsKey( t ) ) {
-						windowsDict.Add( t, new List<BetterWindow>() );
+						windowsDict.Add( t, new List<ExtendedWindow>() );
 					}
 
 					if ( !windowsDict[t].Contains( w ) ) {
@@ -396,7 +396,7 @@ namespace TNRD {
 			}
 		}
 
-		public bool LoadFromPreferences<T>( string key ) where T : BetterEditor {
+		public bool LoadFromPreferences<T>( string key ) where T : ExtendedEditor {
 			if ( PlayerPrefs.HasKey( key ) ) {
 				try {
 					Deserialize<T>( PlayerPrefs.GetString( key ) );
@@ -411,7 +411,7 @@ namespace TNRD {
 			}
 		}
 
-		public bool LoadFromFile<T>( string path ) where T : BetterEditor {
+		public bool LoadFromFile<T>( string path ) where T : ExtendedEditor {
 			if ( string.IsNullOrEmpty( path ) ) {
 				Debug.LogError( "Path is empty, cancelling LoadFromFile." );
 				return false;

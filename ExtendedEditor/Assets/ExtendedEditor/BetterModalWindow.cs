@@ -1,11 +1,11 @@
 ﻿#if UNITY_EDITOR
 using UnityEngine;
 namespace TNRD {
-	public class BetterModalWindow {
+	public class ExtendedModalWindow {
 
-		public BetterEditor Editor;
+		public ExtendedEditor Editor;
 
-		public EBetterModalWindowResult Result { get; private set; }
+		public EExtendedModalWindowResult Result { get; private set; }
 		public bool IsDone { get; private set; }
 		public bool IsDraggable { get; protected set; }
 
@@ -21,7 +21,7 @@ namespace TNRD {
 
 		private bool isInitialized = false;
 
-		public BetterModalWindow() { }
+		public ExtendedModalWindow() { }
 
 		protected virtual void Initialize() {
 			isInitialized = true;
@@ -49,16 +49,16 @@ namespace TNRD {
 			}
 
 			if ( showOKButton ) {
-				if ( BetterInput.KeyPressed( KeyCode.KeypadEnter ) || BetterInput.KeyPressed( KeyCode.Return ) ) {
+				if ( ExtendedInput.KeyPressed( KeyCode.KeypadEnter ) || ExtendedInput.KeyPressed( KeyCode.Return ) ) {
 					Event.current.Use();
-					Result = EBetterModalWindowResult.OK;
+					Result = EExtendedModalWindowResult.OK;
 					IsDone = true;
 				}
 			}
 			if ( showCancelButton ) {
-				if ( BetterInput.KeyPressed( KeyCode.Escape ) ) {
+				if ( ExtendedInput.KeyPressed( KeyCode.Escape ) ) {
 					Event.current.Use();
-					Result = EBetterModalWindowResult.Cancel;
+					Result = EExtendedModalWindowResult.Cancel;
 					IsDone = true;
 				}
 			}
@@ -89,13 +89,13 @@ namespace TNRD {
 		}
 
 		public void OK() {
-			Result = EBetterModalWindowResult.OK;
+			Result = EExtendedModalWindowResult.OK;
 			IsDone = true;
 			Event.current.Use();
 		}
 
 		public void Cancel() {
-			Result = EBetterModalWindowResult.Cancel;
+			Result = EExtendedModalWindowResult.Cancel;
 			IsDone = true;
 			Event.current.Use();
 		}

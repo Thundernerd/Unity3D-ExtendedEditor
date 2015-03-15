@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEditor;
 
 namespace TNRD {
-	public class BetterGUI {
+	public class ExtendedGUI {
 
 		public static void BeginToolbar() {
 			GUILayout.BeginHorizontal( "toolbar" );
