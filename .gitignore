@@ -19,6 +19,7 @@ source/ProjectSettings/EditorBuildSettings.asset
 UnityVS/
 UnityVS.meta
 UnityVS*
+[Jj]sonDotNet*
 *-csharp.sln.ide/
 *.chk
 *.log
