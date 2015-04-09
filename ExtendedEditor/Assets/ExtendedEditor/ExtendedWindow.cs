@@ -15,9 +15,9 @@ namespace TNRD {
 		public bool IsInitialized = false;
 
 		#region GUI.Window 
-		public GUIContent WindowContent;
-		public Rect WindowRect;
-		public GUIStyle WindowStyle;
+		public GUIContent WindowContent = new GUIContent();
+		public Rect WindowRect = new Rect();
+		public GUIStyle WindowStyle = null;
 		#endregion
 
 		public Vector2 Position {
@@ -32,33 +32,30 @@ namespace TNRD {
 		}
 
 		[JsonProperty]
-		protected List<ExtendedControl> Controls;
+		protected List<ExtendedControl> Controls = new List<ExtendedControl>();
 		[JsonIgnore]
-		protected List<ExtendedControl> ControlsToProcess;
+		protected List<ExtendedControl> ControlsToProcess = new List<ExtendedControl>();
 		[JsonProperty]
-		private Dictionary<Type, List<ExtendedControl>> controlsDict;
+		private Dictionary<Type, List<ExtendedControl>> controlsDict = new Dictionary<Type, List<ExtendedControl>>();
 
 		[JsonProperty]
-		protected bool updateSizeInUpdate = true;
+		protected bool fullscreen = true;
 		[JsonIgnore]
 		private long lastClick = 0;
 		[JsonIgnore]
 		private int lastButton = -1;
 
-		public ExtendedWindow() {
-			Controls = new List<ExtendedControl>();
-			ControlsToProcess = new List<ExtendedControl>();
-			controlsDict = new Dictionary<Type, List<ExtendedControl>>();
+		[JsonIgnore]
+		private Vector2 previousEditorSize;
 
-			WindowContent = new GUIContent();
-			WindowRect = new Rect( 1, 0, Editor.position.size.x - 2, Editor.position.size.y );
-			WindowStyle = GUIStyle.none;
-		}
-		public ExtendedWindow( bool isBlocking ) : this() {
+		private ExtendedWindow() { }
+		public ExtendedWindow( bool fullscreen, bool isBlocking ) {
+			this.fullscreen = fullscreen;
 			IsBlocking = isBlocking;
 		}
 
 		public virtual void OnInitialize() {
+			WindowRect = new Rect( 0, 0, Editor.position.size.x, Editor.position.size.y );
 			IsInitialized = true;
 		}
 
@@ -76,13 +73,13 @@ namespace TNRD {
 		public virtual void Update() {
 			ControlsToProcess = new List<ExtendedControl>( Controls );
 
-			if ( updateSizeInUpdate ) {
-				var previousSize = WindowRect.size;
-				var currentSize = new Vector2( Editor.position.size.x - 2, Editor.position.size.y );
-				WindowRect.size = currentSize;
-				if ( previousSize != currentSize ) {
-					Editor.Repaint();
+			if ( fullscreen ) {
+				var currentEditorSize = Editor.position.size;
+				if ( currentEditorSize != previousEditorSize ) {
+					WindowRect.size = currentEditorSize;
 				}
+
+				previousEditorSize = currentEditorSize;
 			}
 
 			foreach ( var item in ControlsToProcess ) {
