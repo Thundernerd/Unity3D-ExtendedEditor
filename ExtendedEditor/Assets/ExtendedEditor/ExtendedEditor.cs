@@ -29,6 +29,10 @@ namespace TNRD {
 		private long lastClick = 0;
 		[JsonIgnore]
 		private int lastButton = -1;
+		[JsonIgnore]
+		private double previousTime = 0;
+		[JsonIgnore]
+		public float DeltaTime = 0;
 
 		/// <summary>
 		/// Dirtiest variable; it is 50 percent of a recompilation check
@@ -53,6 +57,10 @@ namespace TNRD {
 				// Horribleeeee!
 				OnInitialize();
 			}
+
+			var time = Time.realtimeSinceStartup;
+			DeltaTime = (float)( time - previousTime );
+			previousTime = time;
 
 			if ( modalWindow == null ) {
 				for ( int i = Windows.Count - 1; i >= 0; i-- ) {
@@ -114,7 +122,7 @@ namespace TNRD {
 			for ( int i = WindowsToProcess.Count - 1; i >= 0; i-- ) {
 				var w = WindowsToProcess[i];
 				if ( w.WindowStyle == null ) {
-					GUI.Window( i, w.WindowRect, w.OnGUI, w.WindowContent );
+					GUI.Window( i, w.WindowRect, w.OnGUI, w.WindowContent, GUI.skin.window );
 				} else {
 					GUI.Window( i, w.WindowRect, w.OnGUI, w.WindowContent, w.WindowStyle );
 				}

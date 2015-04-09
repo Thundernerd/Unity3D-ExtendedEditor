@@ -2,12 +2,14 @@
 using UnityEngine;
 using System.Collections.Generic;
 using UnityEditor;
+using System.Reflection;
+using System;
 
 namespace TNRD {
 	public class ExtendedGUI {
 
 		public static void BeginToolbar() {
-			GUILayout.BeginHorizontal( "toolbar" );
+			GUILayout.BeginHorizontal( EditorStyles.toolbar );
 		}
 
 		public static void EndToolbar() {
@@ -16,31 +18,39 @@ namespace TNRD {
 		}
 
 		public static bool ToolbarButton( string content ) {
-			return GUILayout.Button( content, "ToolbarButton" );
+			return GUILayout.Button( content, EditorStyles.toolbarButton );
 		}
 
 		public static bool ToolbarButton( GUIContent content ) {
-			return GUILayout.Button( content, "ToolbarButton" );
+			return GUILayout.Button( content, EditorStyles.toolbarButton );
 		}
 
 		public static void ToolbarButtonDisabled( string content ) {
 			EditorGUI.BeginDisabledGroup( true );
-			GUILayout.Button( content, "ToolbarButton" );
+			GUILayout.Button( content, EditorStyles.toolbarButton );
 			EditorGUI.EndDisabledGroup();
 		}
 
 		public static void ToolbarButtonDisabled( GUIContent content ) {
 			EditorGUI.BeginDisabledGroup( true );
-			GUILayout.Button( content, "ToolbarButton" );
+			GUILayout.Button( content, EditorStyles.toolbarButton );
 			EditorGUI.EndDisabledGroup();
 		}
 
-		public static bool ToolbarDropDown( string content ) {
-			return GUILayout.Button( content, "ToolbarDropDown" );
+		public static string ToolbarTextfield( string content ) {
+			return GUILayout.TextField( content, EditorStyles.toolbarTextField, GUILayout.MinWidth( 100f ) );
 		}
 
-		public static bool ToolbarDropDown( GUIContent content ) {
-			return GUILayout.Button( content, "ToolbarDropDown" );
+		public static int ToolbarPopup( int current, string[] items ) {
+			var contents = new GUIContent[items.Length];
+			for ( int i = 0; i < items.Length; i++ ) {
+				contents[i] = new GUIContent( items[i] );
+			}
+			return doDropdownList( GUILayoutUtility.GetRect( contents[0], EditorStyles.toolbarPopup ), current, contents, EditorStyles.toolbarPopup );
+		}
+
+		public static int ToolbarPopup( int current, GUIContent[] items ) {
+			return doDropdownList( GUILayoutUtility.GetRect( items[0], EditorStyles.toolbarPopup ), current, items, EditorStyles.toolbarPopup );
 		}
 
 		private static List<Rect> positions = new List<Rect>();
@@ -129,6 +139,135 @@ namespace TNRD {
 			var rect = GetRect( size );
 			return EditorGUI.ToggleLeft( rect, content, value );
 		}
+
+		#region Dropdown extras
+		private static int dropdownHash = "btrDropDown".GetHashCode();
+
+		private class DropdownCallbackInfo {
+			private const string kMaskMenuChangedMessage = "MaskMenuChanged";
+			public static DropdownCallbackInfo instance;
+			private readonly int controlID;
+			private int selectedIndex;
+
+			private object view;
+			private MethodInfo method;
+
+			public DropdownCallbackInfo( int controlID ) {
+				this.controlID = controlID;
+
+				var assembly = Assembly.GetAssembly( typeof(EditorGUI) );
+				Type t = assembly.GetType( "UnityEditor.GUIView" );
+
+				var p = t.GetProperty( "current", BindingFlags.Static | BindingFlags.Public );
+				view = p.GetValue( null, null );
+				method = t.GetMethod( "SendEvent", BindingFlags.NonPublic | BindingFlags.Instance );
+			}
+
+			public static int GetSelectedValueForControl( int controlID, int index ) {
+				Event current = Event.current;
+
+				if ( current.type == EventType.ExecuteCommand && current.commandName == "MaskMenuChanged" ) {
+					if ( instance == null ) {
+						Debug.LogError( "Mask menu has no instance" );
+						return index;
+					} else if ( instance.controlID == controlID ) {
+						index = instance.selectedIndex;
+
+						GUI.changed = true;
+
+						instance = null;
+						current.Use();
+					}
+				}
+
+				return index;
+			}
+
+			internal void SetMaskValueDelegate( object userData, string[] options, int selected ) {
+				selectedIndex = selected;
+
+				if ( view != null ) {
+					method.Invoke( view, new object[] { EditorGUIUtility.CommandEvent( "MaskMenuChanged" ) } );
+				}
+			}
+		}
+		#endregion
+
+		private static Vector2 GetDropdownSize( string[] items, GUIStyle style ) {
+			float width = 0;
+			float height = 0;
+			for ( int i = 0; i < items.Length; i++ ) {
+				var s = style.CalcSize( new GUIContent( items[i] ) );
+				if ( s.x > width )
+					width = s.x;
+				if ( s.y > height )
+					height = s.y;
+			}
+			return new Vector2( width * 1.1f, height );
+		}
+
+		private static Vector2 GetDropdownSize( GUIContent[] items, GUIStyle style ) {
+			float width = 0;
+			float height = 0;
+			for ( int i = 0; i < items.Length; i++ ) {
+				var s = style.CalcSize( items[i] );
+				if ( s.x > width )
+					width = s.x;
+				if ( s.y > height )
+					height = s.y;
+			}
+			return new Vector2( width * 1.1f, height );
+		}
+
+		public static int DropdownList( int current, string[] items ) {
+			var size = GetDropdownSize( items, EditorStyles.popup );
+			var rect = GetRect( size );
+			GUIContent[] contents = new GUIContent[items.Length];
+			for ( int i = 0; i < items.Length; i++ ) {
+				contents[i] = new GUIContent( items[i] );
+			}
+			return doDropdownList( rect, current, contents, EditorStyles.popup );
+		}
+
+		public static int DropdownList( int current, GUIContent[] items ) {
+			var size = GetDropdownSize( items, EditorStyles.popup );
+			var rect = GetRect( size );
+			return doDropdownList( rect, current, items, EditorStyles.popup );
+		}
+
+		public static int DropdownList( Rect position, int current, string[] items ) {
+			GUIContent[] contents = new GUIContent[items.Length];
+			for ( int i = 0; i < items.Length; i++ ) {
+				contents[i] = new GUIContent( items[i] );
+			}
+			return doDropdownList( position, current, contents, EditorStyles.popup );
+		}
+
+		public static int DropdownList( Rect position, int current, GUIContent[] items ) {
+			return doDropdownList( position, current, items, EditorStyles.popup );
+		}
+
+		private static int doDropdownList( Rect position, int current, GUIContent[] items, GUIStyle style ) {
+			if ( items.Length == 0 ) {
+				return -1;
+			}
+
+			int controlID = GUIUtility.GetControlID( dropdownHash, FocusType.Native, position );
+			var mask = DropdownCallbackInfo.GetSelectedValueForControl( controlID, current );
+
+			var evt = Event.current;
+			if ( evt.type == EventType.Repaint ) {
+				style.Draw( position, new GUIContent( items[current] ), controlID, false );
+			} else if ( evt.type == EventType.MouseDown && position.Contains( evt.mousePosition ) ) {
+				DropdownCallbackInfo.instance = new DropdownCallbackInfo( controlID );
+				evt.Use();
+				EditorUtility.DisplayCustomMenu( position, items, current,
+					new EditorUtility.SelectMenuItemFunction( DropdownCallbackInfo.instance.SetMaskValueDelegate ), null );
+			}
+
+			return mask;
+		}
+
 	}
 }
 #endif
