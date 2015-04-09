@@ -9,6 +9,22 @@ namespace TNRD {
 
 	public class ExtendedWindow {
 
+		private class Notification {
+			public GUIContent Text;
+			public Color @Color;
+			public float Duration;
+			public readonly Vector2 Size;
+
+			public Notification( string text, Color color, float duration, GUIStyle style ) {
+				Text = new GUIContent( text );
+				Color = color;
+				Duration = duration;
+
+				style.CalcMinMaxWidth( Text, out Size.y, out Size.x );
+				Size.y = style.CalcHeight( Text, Size.x );
+			}
+		}
+
 		public ExtendedEditor Editor;
 
 		public bool IsBlocking = true;
@@ -50,6 +66,15 @@ namespace TNRD {
 		[JsonIgnore]
 		private Vector2 previousEditorSize;
 
+		[JsonIgnore]
+		private List<Notification> notifications = new List<Notification>();
+		[JsonIgnore]
+		private GUIStyle notificationBackgroundStyle;
+		[JsonIgnore]
+		private GUIStyle notificationTextStyle;
+		[JsonIgnore]
+		private bool initializedStyles;
+
 		private ExtendedWindow() { }
 		public ExtendedWindow( bool fullscreen, bool isBlocking ) {
 			this.fullscreen = fullscreen;
@@ -72,7 +97,7 @@ namespace TNRD {
 			IsInitialized = false;
 		}
 
-		public virtual void OnFocus() { } 
+		public virtual void OnFocus() { }
 		public virtual void OnLostFocus() { }
 
 		public virtual void Update( bool hasFocus ) {
@@ -90,9 +115,30 @@ namespace TNRD {
 			foreach ( var item in ControlsToProcess ) {
 				item.Update( hasFocus );
 			}
+
+			for ( int i = notifications.Count - 1; i >= 0; i-- ) {
+				var item = notifications[i];
+				if ( item.Duration > 0 && item.Color.a < 1 ) {
+					item.Color.a += Editor.DeltaTime * 5;
+				} else if ( item.Duration > 0 && item.Color.a >= 1 ) {
+					item.Duration -= Editor.DeltaTime;
+				} else if ( item.Duration <= 0 && item.Color.a > 0 ) {
+					item.Color.a -= Editor.DeltaTime * 5;
+				} else if ( item.Duration <= 0 && item.Color.a <= 0 ) {
+					notifications.RemoveAt( i );
+				}
+			}
 		}
 
 		public virtual void OnGUI( int id ) {
+			if ( !initializedStyles ) {
+				notificationBackgroundStyle = new GUIStyle( "NotificationBackground" );
+				notificationTextStyle = new GUIStyle( "NotificationText" );
+				notificationTextStyle.padding = new RectOffset( 20, 20, 20, 20 );
+				notificationTextStyle.fontSize = 17;
+				initializedStyles = true;
+			}
+
 			var e = Editor.CurrentEvent;
 
 			if ( Input.IsDoubleClick ) {
@@ -125,6 +171,22 @@ namespace TNRD {
 			foreach ( var item in ControlsToProcess ) {
 				item.OnGUI();
 			}
+
+			var backgroundColor = GUI.backgroundColor;
+			var color = GUI.color;
+
+			for ( int i = notifications.Count - 1; i >= 0; i-- ) {
+				var item = notifications[i];
+
+				var xp = Size.x - item.Size.x - 20;
+				var yp = Size.y - item.Size.y - 20 - ( i * ( item.Size.y + 5 ) );
+
+				GUI.backgroundColor = GUI.color = item.Color;
+				GUI.Box( new Rect( xp, yp, item.Size.x, item.Size.y ), "", notificationBackgroundStyle );
+				GUI.Label( new Rect( xp, yp, item.Size.x, item.Size.y ), item.Text, notificationTextStyle );
+			}
+			GUI.backgroundColor = backgroundColor;
+			GUI.color = color;
 		}
 
 		public virtual void AddControl( ExtendedControl control ) {
@@ -207,6 +269,16 @@ namespace TNRD {
 			}
 		}
 		#endregion
+
+		public void ShowNotification( string text ) {
+			ShowNotification( text, Color.white, 1.25f );
+		}
+
+		public void ShowNotification( string text, Color color, float duration ) {
+			if ( string.IsNullOrEmpty( text ) ) return;
+			color.a = 0;
+			notifications.Add( new Notification( text, color, duration, notificationTextStyle ) );
+		}
 	}
 }
 #endif
