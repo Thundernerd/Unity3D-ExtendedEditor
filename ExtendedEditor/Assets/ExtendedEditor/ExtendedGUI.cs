@@ -31,6 +31,14 @@ namespace TNRD {
 		}
 		#endregion
 
+		private static GUIStyle toolbarStyle = new GUIStyle( EditorStyles.toolbar );
+		private static GUIStyle toolbarButtonStyle = new GUIStyle( EditorStyles.toolbarButton );
+		private static GUIStyle toolbarDropDownStyle = new GUIStyle( EditorStyles.toolbarDropDown );
+		private static GUIStyle toolbarPopupStyle = new GUIStyle( EditorStyles.toolbarPopup );
+		private static GUIStyle toolbarSearchStyle = new GUIStyle( "ToolbarSeachTextField" );
+		private static GUIStyle toolbarSearchStyleEnd = new GUIStyle( "ToolbarSeachCancelButton" );
+		private static GUIStyle toolbarSearchStyleEndEmpty = new GUIStyle( "ToolbarSeachCancelButtonEmpty" );
+		private static GUIStyle toolbarTextFieldStyle = new GUIStyle( EditorStyles.toolbarTextField );
 
 		public static void BeginToolbar() {
 			GUILayout.BeginHorizontal( toolbarStyle );
