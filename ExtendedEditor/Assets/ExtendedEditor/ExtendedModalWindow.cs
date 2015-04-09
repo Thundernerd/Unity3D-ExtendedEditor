@@ -12,6 +12,8 @@ namespace TNRD {
 		public string Title = "";
 		public Rect WindowRect = new Rect();
 
+		public ExtendedInput Input { get { return Editor.Input; } }
+
 		protected bool alignToCenter = true;
 
 		protected bool showOKButton = false;
@@ -31,6 +33,8 @@ namespace TNRD {
 			isInitialized = false;
 		}
 
+		public virtual void Update( bool hasFocus ) { }
+
 		public virtual void OnGUI( int id ) {
 			if ( !isInitialized ) {
 				Initialize();
@@ -49,14 +53,14 @@ namespace TNRD {
 			}
 
 			if ( showOKButton ) {
-				if ( ExtendedInput.KeyPressed( KeyCode.KeypadEnter ) || ExtendedInput.KeyPressed( KeyCode.Return ) ) {
+				if ( Input.KeyPressed( KeyCode.KeypadEnter ) || Input.KeyPressed( KeyCode.Return ) ) {
 					Event.current.Use();
 					Result = EExtendedModalWindowResult.OK;
 					IsDone = true;
 				}
 			}
 			if ( showCancelButton ) {
-				if ( ExtendedInput.KeyPressed( KeyCode.Escape ) ) {
+				if ( Input.KeyPressed( KeyCode.Escape ) ) {
 					Event.current.Use();
 					Result = EExtendedModalWindowResult.Cancel;
 					IsDone = true;

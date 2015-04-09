@@ -6,6 +6,7 @@ namespace TNRD {
 	public class ExtendedControl {
 
 		public ExtendedWindow Window;
+		public ExtendedInput Input { get { return Window.Input; } }
 
 		public bool IsInitialized;
 
@@ -30,8 +31,7 @@ namespace TNRD {
 			IsInitialized = false;
 		}
 
-		public virtual void Update() { }
-
+		public virtual void Update( bool hasFocus ) { }
 		public virtual void OnGUI() { }
 
 		#region Events

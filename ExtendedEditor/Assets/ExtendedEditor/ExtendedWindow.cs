@@ -31,6 +31,8 @@ namespace TNRD {
 			}
 		}
 
+		public ExtendedInput Input { get { return Editor.Input; } }
+
 		[JsonProperty]
 		protected List<ExtendedControl> Controls = new List<ExtendedControl>();
 		[JsonIgnore]
@@ -70,7 +72,10 @@ namespace TNRD {
 			IsInitialized = false;
 		}
 
-		public virtual void Update() {
+		public virtual void OnFocus() { } 
+		public virtual void OnLostFocus() { }
+
+		public virtual void Update( bool hasFocus ) {
 			ControlsToProcess = new List<ExtendedControl>( Controls );
 
 			if ( fullscreen ) {
@@ -83,12 +88,16 @@ namespace TNRD {
 			}
 
 			foreach ( var item in ControlsToProcess ) {
-				item.Update();
+				item.Update( hasFocus );
 			}
 		}
 
 		public virtual void OnGUI( int id ) {
-			var e = Event.current;
+			var e = Editor.CurrentEvent;
+
+			if ( Input.IsDoubleClick ) {
+				OnDoubleClick( Input.Button, e.mousePosition );
+			}
 
 			if ( WindowRect.Contains( e.mousePosition ) ) {
 				switch ( e.type ) {
@@ -100,17 +109,6 @@ namespace TNRD {
 						break;
 					case EventType.DragUpdated:
 						OnDragUpdate( DragAndDrop.paths, e.mousePosition );
-						break;
-					case EventType.MouseDown:
-						var click = DateTime.Now.Ticks;
-						var button = e.button;
-
-						if ( click - lastClick < 2500000 && button == lastButton ) {
-							OnDoubleClick( (EMouseButton)e.button, e.mousePosition );
-						}
-
-						lastClick = click;
-						lastButton = button;
 						break;
 				}
 			}

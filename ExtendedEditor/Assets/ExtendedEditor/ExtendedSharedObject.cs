@@ -4,7 +4,7 @@ namespace TNRD {
 
 		public ExtendedSharedObject() { }
 
-		public virtual void Update() { }
+		public virtual void Update( bool hasFocus ) { }
 	}
 }
 #endif

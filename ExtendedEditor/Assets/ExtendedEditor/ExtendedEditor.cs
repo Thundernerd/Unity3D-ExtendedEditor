@@ -9,6 +9,43 @@ using System.IO;
 namespace TNRD {
 	public class ExtendedEditor : EditorWindow {
 
+		[SerializeField]
+		private static Dictionary<Type, bool> instances = new Dictionary<Type, bool>();
+		public static T CreateWindow<T>( string title = "" ) where T : EditorWindow {
+			var t = typeof(T);
+			var attributes = t.GetCustomAttributes( false );
+			var allowMultiple = false;
+			foreach ( var item in attributes ) {
+				if ( item.GetType() == typeof(AllowMultipleWindowsAttribute) ) {
+					allowMultiple = true;
+					break;
+				}
+			}
+			if ( allowMultiple ) {
+				var instance = CreateInstance<T>();
+				if ( !string.IsNullOrEmpty( title ) ) {
+					instance.title = title;
+				}
+				return instance;
+			} else {
+				var type = typeof(T);
+				if ( !instances.ContainsKey( type ) ) {
+					instances.Add( type, false );
+				}
+
+				if ( instances[type] ) {
+					return GetWindow<T>();
+				} else {
+					instances[type] = true;
+					var instance = CreateInstance<T>();
+					if ( !string.IsNullOrEmpty( title ) ) {
+						instance.title = title;
+					}
+					return instance;
+				}
+			}
+		}
+
 		[JsonProperty]
 		protected bool RepaintOnUpdate = false;
 
@@ -34,6 +71,11 @@ namespace TNRD {
 		[JsonIgnore]
 		public float DeltaTime = 0;
 
+		[JsonIgnore]
+		public ExtendedInput Input { get; private set; }
+		[JsonIgnore]
+		public Event CurrentEvent { get; private set; }
+
 		/// <summary>
 		/// Dirtiest variable; it is 50 percent of a recompilation check
 		/// </summary>
@@ -41,6 +83,8 @@ namespace TNRD {
 
 		protected virtual void OnInitialize() {
 			initializedCheck = new object();
+
+			Input = new ExtendedInput();
 
 			Windows = new List<ExtendedWindow>();
 			WindowsToProcess = new List<ExtendedWindow>();
@@ -50,31 +94,55 @@ namespace TNRD {
 			wantsMouseMove = true;
 		}
 
+		protected virtual void OnDestroy() {
+			instances[GetType()] = false;
+		}
+
+		protected virtual void OnFocus() {
+			for ( int i = Windows.Count - 1; i >= 0; i-- ) {
+				Windows[i].OnFocus();
+				if ( Windows[i].IsBlocking ) return;
+			}
+		}
+
+		protected virtual void OnLostFocus() {
+			for ( int i = Windows.Count - 1; i >= 0; i-- ) {
+				Windows[i].OnLostFocus();
+				if ( Windows[i].IsBlocking ) return;
+			}
+		}
+
 		protected virtual void Update() {
 			// The other 50 percent
 			if ( initializedCheck == null ) {
-				ExtendedInput.Initialize();
 				// Horribleeeee!
 				OnInitialize();
 			}
 
 			var time = Time.realtimeSinceStartup;
-			DeltaTime = (float)( time - previousTime );
+			// Min-Maxing this to make sure it's between 0 and 1/60
+			DeltaTime = Mathf.Min( Mathf.Max( 0, (float)( time - previousTime ) ), 0.016f );
 			previousTime = time;
 
-			if ( modalWindow == null ) {
-				for ( int i = Windows.Count - 1; i >= 0; i-- ) {
-					Windows[i].Update();
+			var hasFocus = focusedWindow == this;
 
-					if ( Windows[i].IsBlocking ) {
-						break;
-					}
+			for ( int i = Windows.Count - 1; i >= 0; i-- ) {
+				Windows[i].Update( hasFocus && modalWindow == null );
+
+				if ( Windows[i].IsBlocking ) {
+					break;
 				}
 			}
 
-			foreach ( var item in SharedObjects ) {
-				item.Value.Update();
+			if ( modalWindow != null ) {
+				modalWindow.Update( hasFocus );
 			}
+
+			foreach ( var item in SharedObjects ) {
+				item.Value.Update( hasFocus );
+			}
+
+			Input.Update();
 
 			if ( RepaintOnUpdate ) {
 				Repaint();
@@ -82,39 +150,41 @@ namespace TNRD {
 		}
 
 		protected virtual void OnGUI() {
-			var e = Event.current;
-			if ( e != null ) {
-				switch ( e.type ) {
+			if ( initializedCheck == null ) return;
+
+			CurrentEvent = Event.current;
+			Input.OnGUI( CurrentEvent );
+
+			if ( CurrentEvent != null ) {
+				switch ( CurrentEvent.type ) {
 					case EventType.ContextClick:
-						OnContextClick( e.mousePosition );
+						OnContextClick( CurrentEvent.mousePosition );
 						break;
 					case EventType.DragExited:
 						OnDragExited();
 						break;
 					case EventType.DragPerform:
-						OnDragPerform( DragAndDrop.paths, e.mousePosition );
+						OnDragPerform( DragAndDrop.paths, CurrentEvent.mousePosition );
 						break;
 					case EventType.DragUpdated:
-						OnDragUpdate( DragAndDrop.paths, e.mousePosition );
+						OnDragUpdate( DragAndDrop.paths, CurrentEvent.mousePosition );
 						break;
 					case EventType.MouseDown:
 						var click = DateTime.Now.Ticks;
-						var button = e.button;
+						var button = CurrentEvent.button;
 
 						if ( click - lastClick < 2500000 && button == lastButton ) {
-							OnDoubleClick( (EMouseButton)e.button, e.mousePosition );
+							OnDoubleClick( (EMouseButton)CurrentEvent.button, CurrentEvent.mousePosition );
 						}
 
 						lastClick = click;
 						lastButton = button;
 						break;
 					case EventType.ScrollWheel:
-						OnScrollWheel( e.delta );
+						OnScrollWheel( CurrentEvent.delta );
 						break;
 				}
 			}
-
-			ExtendedInput.OnGUI();
 
 			WindowsToProcess = new List<ExtendedWindow>( Windows );
 
@@ -122,7 +192,7 @@ namespace TNRD {
 			for ( int i = WindowsToProcess.Count - 1; i >= 0; i-- ) {
 				var w = WindowsToProcess[i];
 				if ( w.WindowStyle == null ) {
-					GUI.Window( i, w.WindowRect, w.OnGUI, w.WindowContent, GUI.skin.window );
+					GUI.Window( i, w.WindowRect, w.OnGUI, w.WindowContent );
 				} else {
 					GUI.Window( i, w.WindowRect, w.OnGUI, w.WindowContent, w.WindowStyle );
 				}
@@ -136,6 +206,7 @@ namespace TNRD {
 				GUI.BringWindowToFront( WindowsToProcess.Count );
 				var p1 = modalWindow.WindowRect;
 				modalWindow.WindowRect = GUI.Window( WindowsToProcess.Count, modalWindow.WindowRect, modalWindow.OnGUI, modalWindow.Title );
+				GUI.FocusWindow( WindowsToProcess.Count );
 				if ( p1 != modalWindow.WindowRect ) {
 					Event.current.Use();
 				}
