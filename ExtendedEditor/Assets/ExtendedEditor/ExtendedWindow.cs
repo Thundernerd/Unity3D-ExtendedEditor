@@ -136,10 +136,6 @@ namespace TNRD {
 
 			var e = Editor.CurrentEvent;
 
-			if ( Input.IsDoubleClick ) {
-				OnDoubleClick( Input.Button, e.mousePosition );
-			}
-
 			if ( WindowRect.Contains( e.mousePosition ) ) {
 				switch ( e.type ) {
 					case EventType.ContextClick:

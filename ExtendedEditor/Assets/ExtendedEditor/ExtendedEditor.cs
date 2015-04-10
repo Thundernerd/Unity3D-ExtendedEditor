@@ -151,10 +151,6 @@ namespace TNRD {
 			CurrentEvent = Event.current;
 			Input.OnGUI( CurrentEvent );
 
-			if ( Input.IsDoubleClick ) {
-				OnDoubleClick( Input.Button, CurrentEvent.mousePosition );
-			}
-
 			if ( CurrentEvent != null ) {
 				switch ( CurrentEvent.type ) {
 					case EventType.ContextClick:
