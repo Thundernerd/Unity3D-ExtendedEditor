@@ -413,7 +413,7 @@ namespace TNRD {
 
 		public void Deserialize<T>( string value ) where T : ExtendedEditor {
 			var settings = new JsonSerializerSettings();
-			settings.Converters.Add( new ExtebdedEditorConverter() );
+			settings.Converters.Add( new ExtendedEditorConverter() );
 			settings.TypeNameHandling = TypeNameHandling.Auto;
 
 			ExtendedEditor deserialized = null;

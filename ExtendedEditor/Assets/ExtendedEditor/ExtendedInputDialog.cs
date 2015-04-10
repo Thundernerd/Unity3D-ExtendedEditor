@@ -3,7 +3,7 @@ using UnityEngine;
 namespace TNRD {
 	public class ExtendedInputDialog : ExtendedModalWindow {
 
-		public string Input = "";
+		public string InputText = "";
 
 		private string message = "";
 
@@ -32,7 +32,7 @@ namespace TNRD {
 			GUI.Label( new Rect( 20, 35, WindowRect.width - 40, 20 ), message );
 
 			var rect = new Rect( 20, 55, WindowRect.width - 40, 20 );
-			Input = GUI.TextField( rect, Input );
+			InputText = GUI.TextField( rect, InputText );
 		}
 	}
 }
