@@ -39,6 +39,7 @@ namespace TNRD {
 		private static GUIStyle toolbarSearchStyleEnd = new GUIStyle( "ToolbarSeachCancelButton" );
 		private static GUIStyle toolbarSearchStyleEndEmpty = new GUIStyle( "ToolbarSeachCancelButtonEmpty" );
 		private static GUIStyle toolbarTextFieldStyle = new GUIStyle( EditorStyles.toolbarTextField );
+		private static GUIStyle dropdownPopupStyle = new GUIStyle( EditorStyles.popup );
 
 		public static void BeginToolbar() {
 			GUILayout.BeginHorizontal( toolbarStyle );
@@ -201,7 +202,6 @@ namespace TNRD {
 
 		#region Dropdown extras
 		private static int dropdownHash = "btrDropDown".GetHashCode();
-		private static GUIStyle dropdownStyle = new GUIStyle( EditorStyles.popup );
 
 		private class DropdownCallbackInfo {
 			private const string kMaskMenuChangedMessage = "MaskMenuChanged";
@@ -280,28 +280,28 @@ namespace TNRD {
 		}
 
 		public static int DropdownList( int current, string[] items ) {
-			var size = GetDropdownSize( items, EditorStyles.popup );
+			var size = GetDropdownSize( items, dropdownPopupStyle );
 			var rect = GetRect( size );
 			GUIContent[] contents = new GUIContent[items.Length];
 			for ( int i = 0; i < items.Length; i++ ) {
 				contents[i] = new GUIContent( items[i] );
 			}
-			return doDropdownList( rect, current, contents, EditorStyles.popup );
+			return doDropdownList( rect, current, contents, dropdownPopupStyle );
 		}
 		public static int DropdownList( int current, GUIContent[] items ) {
-			var size = GetDropdownSize( items, EditorStyles.popup );
+			var size = GetDropdownSize( items, dropdownPopupStyle );
 			var rect = GetRect( size );
-			return doDropdownList( rect, current, items, EditorStyles.popup );
+			return doDropdownList( rect, current, items, dropdownPopupStyle );
 		}
 		public static int DropdownList( Rect position, int current, string[] items ) {
 			GUIContent[] contents = new GUIContent[items.Length];
 			for ( int i = 0; i < items.Length; i++ ) {
 				contents[i] = new GUIContent( items[i] );
 			}
-			return doDropdownList( position, current, contents, EditorStyles.popup );
+			return doDropdownList( position, current, contents, dropdownPopupStyle );
 		}
 		public static int DropdownList( Rect position, int current, GUIContent[] items ) {
-			return doDropdownList( position, current, items, EditorStyles.popup );
+			return doDropdownList( position, current, items, dropdownPopupStyle );
 		}
 
 		private static int doDropdownList( Rect position, int current, GUIContent[] items, GUIStyle style ) {
