@@ -63,10 +63,6 @@ namespace TNRD {
 		[JsonIgnore]
 		private Action<ExtendedModalWindowEventArgs> modalWindowCallback;
 		[JsonIgnore]
-		private long lastClick = 0;
-		[JsonIgnore]
-		private int lastButton = -1;
-		[JsonIgnore]
 		private double previousTime = 0;
 		[JsonIgnore]
 		public float DeltaTime = 0;
@@ -155,6 +151,10 @@ namespace TNRD {
 			CurrentEvent = Event.current;
 			Input.OnGUI( CurrentEvent );
 
+			if ( Input.IsDoubleClick ) {
+				OnDoubleClick( Input.Button, CurrentEvent.mousePosition );
+			}
+
 			if ( CurrentEvent != null ) {
 				switch ( CurrentEvent.type ) {
 					case EventType.ContextClick:
@@ -168,17 +168,6 @@ namespace TNRD {
 						break;
 					case EventType.DragUpdated:
 						OnDragUpdate( DragAndDrop.paths, CurrentEvent.mousePosition );
-						break;
-					case EventType.MouseDown:
-						var click = DateTime.Now.Ticks;
-						var button = CurrentEvent.button;
-
-						if ( click - lastClick < 2500000 && button == lastButton ) {
-							OnDoubleClick( (EMouseButton)CurrentEvent.button, CurrentEvent.mousePosition );
-						}
-
-						lastClick = click;
-						lastButton = button;
 						break;
 					case EventType.ScrollWheel:
 						OnScrollWheel( CurrentEvent.delta );
@@ -330,11 +319,6 @@ namespace TNRD {
 		protected virtual void OnContextClick( Vector2 position ) {
 			if ( modalWindow != null ) {
 				modalWindow.OnContextClick( position );
-			}
-		}
-		protected virtual void OnDoubleClick( EMouseButton button, Vector2 position ) {
-			if ( modalWindow != null ) {
-				modalWindow.OnDoubleClick( button, position );
 			}
 		}
 		protected virtual void OnDragExited() {

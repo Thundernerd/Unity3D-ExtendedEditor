@@ -236,6 +236,7 @@ namespace TNRD {
 						GUI.changed = true;
 
 						instance = null;
+						GUIUtility.hotControl = GUIUtility.keyboardControl = 0;
 						current.Use();
 					}
 				}
@@ -316,7 +317,8 @@ namespace TNRD {
 				style.Draw( position, new GUIContent( items[current] ), controlID, false );
 			} else if ( evt.type == EventType.MouseDown && position.Contains( evt.mousePosition ) ) {
 				DropdownCallbackInfo.instance = new DropdownCallbackInfo( controlID );
-				evt.Use();
+				GUIUtility.keyboardControl = GUIUtility.hotControl = 0;
+				//evt.Use();
 				EditorUtility.DisplayCustomMenu( position, items, current,
 					new EditorUtility.SelectMenuItemFunction( DropdownCallbackInfo.instance.SetMaskValueDelegate ), null );
 			}

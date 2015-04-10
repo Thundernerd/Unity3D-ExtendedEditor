@@ -59,11 +59,6 @@ namespace TNRD {
 		[JsonProperty]
 		protected bool fullscreen = true;
 		[JsonIgnore]
-		private long lastClick = 0;
-		[JsonIgnore]
-		private int lastButton = -1;
-
-		[JsonIgnore]
 		private Vector2 previousEditorSize;
 
 		[JsonIgnore]
@@ -174,7 +169,6 @@ namespace TNRD {
 
 			var backgroundColor = GUI.backgroundColor;
 			var color = GUI.color;
-
 			for ( int i = notifications.Count - 1; i >= 0; i-- ) {
 				var item = notifications[i];
 
@@ -241,11 +235,6 @@ namespace TNRD {
 		public virtual void OnContextClick( Vector2 position ) {
 			for ( int i = ControlsToProcess.Count - 1; i >= 0; i-- ) {
 				ControlsToProcess[i].OnContextClick( position );
-			}
-		}
-		public virtual void OnDoubleClick( EMouseButton button, Vector2 position ) {
-			for ( int i = ControlsToProcess.Count - 1; i >= 0; i-- ) {
-				ControlsToProcess[i].OnDoubleClick( button, position );
 			}
 		}
 		public virtual void OnDragExited() {

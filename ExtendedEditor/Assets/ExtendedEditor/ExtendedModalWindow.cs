@@ -15,7 +15,6 @@ namespace TNRD {
 		public ExtendedInput Input { get { return Editor.Input; } }
 
 		protected bool alignToCenter = true;
-
 		protected bool showOKButton = false;
 		protected bool showCancelButton = false;
 		protected string textOKButton = "OK";
