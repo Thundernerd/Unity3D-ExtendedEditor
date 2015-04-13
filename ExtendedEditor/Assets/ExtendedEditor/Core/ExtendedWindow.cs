@@ -227,6 +227,36 @@ namespace TNRD {
 			}
 		}
 
+		public List<T> GetControlsSlow<T>() where T : ExtendedControl {
+			var type = typeof(T);
+			var list = new List<T>();
+
+			foreach ( var item in Controls ) {
+				var baseType = item.GetType().BaseType;
+				while ( baseType != null ) {
+					if ( baseType == type ) {
+						list.Add( item as T );
+						break;
+					}
+					baseType = baseType.BaseType;
+				}
+			}
+
+			return list;
+		}
+
+		public List<ExtendedControl> GetControlsSlow( Type type ) {
+			var list = new List<ExtendedControl>();
+
+			foreach ( var item in Controls ) {
+				if ( item.GetType() == type.GetType() ) {
+					list.Add( item );
+				}
+			}
+
+			return list;
+		}
+
 		#region Events
 		public virtual void OnContextClick( Vector2 position ) {
 			for ( int i = ControlsToProcess.Count - 1; i >= 0; i-- ) {

@@ -15,6 +15,8 @@ namespace TNRD {
 		public bool IsDoubleClick { get; private set; }
 		public EMouseButton Button { get; private set; }
 
+		public EventType Type { get; private set; }
+
 		private long lastClick = 0;
 		private int lastButton = -1;
 
@@ -43,6 +45,8 @@ namespace TNRD {
 
 		public void OnGUI( Event e ) {
 			if ( e == null ) return;
+
+			Type = e.type;
 
 			HandleKeys( e );
 			HandleMouse( e );
