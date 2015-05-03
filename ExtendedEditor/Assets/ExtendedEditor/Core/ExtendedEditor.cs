@@ -97,14 +97,14 @@ namespace TNRD {
 		protected virtual void OnFocus() {
 			for ( int i = Windows.Count - 1; i >= 0; i-- ) {
 				Windows[i].OnFocus();
-				if ( Windows[i].IsBlocking ) return;
+				if ( Windows[i].Settings.IsBlocking ) return;
 			}
 		}
 
 		protected virtual void OnLostFocus() {
 			for ( int i = Windows.Count - 1; i >= 0; i-- ) {
 				Windows[i].OnLostFocus();
-				if ( Windows[i].IsBlocking ) return;
+				if ( Windows[i].Settings.IsBlocking ) return;
 			}
 		}
 
@@ -125,7 +125,7 @@ namespace TNRD {
 			for ( int i = Windows.Count - 1; i >= 0; i-- ) {
 				Windows[i].Update( hasFocus && modalWindow == null );
 
-				if ( Windows[i].IsBlocking ) {
+				if ( Windows[i].Settings.IsBlocking ) {
 					break;
 				}
 			}
@@ -177,12 +177,12 @@ namespace TNRD {
 			for ( int i = WindowsToProcess.Count - 1; i >= 0; i-- ) {
 				var w = WindowsToProcess[i];
 				if ( w.WindowStyle == null ) {
-					GUI.Window( i, w.WindowRect, w.OnGUI, w.WindowContent );
+					GUI.Window( i, w.WindowRect, w.InternalGUI, w.WindowContent );
 				} else {
-					GUI.Window( i, w.WindowRect, w.OnGUI, w.WindowContent, w.WindowStyle );
+					GUI.Window( i, w.WindowRect, w.InternalGUI, w.WindowContent, w.WindowStyle );
 				}
 
-				if ( w.IsBlocking ) {
+				if ( w.Settings.IsBlocking ) {
 					break;
 				}
 			}

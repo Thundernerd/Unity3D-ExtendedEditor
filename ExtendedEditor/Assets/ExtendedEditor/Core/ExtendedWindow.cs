@@ -9,25 +9,10 @@ namespace TNRD {
 
 	public class ExtendedWindow {
 
-		private class Notification {
-			public GUIContent Text;
-			public Color @Color;
-			public float Duration;
-			public readonly Vector2 Size;
-
-			public Notification( string text, Color color, float duration, GUIStyle style ) {
-				Text = new GUIContent( text );
-				Color = color;
-				Duration = duration;
-
-				style.CalcMinMaxWidth( Text, out Size.y, out Size.x );
-				Size.y = style.CalcHeight( Text, Size.x );
-			}
-		}
-
 		public ExtendedEditor Editor;
 
-		public bool IsBlocking = true;
+		public ExtendedWindowSettings Settings;
+
 		public bool IsInitialized = false;
 
 		#region GUI.Window 
@@ -56,29 +41,29 @@ namespace TNRD {
 		[JsonProperty]
 		private Dictionary<Type, List<ExtendedControl>> controlsDict = new Dictionary<Type, List<ExtendedControl>>();
 
-		[JsonProperty]
-		protected bool fullscreen = true;
 		[JsonIgnore]
 		private Vector2 previousEditorSize;
 
 		[JsonIgnore]
-		private List<Notification> notifications = new List<Notification>();
-		[JsonIgnore]
-		private GUIStyle notificationBackgroundStyle;
-		[JsonIgnore]
-		private GUIStyle notificationTextStyle;
-		[JsonIgnore]
-		private bool initializedStyles;
+		private bool initializedGUI = false;
 
 		private ExtendedWindow() { }
-		public ExtendedWindow( bool fullscreen, bool isBlocking ) {
-			this.fullscreen = fullscreen;
-			IsBlocking = isBlocking;
+		public ExtendedWindow( ExtendedWindowSettings settings ) {
+			Settings = settings;
 		}
 
+		#region Initialization
 		public virtual void OnInitialize() {
 			WindowRect = new Rect( 0, 0, Editor.position.size.x, Editor.position.size.y );
 			IsInitialized = true;
+		}
+
+		protected virtual void OnInitializeGUI() {
+			notificationBackgroundStyle = new GUIStyle( "NotificationBackground" );
+			notificationTextStyle = new GUIStyle( "NotificationText" );
+			notificationTextStyle.padding = new RectOffset( 20, 20, 20, 20 );
+			notificationTextStyle.fontSize = 17;
+			initializedGUI = true;
 		}
 
 		public virtual void OnDeserialized() {
@@ -91,6 +76,7 @@ namespace TNRD {
 		public virtual void OnDestroy() {
 			IsInitialized = false;
 		}
+		#endregion
 
 		public virtual void OnFocus() { }
 		public virtual void OnLostFocus() { }
@@ -98,7 +84,7 @@ namespace TNRD {
 		public virtual void Update( bool hasFocus ) {
 			ControlsToProcess = new List<ExtendedControl>( Controls );
 
-			if ( fullscreen ) {
+			if ( Settings.Fullscreen ) {
 				var currentEditorSize = Editor.position.size;
 				if ( currentEditorSize != previousEditorSize ) {
 					WindowRect.size = currentEditorSize;
@@ -125,13 +111,10 @@ namespace TNRD {
 			}
 		}
 
-		public virtual void OnGUI( int id ) {
-			if ( !initializedStyles ) {
-				notificationBackgroundStyle = new GUIStyle( "NotificationBackground" );
-				notificationTextStyle = new GUIStyle( "NotificationText" );
-				notificationTextStyle.padding = new RectOffset( 20, 20, 20, 20 );
-				notificationTextStyle.fontSize = 17;
-				initializedStyles = true;
+		#region GUI
+		public void InternalGUI( int id ) {
+			if ( !initializedGUI ) {
+				OnInitializeGUI();
 			}
 
 			var e = Editor.CurrentEvent;
@@ -159,10 +142,24 @@ namespace TNRD {
 					break;
 			}
 
+			BeginGUI();
+			OnGUI();
+			EndGUI();
+		}
+		public void BeginGUI() {
 			foreach ( var item in ControlsToProcess ) {
 				item.OnGUI();
 			}
 
+			if ( Settings.DrawToolbar ) {
+				ExtendedGUI.BeginToolbar();
+				OnToolbarGUI();
+				ExtendedGUI.EndToolbar();
+			}
+		}
+		public virtual void OnToolbarGUI() { }
+		public virtual void OnGUI() { }
+		public void EndGUI() {
 			var backgroundColor = GUI.backgroundColor;
 			var color = GUI.color;
 			for ( int i = notifications.Count - 1; i >= 0; i-- ) {
@@ -178,7 +175,9 @@ namespace TNRD {
 			GUI.backgroundColor = backgroundColor;
 			GUI.color = color;
 		}
+		#endregion
 
+		#region Controls
 		public virtual void AddControl( ExtendedControl control ) {
 			if ( Controls.Contains( control ) ) return;
 
@@ -249,13 +248,19 @@ namespace TNRD {
 			var list = new List<ExtendedControl>();
 
 			foreach ( var item in Controls ) {
-				if ( item.GetType() == type.GetType() ) {
-					list.Add( item );
+				var baseType = item.GetType().BaseType;
+				while ( baseType != null ) {
+					if ( baseType == type ) {
+						list.Add( item );
+						break;
+					}
+					baseType = baseType.BaseType;
 				}
 			}
 
 			return list;
 		}
+		#endregion
 
 		#region Events
 		public virtual void OnContextClick( Vector2 position ) {
@@ -285,15 +290,23 @@ namespace TNRD {
 		}
 		#endregion
 
+		#region Notifications
+		[JsonIgnore]
+		private List<ExtendedNotification> notifications = new List<ExtendedNotification>();
+		[JsonIgnore]
+		private GUIStyle notificationBackgroundStyle;
+		[JsonIgnore]
+		private GUIStyle notificationTextStyle;
+
 		public void ShowNotification( string text ) {
 			ShowNotification( text, Color.white, 1.25f );
 		}
-
 		public void ShowNotification( string text, Color color, float duration ) {
 			if ( string.IsNullOrEmpty( text ) ) return;
 			color.a = 0;
-			notifications.Add( new Notification( text, color, duration, notificationTextStyle ) );
+			notifications.Add( new ExtendedNotification( text, color, duration, notificationTextStyle ) );
 		}
+		#endregion
 	}
 }
 #endif
