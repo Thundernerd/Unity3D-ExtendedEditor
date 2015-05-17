@@ -15,7 +15,7 @@ namespace TNRD {
 		[JsonIgnore]
 		public Rect Rectangle {
 			get {
-				var scaledPosition = Window.ScaleMatrix.MultiplyVector( Position );
+				var scaledPosition = Window.ScaleMatrix.MultiplyVector( Position + (Vector2)Window.Camera );
 				var scaledSize = Window.ScaleMatrix.MultiplyVector( Size );
 				return new Rect( scaledPosition.x, scaledPosition.y, scaledSize.x, scaledSize.y );
 			}

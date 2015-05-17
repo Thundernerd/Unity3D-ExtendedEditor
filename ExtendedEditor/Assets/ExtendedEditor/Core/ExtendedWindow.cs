@@ -113,6 +113,22 @@ namespace TNRD {
 					notifications.RemoveAt( i );
 				}
 			}
+
+			if ( hasFocus ) {
+				if ( Input.KeyDown( KeyCode.LeftAlt ) || Input.KeyDown( KeyCode.RightAlt ) ) {
+					if ( Input.ButtonDown( EMouseButton.Left ) ) {
+						Camera += ScaleMatrix.inverse.MultiplyVector( Input.MouseDelta );
+					} else if ( Input.ButtonDown( EMouseButton.Right ) ) {
+						var delta = Input.MouseDelta / 10f;
+						Camera.z -= delta.x;
+						Camera.z -= delta.y;
+
+						if ( Camera.z < 0.1f ) {
+							Camera.z = 0.1f;
+						}
+					}
+				}
+			}
 		}
 
 		#region GUI
@@ -157,6 +173,18 @@ namespace TNRD {
 				var translation = Matrix4x4.TRS( WindowRect.TopLeft(), Quaternion.identity, Vector3.one );
 				var scale = Matrix4x4.Scale( new Vector3( Camera.z, Camera.z, 1f ) );
 				ScaleMatrix = translation * scale * translation.inverse * GUI.matrix;
+
+				if ( Input.KeyDown( KeyCode.LeftAlt ) || Input.KeyDown( KeyCode.RightAlt ) ) {
+					if ( Input.ButtonDown( EMouseButton.Right ) ) {
+						EditorGUIUtility.AddCursorRect( WindowRect, MouseCursor.Zoom );
+					} else {
+						EditorGUIUtility.AddCursorRect( WindowRect, MouseCursor.Pan );
+					}
+				} else if ( Input.ButtonDown( EMouseButton.Middle ) ) {
+					EditorGUIUtility.AddCursorRect( WindowRect, MouseCursor.Pan );
+				} else {
+					EditorGUIUtility.AddCursorRect( WindowRect, MouseCursor.Arrow );
+				}
 			}
 
 			Rect area = WindowRect;
