@@ -79,7 +79,7 @@ public class ListControl : ExtendedControl {
 			}
 
 			listRect.y += 17.5f;
-			listRect.height -= 17.5f;
+			listRect.height -= 35f;
 		}
 
 		if ( scrollable ) {
