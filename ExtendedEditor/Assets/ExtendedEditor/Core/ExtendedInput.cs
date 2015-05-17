@@ -9,7 +9,7 @@ namespace TNRD {
 		private Dictionary<KeyCode, State<bool>> kStates = new Dictionary<KeyCode, State<bool>>();
 		private Dictionary<EMouseButton, State<bool>> mStates = new Dictionary<EMouseButton, State<bool>>();
 
-		public Vector2 MousePosition { get; private set; }
+		public Vector2 MousePosition { get; set; }
 		public Vector2 MouseDelta { get; private set; }
 
 		public bool IsDoubleClick { get; private set; }

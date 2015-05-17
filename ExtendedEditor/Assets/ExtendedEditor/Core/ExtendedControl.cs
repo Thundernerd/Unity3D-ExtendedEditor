@@ -15,17 +15,30 @@ namespace TNRD {
 		[JsonIgnore]
 		public Rect Rectangle {
 			get {
-				return new Rect( Position.x, Position.y, Size.x, Size.y );
+				var scaledPosition = Window.ScaleMatrix.MultiplyVector( Position );
+				var scaledSize = Window.ScaleMatrix.MultiplyVector( Size );
+				return new Rect( scaledPosition.x, scaledPosition.y, scaledSize.x, scaledSize.y );
 			}
 		}
+
+		[JsonProperty]
+		private int controlHint = -1;
 
 		public ExtendedControl() { }
 
 		public virtual void OnInitialize() {
 			IsInitialized = true;
+
+			var t = GetType();
+			controlHint = t.Name.GetHashCode();
 		}
 
-		public virtual void OnDeserialized() { }
+		public virtual void OnDeserialized() {
+			if ( controlHint == -1 ) {
+				var t = GetType();
+				controlHint = t.Name.GetHashCode();
+			}
+		}
 
 		public virtual void OnDestroy() {
 			IsInitialized = false;
@@ -33,6 +46,10 @@ namespace TNRD {
 
 		public virtual void Update( bool hasFocus ) { }
 		public virtual void OnGUI() { }
+
+		public int GetControlID( FocusType focus ) {
+			return GUIUtility.GetControlID( controlHint, focus );
+		}
 
 		#region Events
 		public virtual void OnContextClick( Vector2 position ) { }

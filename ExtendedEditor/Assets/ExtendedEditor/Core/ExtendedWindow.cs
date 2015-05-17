@@ -31,6 +31,10 @@ namespace TNRD {
 				return WindowRect.size;
 			}
 		}
+		[JsonIgnore]
+		public Vector3 Camera = new Vector3( 0, 0, 1 );
+		[JsonIgnore]
+		public Matrix4x4 ScaleMatrix = Matrix4x4.identity;
 
 		public ExtendedInput Input { get { return Editor.Input; } }
 
@@ -84,7 +88,7 @@ namespace TNRD {
 		public virtual void Update( bool hasFocus ) {
 			ControlsToProcess = new List<ExtendedControl>( Controls );
 
-			if ( Settings.Fullscreen ) {
+			if ( Settings.IsFullscreen ) {
 				var currentEditorSize = Editor.position.size;
 				if ( currentEditorSize != previousEditorSize ) {
 					WindowRect.size = currentEditorSize;
@@ -145,21 +149,44 @@ namespace TNRD {
 			BeginGUI();
 			OnGUI();
 			EndGUI();
+
 		}
 		public void BeginGUI() {
-			foreach ( var item in ControlsToProcess ) {
-				item.OnGUI();
+			if ( Settings.UseCamera ) {
+				var wRect = WindowRect.ScaleSizeBy( 1f / Camera.z, WindowRect.TopLeft() );
+				var translation = Matrix4x4.TRS( WindowRect.TopLeft(), Quaternion.identity, Vector3.one );
+				var scale = Matrix4x4.Scale( new Vector3( Camera.z, Camera.z, 1f ) );
+				ScaleMatrix = translation * scale * translation.inverse * GUI.matrix;
 			}
 
+			Rect area = WindowRect;
 			if ( Settings.DrawToolbar ) {
-				ExtendedGUI.BeginToolbar();
-				OnToolbarGUI();
-				ExtendedGUI.EndToolbar();
+				area.y += 17.5f;
+				area.height -= 17.5f;
+
+				// Feels a bit weird, but it has to be I guess
+				var pos = Input.MousePosition;
+				pos.y -= 17.5f;
+				Input.MousePosition = pos;
+			}
+
+			GUILayout.BeginArea( area );
+
+			foreach ( var item in ControlsToProcess ) {
+				item.OnGUI();
 			}
 		}
 		public virtual void OnToolbarGUI() { }
 		public virtual void OnGUI() { }
 		public void EndGUI() {
+			if ( Settings.DrawToolbar ) {
+				var pos = Input.MousePosition;
+				pos.y += 17.5f;
+				Input.MousePosition = pos;
+			}
+			// End the area started in BeginGUI
+			GUILayout.EndArea();
+
 			var backgroundColor = GUI.backgroundColor;
 			var color = GUI.color;
 			for ( int i = notifications.Count - 1; i >= 0; i-- ) {
@@ -174,6 +201,12 @@ namespace TNRD {
 			}
 			GUI.backgroundColor = backgroundColor;
 			GUI.color = color;
+
+			if ( Settings.DrawToolbar ) {
+				ExtendedGUI.BeginToolbar();
+				OnToolbarGUI();
+				ExtendedGUI.EndToolbar();
+			}
 		}
 		#endregion
 
