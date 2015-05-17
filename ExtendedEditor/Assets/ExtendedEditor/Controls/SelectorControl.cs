@@ -2,135 +2,130 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace TNRD {
 	public class SelectorControl : ExtendedControl {
 
-		private bool isSelecting = false;
+		public List<SelectableControl> SelectedControls = new List<SelectableControl>();
 
 		private Vector2 start;
 		private Vector2 end;
 
-		private List<SelectableControl> selectedControls = new List<SelectableControl>();
+		private bool startedDrag = false;
 
-		public SelectorControl() {
-
-		}
+		public SelectorControl() { }
 
 		public override void OnInitialize() {
 			base.OnInitialize();
+		}
+
+		public override void OnDeserialized() {
+			base.OnDeserialized();
 		}
 
 		public override void OnDestroy() {
 			base.OnDestroy();
 		}
 
-		private bool waitForNextState;
-		private bool showDragField;
-		private bool handleSelectedControls;
-		private bool allowDrag;
-
 		public override void OnGUI() {
-			if ( waitForNextState ) {
-				if ( Input.ButtonReleased( EMouseButton.Left ) ) {
-					waitForNextState = false;
-					showDragField = false;
+			if ( Input.KeyDown( KeyCode.LeftAlt ) || Input.KeyDown( KeyCode.RightAlt ) ) return;
 
+			if ( ( Input.KeyDown( KeyCode.LeftShift ) || Input.KeyDown( KeyCode.RightShift ) ) && Input.ButtonReleased( EMouseButton.Left ) ) {
+				var controls = Window.GetControlsSlow<SelectableControl>();
+				foreach ( var item in controls ) {
+					if ( item.Contains( Input.MousePosition ) ) {
+						item.OnSelect();
+						SelectedControls.Add( item );
+						return;
+					}
+				}
+			}
+
+			if ( Input.ButtonDown( EMouseButton.Left ) ) {
+				if ( SelectedControls.Count < 2 ) {
 					var controls = Window.GetControlsSlow<SelectableControl>();
-					foreach ( var item in controls ) {
-						var contains = item.Contains( Input.MousePosition );
-						if ( item.IsSelected && !contains ) {
-							item.OnDeselect();
-						} else if ( !item.IsSelected && contains ) {
+					var newControls = new List<SelectableControl>();
+
+					for ( int i = 0; i < controls.Count; i++ ) {
+						if ( controls[i].Contains( Input.MousePosition ) ) {
+							newControls.Add( controls[i] );
+						}
+					}
+
+					if ( newControls.Count == 1 ) {
+						for ( int i = 0; i < SelectedControls.Count; i++ ) {
+							SelectedControls[i].OnDeselect();
+						}
+
+						SelectedControls.Clear();
+						SelectedControls.Add( newControls[0] );
+						newControls[0].OnSelect();
+					}
+				}
+			}
+
+			if ( Input.Type == EventType.MouseDrag && Input.ButtonDown( EMouseButton.Left ) ) {
+				var controls = Window.GetControlsSlow<SelectableControl>();
+				bool doMove = false;
+				if ( !startedDrag && SelectedControls.Count > 0 ) {
+					for ( int i = 0; i < SelectedControls.Count; i++ ) {
+						if ( !doMove ) {
+							if ( SelectedControls[i].Contains( Input.MousePosition ) ) {
+								doMove = true;
+								i = -1;
+							}
+						} else {
+							SelectedControls[i].Move( Input.MouseDelta );
+						}
+					}
+				}
+
+				if ( doMove ) return;
+
+				if ( !startedDrag ) {
+					start = Input.MousePosition;
+					startedDrag = true;
+				}
+
+				end = Input.MousePosition;
+
+				var minx = Mathf.Min( start.x, end.x );
+				var maxx = Mathf.Max( start.x, end.x );
+				var miny = Mathf.Min( start.y, end.y );
+				var maxy = Mathf.Max( start.y, end.y );
+
+				Position.Set( minx, miny );
+				Size.Set( maxx - minx, maxy - miny );
+
+				foreach ( var item in controls ) {
+					if ( Rectangle.Contains( item.Center() ) ) {
+						if ( !item.IsSelected ) {
 							item.OnSelect();
+							SelectedControls.Add( item );
 						}
-					}
-				} else if ( Input.Type == EventType.MouseDrag ) {
-					var controls = Window.GetControlsSlow<SelectableControl>();
-					var controlsSelected = 0;
-					SelectableControl control = null;
-					foreach ( var item in controls ) {
-						if ( item.Contains( Input.MousePosition ) ) {
-							controlsSelected++;
-							control = item;
-						}
-					}
-
-					if ( controlsSelected == 1 && control != null ) {
-						waitForNextState = false;
-						handleSelectedControls = true;
-						allowDrag = true;
-						control.OnSelect();
-						selectedControls.Add( control );
 					} else {
-						waitForNextState = false;
-						showDragField = true;
-					}
-				}
-			} else {
-				if ( handleSelectedControls ) {
-					if ( Input.ButtonPressed( EMouseButton.Left ) ) {
-						allowDrag = false;
-						foreach ( var item in selectedControls ) {
-							if ( item.Contains( Input.MousePosition ) ) {
-								allowDrag = true;
-								break;
-							}
-						}
-
-						if ( !allowDrag ) {
-							foreach ( var item in selectedControls ) {
-								item.OnDeselect();
-							}
-							selectedControls.Clear();
-							handleSelectedControls = false;
-							waitForNextState = true;
-							start = end = Input.MousePosition;
-						}
-					}
-					if ( allowDrag && Input.Type == EventType.MouseDrag ) {
-						foreach ( var item in selectedControls ) {
-							item.Position += Input.MouseDelta;
-						}
-					}
-				} else if ( showDragField ) {
-					end = Input.MousePosition;
-
-					var minx = Mathf.Min( start.x, end.x );
-					var maxx = Mathf.Max( start.x, end.x );
-					var miny = Mathf.Min( start.y, end.y );
-					var maxy = Mathf.Max( start.y, end.y );
-
-					var rect = new Rect( minx, miny, maxx - minx, maxy - miny );
-
-					GUI.Box( rect, "" );
-
-					selectedControls.Clear();
-					var controls = Window.GetControlsSlow<SelectableControl>();
-					foreach ( var item in controls ) {
-						var contains = rect.Contains( item.Center() );
-						if ( item.IsSelected && !contains ) {
+						if ( item.IsSelected ) {
 							item.OnDeselect();
-						} else if ( !item.IsSelected && contains ) {
-							item.OnSelect();
-							selectedControls.Add( item );
-						} else if ( item.IsSelected && contains ) {
-							selectedControls.Add( item );
+							SelectedControls.Remove( item );
 						}
 					}
-
-					if ( Input.ButtonReleased( EMouseButton.Left ) ) {
-						showDragField = false;
-						waitForNextState = false;
-						handleSelectedControls = selectedControls.Count > 0;
-					}
-				} else {
-					if ( Input.ButtonPressed( EMouseButton.Left ) ) {
-						waitForNextState = true;
-						showDragField = false;
-						start = end = Input.MousePosition;
-					}
 				}
+
+			} else if ( Input.IsDoubleClick && Input.Button == EMouseButton.Left ) {
+				foreach ( var item in SelectedControls ) {
+					item.OnDeselect();
+				}
+
+				SelectedControls.Clear();
+			} else if ( Input.ButtonReleased( EMouseButton.Left ) ) {
+				if ( startedDrag ) {
+					startedDrag = false;
+				}
+			}
+
+			if ( startedDrag ) {
+				GUI.Box( Rectangle, "" );
 			}
 		}
 	}

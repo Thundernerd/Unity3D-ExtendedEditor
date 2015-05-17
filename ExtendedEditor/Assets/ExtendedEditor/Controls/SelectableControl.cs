@@ -10,8 +10,15 @@ namespace TNRD {
 		public virtual void OnSelect() { IsSelected = true; }
 		public virtual void OnDeselect() { IsSelected = false; }
 
-		public abstract Vector2 Center();
-		public abstract bool Contains( Vector2 value );
+		public virtual Vector2 Center() {
+			return Rectangle.center;
+		}
+		public virtual bool Contains( Vector2 value ) {
+			return Rectangle.Contains( value );
+		}
+		public virtual void Move( Vector2 delta ) {
+			Position += delta;
+		}
 	}
 }
 #endif

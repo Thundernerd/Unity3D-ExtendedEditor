@@ -53,6 +53,7 @@ namespace TNRD {
 		}
 
 		private void HandleKeys( Event e ) {
+
 			switch ( e.type ) {
 				case EventType.KeyDown:
 					SetValue( e.keyCode, true );
@@ -65,6 +66,10 @@ namespace TNRD {
 					ShiftHack( e.shift );
 					ControlHack( e.control );
 					AltHack( e.alt );
+					break;
+				case EventType.Repaint:
+				case EventType.Layout:
+					ShiftHack( e.shift );
 					break;
 				default:
 					break;

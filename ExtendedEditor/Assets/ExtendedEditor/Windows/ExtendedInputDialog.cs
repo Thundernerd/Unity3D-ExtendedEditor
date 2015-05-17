@@ -14,6 +14,10 @@ namespace TNRD {
 			this.message = message;
 		}
 
+		public ExtendedInputDialog( string title, string message, string input ) : this( title, message ) {
+			this.InputText = input;
+		}
+		
 		protected override void Initialize() {
 			base.Initialize();
 

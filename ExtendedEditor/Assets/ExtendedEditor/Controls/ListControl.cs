@@ -70,10 +70,10 @@ public class ListControl : ExtendedControl {
 		GUI.Box( boxRect, "", EditorStyles.helpBox );
 
 		if ( searchable ) {
-			searchText = ExtendedGUI.ToolbarSearchFieldWithBackground( listRect, searchText );
+			searchText = ExtendedGUI.ToolbarSearchFieldWithBackground( listRect, searchText ).ToLower();
 
 			for ( int i = itemsToProcess.Count - 1; i >= 0; i-- ) {
-				if ( !itemsToProcess[i].Contains( searchText ) ) {
+				if ( !itemsToProcess[i].ToLower().Contains( searchText ) ) {
 					itemsToProcess.RemoveAt( i );
 				}
 			}

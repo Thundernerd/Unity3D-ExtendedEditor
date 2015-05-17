@@ -74,6 +74,15 @@ namespace TNRD {
 			return GUILayout.Button( content, toolbarDropDownStyle );
 		}
 
+		public static Enum ToolbarEnumPopup( Enum selected ) {
+			return EditorGUILayout.EnumPopup( "", selected, toolbarPopupStyle );
+		}
+
+		public static void ToolbarLabel( string content ) {
+			GUILayout.Label( content, toolbarButtonStyle );
+		}
+
+		
 		public static int ToolbarPopup( int current, string[] items ) {
 			var contents = new GUIContent[items.Length];
 			for ( int i = 0; i < items.Length; i++ ) {
