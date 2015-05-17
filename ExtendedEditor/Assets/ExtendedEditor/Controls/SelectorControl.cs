@@ -1,8 +1,6 @@
 ﻿#if UNITY_EDITOR
 using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
-using Newtonsoft.Json;
 
 namespace TNRD {
 	public class SelectorControl : ExtendedControl {
@@ -13,8 +11,15 @@ namespace TNRD {
 		private Vector2 end;
 
 		private bool startedDrag = false;
+		private bool dragControls = false;
 
 		public SelectorControl() { }
+
+		new public Rect Rectangle {
+			get {
+				return new Rect( Position.x, Position.y, Size.x, Size.y );
+			}
+		}
 
 		public override void OnInitialize() {
 			base.OnInitialize();
@@ -29,7 +34,10 @@ namespace TNRD {
 		}
 
 		public override void OnGUI() {
+			var id = GetControlID( FocusType.Passive );
+			if ( GUIUtility.hotControl != 0 && GUIUtility.hotControl != id ) return;
 			if ( Input.KeyDown( KeyCode.LeftAlt ) || Input.KeyDown( KeyCode.RightAlt ) ) return;
+
 
 			if ( ( Input.KeyDown( KeyCode.LeftShift ) || Input.KeyDown( KeyCode.RightShift ) ) && Input.ButtonReleased( EMouseButton.Left ) ) {
 				var controls = Window.GetControlsSlow<SelectableControl>();
@@ -67,23 +75,34 @@ namespace TNRD {
 
 			if ( Input.Type == EventType.MouseDrag && Input.ButtonDown( EMouseButton.Left ) ) {
 				var controls = Window.GetControlsSlow<SelectableControl>();
-				bool doMove = false;
+
+				var delta = Input.MouseDelta;
+				if ( Window.Settings.UseCamera ) {
+					delta = Window.ScaleMatrix.inverse.MultiplyVector( delta );
+				}
+
 				if ( !startedDrag && SelectedControls.Count > 0 ) {
 					for ( int i = 0; i < SelectedControls.Count; i++ ) {
-						if ( !doMove ) {
+						if ( !dragControls ) {
 							if ( SelectedControls[i].Contains( Input.MousePosition ) ) {
-								doMove = true;
+								GUIUtility.hotControl = id;
+								GUIUtility.keyboardControl = 0;
+								
+								dragControls = true;
 								i = -1;
 							}
 						} else {
-							SelectedControls[i].Move( Input.MouseDelta );
+							SelectedControls[i].Move( delta );
 						}
 					}
 				}
 
-				if ( doMove ) return;
+				if ( dragControls ) return;
 
 				if ( !startedDrag ) {
+					GUIUtility.hotControl = id;
+					GUIUtility.keyboardControl = 0;
+
 					start = Input.MousePosition;
 					startedDrag = true;
 				}
@@ -119,8 +138,11 @@ namespace TNRD {
 
 				SelectedControls.Clear();
 			} else if ( Input.ButtonReleased( EMouseButton.Left ) ) {
-				if ( startedDrag ) {
-					startedDrag = false;
+				startedDrag = false;
+				dragControls = false;
+
+				if ( GUIUtility.hotControl == id ) {
+					GUIUtility.hotControl = 0;
 				}
 			}
 

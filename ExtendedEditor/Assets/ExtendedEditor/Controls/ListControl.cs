@@ -22,6 +22,12 @@ public class ListControl : ExtendedControl {
 	public event EventHandler<ListEventArgs> OnSelectedItemChanged;
 	public event EventHandler<ListEventArgs> OnItemDoubleClick;
 
+	new public Rect Rectangle {
+		get {
+			return new Rect( Position.x, Position.y, Size.x, Size.y );
+		}
+	}
+
 	private string[] items;
 
 	private int index = -1;
@@ -66,6 +72,7 @@ public class ListControl : ExtendedControl {
 		var lineHeight = GUI.skin.label.CalcSize( new GUIContent( items[0] ) ).y;
 		var mouseDown = Input.ButtonPressed( EMouseButton.Left );
 		var mousePos = Input.MousePosition;
+		var controlID = GetControlID( FocusType.Passive );
 
 		GUI.Box( boxRect, "", EditorStyles.helpBox );
 
@@ -79,7 +86,7 @@ public class ListControl : ExtendedControl {
 			}
 
 			listRect.y += 17.5f;
-			listRect.height -= 35f;
+			listRect.height -= 17.5f;
 		}
 
 		if ( scrollable ) {
@@ -98,6 +105,11 @@ public class ListControl : ExtendedControl {
 
 		if ( mouseDown ) {
 			index = -1;
+
+			if ( new Rect( listRect.x, listRect.y, viewRect.width, listRect.height ).Contains( mousePos ) ) {
+				GUIUtility.hotControl = controlID;
+				GUIUtility.keyboardControl = 0;
+			}
 		}
 
 		scrollPosition = GUI.BeginScrollView( listRect, scrollPosition, viewRect, false, false );
@@ -110,14 +122,16 @@ public class ListControl : ExtendedControl {
 			}
 
 			if ( mouseDown ) {
-				if ( r.Contains( mousePos + scrollPosition ) ) {
-					index = i;
+				if ( listRect.Contains( mousePos ) ) {
+					if ( r.Contains( mousePos + scrollPosition ) ) {
+						index = i;
 
-					if ( OnSelectedItemChanged != null ) {
-						OnSelectedItemChanged.Invoke( this, new ListEventArgs( i, itemsToProcess[i] ) );
+						if ( OnSelectedItemChanged != null ) {
+							OnSelectedItemChanged.Invoke( this, new ListEventArgs( i, itemsToProcess[i] ) );
+						}
+
+						GUIUtility.keyboardControl = 0;
 					}
-
-					GUIUtility.keyboardControl = 0;
 				}
 			} else {
 				GUI.Label( r, itemsToProcess[i] );
@@ -131,15 +145,21 @@ public class ListControl : ExtendedControl {
 			}
 
 			if ( Input.IsDoubleClick && Input.Button == EMouseButton.Left ) {
-				if ( r.Contains( mousePos + scrollPosition ) ) {
-					if ( OnItemDoubleClick != null ) {
-						OnItemDoubleClick.Invoke( this, new ListEventArgs( i, itemsToProcess[i] ) );
+				if ( listRect.Contains( mousePos ) ) {
+					if ( r.Contains( mousePos + scrollPosition ) ) {
+						if ( OnItemDoubleClick != null ) {
+							OnItemDoubleClick.Invoke( this, new ListEventArgs( i, itemsToProcess[i] ) );
+						}
 					}
 				}
 			}
 		}
 
 		GUI.EndScrollView();
+
+		if ( Input.ButtonUp( EMouseButton.Left ) && GUIUtility.hotControl == controlID ) {
+			GUIUtility.hotControl = 0;
+		}
 	}
 
 	public void UpdateItems( string[] items ) {
