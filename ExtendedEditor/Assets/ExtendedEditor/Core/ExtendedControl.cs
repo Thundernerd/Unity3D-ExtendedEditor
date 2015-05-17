@@ -52,8 +52,7 @@ namespace TNRD {
 		}
 
 		#region Events
-		public virtual void OnContextClick( Vector2 position ) { }
-		public virtual void OnDoubleClick( EMouseButton button, Vector2 position ) { }
+		public virtual void OnContextClick( Vector2 position, ref bool used ) { }
 		public virtual void OnDragExited() { }
 		public virtual void OnDragPerform( string[] paths, Vector2 position ) { }
 		public virtual void OnDragUpdate( string[] paths, Vector2 position ) { }

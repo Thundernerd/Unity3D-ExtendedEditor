@@ -327,8 +327,10 @@ namespace TNRD {
 
 		#region Events
 		public virtual void OnContextClick( Vector2 position ) {
+			bool used = false;
+
 			for ( int i = ControlsToProcess.Count - 1; i >= 0; i-- ) {
-				ControlsToProcess[i].OnContextClick( position );
+				ControlsToProcess[i].OnContextClick( position, ref used );
 			}
 		}
 		public virtual void OnDragExited() {

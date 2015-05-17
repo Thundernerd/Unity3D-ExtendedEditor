@@ -143,6 +143,16 @@ public class TimelineControl : ExtendedControl {
 				isScrubbing = true;
 			}
 		}
+
+		if ( Input.IsDoubleClick && Input.Button == EMouseButton.Left ) {
+			var position = Input.MousePosition;
+			if ( Rectangle.Contains( position ) ) {
+				var p = position.x - Position.x;
+				var fo = p / Rectangle.width;
+				CurrentFrame = Mathf.FloorToInt( FrameCount * fo );
+				Play();
+			}
+		}
 	}
 
 	public void Play() {
@@ -156,17 +166,6 @@ public class TimelineControl : ExtendedControl {
 	public void Stop() {
 		isPlaying = false;
 		CurrentFrame = 0;
-	}
-
-	public override void OnDoubleClick( EMouseButton button, Vector2 position ) {
-		base.OnDoubleClick( button, position );
-
-		if ( Rectangle.Contains( position ) ) {
-			var p = position.x - Position.x;
-			var fo = p / Rectangle.width;
-			CurrentFrame = Mathf.FloorToInt( FrameCount * fo );
-			Play();
-		}
 	}
 
 	public void AddMarker( int frame, Color color ) {
