@@ -115,16 +115,18 @@ namespace TNRD {
 			}
 
 			if ( hasFocus ) {
-				if ( Input.KeyDown( KeyCode.LeftAlt ) || Input.KeyDown( KeyCode.RightAlt ) ) {
-					if ( Input.ButtonDown( EMouseButton.Left ) ) {
-						Camera += ScaleMatrix.inverse.MultiplyVector( Input.MouseDelta );
-					} else if ( Input.ButtonDown( EMouseButton.Right ) ) {
-						var delta = Input.MouseDelta / 10f;
-						Camera.z -= delta.x;
-						Camera.z -= delta.y;
+				if ( Settings.UseCamera ) {
+					if ( Input.KeyDown( KeyCode.LeftAlt ) || Input.KeyDown( KeyCode.RightAlt ) ) {
+						if ( Input.ButtonDown( EMouseButton.Left ) ) {
+							Camera += ScaleMatrix.inverse.MultiplyVector( Input.MouseDelta );
+						} else if ( Input.ButtonDown( EMouseButton.Right ) ) {
+							var delta = Input.MouseDelta / 1000f;
+							Camera.z -= delta.x;
+							Camera.z -= delta.y;
 
-						if ( Camera.z < 0.1f ) {
-							Camera.z = 0.1f;
+							if ( Camera.z < 0.1f ) {
+								Camera.z = 0.1f;
+							}
 						}
 					}
 				}
@@ -345,6 +347,14 @@ namespace TNRD {
 			}
 		}
 		public virtual void OnScrollWheel( Vector2 delta ) {
+			if ( Settings.UseCamera ) {
+				var mDelta = Input.MouseDelta.y;
+				if ( mDelta > 0 ) {
+					Camera.z *= 0.9f;
+				} else if ( mDelta < 0 ) {
+					Camera.z *= 1.1f;
+				}
+			}
 			for ( int i = ControlsToProcess.Count - 1; i >= 0; i-- ) {
 				ControlsToProcess[i].OnScrollWheel( delta );
 			}
