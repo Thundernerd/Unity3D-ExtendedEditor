@@ -1,10 +1,12 @@
 ﻿#if UNITY_EDITOR
 using UnityEngine;
 using System.Collections;
+using Newtonsoft.Json;
 
 namespace TNRD {
 	public abstract class SelectableControl : ExtendedControl {
 
+		[JsonIgnore]
 		public bool IsSelected;
 
 		public virtual void OnSelect() { IsSelected = true; }

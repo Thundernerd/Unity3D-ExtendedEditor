@@ -82,7 +82,6 @@ namespace TNRD {
 			GUILayout.Label( content, toolbarButtonStyle );
 		}
 
-		
 		public static int ToolbarPopup( int current, string[] items ) {
 			var contents = new GUIContent[items.Length];
 			for ( int i = 0; i < items.Length; i++ ) {

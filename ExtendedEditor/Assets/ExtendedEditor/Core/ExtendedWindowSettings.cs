@@ -1,10 +1,14 @@
-﻿public class ExtendedWindowSettings {
+﻿#if UNITY_EDITOR
+namespace TNRD {
+	public class ExtendedWindowSettings {
 
-	public bool DrawToolbar = false;
-	//public bool DrawCameraInfo = false;
+		public bool DrawToolbar = false;
+		//public bool DrawCameraInfo = false;
 
-	public bool IsBlocking = true;
-	public bool IsFullscreen = true;
+		public bool IsBlocking = true;
+		public bool IsFullscreen = true;
 
-	public bool UseCamera = false;
+		public bool UseCamera = false;
+	}
 }
+#endif

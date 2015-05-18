@@ -1,10 +1,12 @@
 ﻿#if UNITY_EDITOR
 using UnityEngine;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace TNRD {
 	public class SelectorControl : ExtendedControl {
 
+		[JsonIgnore]
 		public List<SelectableControl> SelectedControls = new List<SelectableControl>();
 
 		private Vector2 start;

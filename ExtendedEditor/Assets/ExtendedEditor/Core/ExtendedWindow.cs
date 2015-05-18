@@ -51,7 +51,7 @@ namespace TNRD {
 		[JsonIgnore]
 		private bool initializedGUI = false;
 
-		private ExtendedWindow() { }
+		public ExtendedWindow() : this( new ExtendedWindowSettings() ) { }
 		public ExtendedWindow( ExtendedWindowSettings settings ) {
 			Settings = settings;
 		}
@@ -72,8 +72,34 @@ namespace TNRD {
 
 		public virtual void OnDeserialized() {
 			for ( int i = 0; i < Controls.Count; i++ ) {
-				Controls[i].Window = this;
-				Controls[i].OnDeserialized();
+				if ( Controls[i] != null ) {
+					Controls[i].Window = this;
+					Controls[i].OnDeserialized();
+				}
+			}
+
+			ClearNullers();
+		}
+
+		private void ClearNullers() {
+			int removed = 0;
+			for ( int i = Controls.Count - 1; i >= 0; i-- ) {
+				if ( Controls[i] == null ) {
+					Controls.RemoveAt( i );
+					removed++;
+				}
+			}
+
+			foreach ( var item in controlsDict ) {
+				for ( int i = item.Value.Count - 1; i >= 0; i-- ) {
+					if ( item.Value[i] == null ) {
+						item.Value.RemoveAt( i );
+					}
+				}
+			}
+
+			if ( removed > 0 ) {
+				Debug.LogErrorFormat( "Removed {0} \"NULL\" control(s); Check your editor!", removed );
 			}
 		}
 
