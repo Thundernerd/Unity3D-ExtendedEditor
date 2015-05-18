@@ -23,18 +23,6 @@ namespace TNRD {
 			}
 		}
 
-		public override void OnInitialize() {
-			base.OnInitialize();
-		}
-
-		public override void OnDeserialized() {
-			base.OnDeserialized();
-		}
-
-		public override void OnDestroy() {
-			base.OnDestroy();
-		}
-
 		public override void OnGUI() {
 			var id = GetControlID( FocusType.Passive );
 			if ( GUIUtility.hotControl != 0 && GUIUtility.hotControl != id ) return;

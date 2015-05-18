@@ -51,6 +51,8 @@ namespace TNRD {
 		[JsonIgnore]
 		private bool initializedGUI = false;
 
+		private const int cameraSpeed = 500;
+
 		public ExtendedWindow() : this( new ExtendedWindowSettings() ) { }
 		public ExtendedWindow( ExtendedWindowSettings settings ) {
 			Settings = settings;
@@ -154,6 +156,23 @@ namespace TNRD {
 								Camera.z = 0.1f;
 							}
 						}
+					}
+
+					if ( Input.Type == EventType.MouseDrag && Input.ButtonDown( EMouseButton.Middle ) ) {
+						Camera += ScaleMatrix.inverse.MultiplyVector( Input.MouseDelta );
+					}
+
+					if ( Input.KeyDown( KeyCode.LeftArrow ) ) {
+						Camera.x += cameraSpeed * Editor.DeltaTime;
+					}
+					if ( Input.KeyDown( KeyCode.RightArrow ) ) {
+						Camera.x -= cameraSpeed * Editor.DeltaTime;
+					}
+					if ( Input.KeyDown( KeyCode.UpArrow ) ) {
+						Camera.y += cameraSpeed * Editor.DeltaTime;
+					}
+					if ( Input.KeyDown( KeyCode.DownArrow ) ) {
+						Camera.y -= cameraSpeed * Editor.DeltaTime;
 					}
 				}
 			}
@@ -352,8 +371,14 @@ namespace TNRD {
 		#endregion
 
 		#region Events
-		public virtual void OnContextClick( Vector2 position ) {
+		public void OnContextClick( Vector2 position ) {
 			bool used = false;
+			OnContextClick( position, ref used );
+		}
+		public virtual void OnContextClick( Vector2 position, ref bool used ) {
+			if ( Settings.DrawToolbar ) {
+				position.y -= 17.5f;
+			}
 
 			for ( int i = ControlsToProcess.Count - 1; i >= 0; i-- ) {
 				ControlsToProcess[i].OnContextClick( position, ref used );
