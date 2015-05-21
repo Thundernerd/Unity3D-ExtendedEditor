@@ -49,13 +49,59 @@ namespace TNRD {
 			GUILayout.EndHorizontal();
 		}
 
-		public static IndentBlock Indent() {
+		#region Blocks
+		public static DisabledBlock DisabledBlock( bool disabled ) {
+			return new DisabledBlock( disabled );
+		}
+
+		public static HorizontalBlock HorizontalBlock( params GUILayoutOption[] options ) {
+			return new HorizontalBlock( options );
+		}
+
+		public static HorizontalBlock HorizontalBlock( GUIStyle style, params GUILayoutOption[] options ) {
+			return new HorizontalBlock( style, options );
+		}
+
+		public static IndentBlock IndentBlock() {
 			return new IndentBlock();
 		}
 
-		public static IndentBlock Indent( int level ) {
+		public static IndentBlock IndentBlock( int level ) {
 			return new IndentBlock( level );
 		}
+
+		public static ScrollBlock ScrollBlock( ref Vector2 scrollPosition, params GUILayoutOption[] options ) {
+			return new ScrollBlock( ref scrollPosition, options );
+		}
+
+		public static ScrollBlock ScrollBlock( ref Vector2 scrollPosition, bool alwaysShowHorizontal, bool alwaysShowVertical, params GUILayoutOption[] options ) {
+			return new ScrollBlock( ref scrollPosition, alwaysShowHorizontal, alwaysShowVertical, options );
+		}
+
+		public static ScrollBlock ScrollBlock( ref Vector2 scrollPosition, GUIStyle horizontalScrollbar, GUIStyle verticalScrollbar, params GUILayoutOption[] options ) {
+			return new ScrollBlock( ref scrollPosition, horizontalScrollbar, verticalScrollbar, options );
+		}
+
+		public static ScrollBlock ScrollBlock( ref Vector2 scrollPosition, bool alwaysShowHorizontal, bool alwaysShowVertical, GUIStyle horizontalScrollbar, GUIStyle verticalScrollbar, GUIStyle background, params GUILayoutOption[] options ) {
+			return new ScrollBlock( ref scrollPosition, alwaysShowHorizontal, alwaysShowVertical, horizontalScrollbar, verticalScrollbar, background, options );
+		}
+		
+		public static ToggleBlock ToggleBlock( string label, ref bool toggle ) {
+			return new ToggleBlock( label, ref toggle );
+		}
+
+		public static ToggleBlock ToggleBlock( GUIContent label, ref bool toggle ) {
+			return new ToggleBlock( label, ref toggle );
+		}
+
+		public static VerticalBlock VerticalBlock( params GUILayoutOption[] options ) {
+			return new VerticalBlock( options );
+		}
+
+		public static VerticalBlock VerticalBlock( GUIStyle style, params GUILayoutOption[] options ) {
+			return new VerticalBlock( style, options );
+		}
+		#endregion
 
 		public static bool ToolbarButton( string content ) {
 			return GUILayout.Button( content, toolbarButtonStyle );

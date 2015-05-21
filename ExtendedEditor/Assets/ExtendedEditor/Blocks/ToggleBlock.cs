@@ -3,6 +3,8 @@ using System;
 using UnityEditor;
 using UnityEngine;
 
+// Inspired by https://github.com/nickgravelyn/UnityToolbag/tree/master/EditorTools
+
 namespace TNRD {
 	public class ToggleBlock : IDisposable {
 

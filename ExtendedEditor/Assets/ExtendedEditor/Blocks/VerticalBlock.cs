@@ -3,6 +3,8 @@ using System;
 using UnityEditor;
 using UnityEngine;
 
+// Taken from https://github.com/nickgravelyn/UnityToolbag/tree/master/EditorTools
+
 namespace TNRD {
 	public class VerticalBlock : IDisposable {
 
