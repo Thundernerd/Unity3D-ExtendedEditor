@@ -49,6 +49,14 @@ namespace TNRD {
 			GUILayout.EndHorizontal();
 		}
 
+		public static IndentBlock Indent() {
+			return new IndentBlock();
+		}
+
+		public static IndentBlock Indent( int level ) {
+			return new IndentBlock( level );
+		}
+
 		public static bool ToolbarButton( string content ) {
 			return GUILayout.Button( content, toolbarButtonStyle );
 		}
