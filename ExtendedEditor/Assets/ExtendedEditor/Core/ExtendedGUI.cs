@@ -380,7 +380,7 @@ namespace TNRD {
 			} else if ( evt.type == EventType.MouseDown && position.Contains( evt.mousePosition ) ) {
 				DropdownCallbackInfo.instance = new DropdownCallbackInfo( controlID );
 				GUIUtility.keyboardControl = GUIUtility.hotControl = 0;
-				//evt.Use();
+				evt.Use();
 				EditorUtility.DisplayCustomMenu( position, items, current,
 					new EditorUtility.SelectMenuItemFunction( DropdownCallbackInfo.instance.SetMaskValueDelegate ), null );
 			}

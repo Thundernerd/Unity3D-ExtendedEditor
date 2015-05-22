@@ -28,7 +28,6 @@ namespace TNRD {
 			if ( GUIUtility.hotControl != 0 && GUIUtility.hotControl != id ) return;
 			if ( Input.KeyDown( KeyCode.LeftAlt ) || Input.KeyDown( KeyCode.RightAlt ) ) return;
 
-
 			if ( ( Input.KeyDown( KeyCode.LeftShift ) || Input.KeyDown( KeyCode.RightShift ) ) && Input.ButtonReleased( EMouseButton.Left ) ) {
 				var controls = Window.GetControlsSlow<SelectableControl>();
 				foreach ( var item in controls ) {

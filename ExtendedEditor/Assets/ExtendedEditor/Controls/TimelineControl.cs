@@ -7,8 +7,25 @@ using System.Collections.Generic;
 
 public class TimelineControl : ExtendedControl {
 
+	public enum EPlayMode {
+		Normal,
+		Reversed
+	}
+
+	public class OnFrameEventArgs : EventArgs {
+		public readonly int Frame;
+		public readonly bool IsMarker;
+		public readonly Color MarkerColor;
+
+		public OnFrameEventArgs( int frame, bool isMarker, Color markerColor ) : base() {
+			Frame = frame;
+			IsMarker = isMarker;
+			MarkerColor = markerColor;
+		}
+	}
+
 	public event EventHandler OnFinished;
-	public event EventHandler OnFrame;
+	public event EventHandler<OnFrameEventArgs> OnFrame;
 	public event EventHandler OnPlay;
 
 	public string Name = "";
@@ -16,12 +33,12 @@ public class TimelineControl : ExtendedControl {
 	public int FrameCount = 0;
 	public int CurrentFrame = 0;
 
-	public bool IsPlaying { get { return isPlaying; } }
+	public bool IsPlaying { get; private set; }
+
+	public EPlayMode PlayMode = EPlayMode.Normal;
 
 	private float fps = 30;
-
-	private bool isScrubbing = false;
-	private bool isPlaying = false;
+	
 	private float timer = 0;
 
 	private GUIStyle skin;
@@ -41,14 +58,47 @@ public class TimelineControl : ExtendedControl {
 	public override void Update( bool hasFocus ) {
 		base.Update( hasFocus );
 
-		if ( isPlaying ) {
+		if ( Input.IsDoubleClick ) {
+			var position = Input.MousePosition;
+			if ( Rectangle.Contains( position ) ) {
+				var p = position.x - Position.x;
+				var fo = p / Rectangle.width;
+				CurrentFrame = Mathf.FloorToInt( FrameCount * fo );
+				Play();
+			}
+		}
+
+		if ( IsPlaying ) {
 			timer += Window.Editor.DeltaTime;
 			if ( timer >= ( 1f / fps ) ) {
-				if ( CurrentFrame < FrameCount ) {
-					CurrentFrame++;
-					timer = 0;
+				var isDone = false;
+				if ( PlayMode == EPlayMode.Reversed ) {
+					if ( CurrentFrame > 0 ) {
+						CurrentFrame--;
+					} else {
+						isDone = true;
+					}
+				} else if ( PlayMode == EPlayMode.Normal ) {
+					if ( CurrentFrame < FrameCount ) {
+						CurrentFrame++;
+					} else {
+						isDone = true;
+					}
+				}
+
+				if ( isDone ) {
+					IsPlaying = false;
+
+					if ( OnFinished != null ) {
+						OnFinished.Invoke( this, new EventArgs() );
+					}
 				} else {
-					isPlaying = false;
+					timer = 0;
+
+					if ( OnFrame != null ) {
+						bool isMarker = markers.ContainsKey( CurrentFrame );
+						OnFrame.Invoke( this, new OnFrameEventArgs( CurrentFrame, isMarker, isMarker ? markers[CurrentFrame] : new Color() ) );
+					}
 				}
 			}
 		}
@@ -62,10 +112,7 @@ public class TimelineControl : ExtendedControl {
 			skin.fixedHeight = 0;
 		}
 
-		GUI.Label( Rectangle, "", GUI.skin.box );
-		EditorGUI.BeginDisabledGroup( true );
-		GUI.Label( Rectangle, Name );
-		EditorGUI.EndDisabledGroup();
+
 
 		var barYOffset = Rectangle.height * 0.8f;
 		var barHeight = Rectangle.height * 0.2f;
@@ -89,7 +136,7 @@ public class TimelineControl : ExtendedControl {
 						new Vector3( Rectangle.x + offset, Rectangle.y ),
 						new Vector3( Rectangle.x + offset, Rectangle.y + Rectangle.height - barHeight ) );
 
-				if ( !isPlaying ) {
+				if ( !IsPlaying ) {
 					var content = new GUIContent( ( lineOffset * i ).ToString() );
 					var size = GUI.skin.label.CalcSize( content );
 					GUI.Label( new Rect(
@@ -109,6 +156,8 @@ public class TimelineControl : ExtendedControl {
 		}
 
 		foreach ( var item in markers.Keys ) {
+			if ( item > FrameCount ) continue;
+
 			var hc = Handles.color;
 			Handles.color = markers[item];
 			Handles.DrawAAPolyLine( 2.5f,
@@ -133,38 +182,45 @@ public class TimelineControl : ExtendedControl {
 		GUI.Label( new Rect( Rectangle.x + ( linePositionX * CurrentFrame ) - ( scrubberSize.x / 2 ), Rectangle.y + barYOffset + ( barHeight / 2 ) - ( scrubberSize.y / 2 ), scrubberSize.x, scrubberSize.y ), scrubberContent );
 		GUI.skin.label.fontStyle = FontStyle.Normal;
 		GUI.color = gColor;
-
-		isScrubbing = false;
+		
 		if ( Input.ButtonDown( EMouseButton.Left ) ) {
 			if ( Rectangle.Contains( Input.MousePosition ) ) {
 				var p = Input.MousePosition.x - Position.x;
 				var fo = p / Rectangle.width;
 				CurrentFrame = Mathf.RoundToInt( FrameCount * fo );
-				isScrubbing = true;
 			}
 		}
 
-		if ( Input.IsDoubleClick && Input.Button == EMouseButton.Left ) {
-			var position = Input.MousePosition;
-			if ( Rectangle.Contains( position ) ) {
-				var p = position.x - Position.x;
-				var fo = p / Rectangle.width;
-				CurrentFrame = Mathf.FloorToInt( FrameCount * fo );
-				Play();
-			}
-		}
+		GUI.Label( Rectangle, "", GUI.skin.box );
+		EditorGUI.BeginDisabledGroup( true );
+		GUI.Label( Rectangle, Name );
+		EditorGUI.EndDisabledGroup();
 	}
 
 	public void Play() {
-		isPlaying = true;
+		PlayMode = EPlayMode.Normal;
+		IsPlaying = true;
+
+		if ( OnPlay != null ) {
+			OnPlay.Invoke( this, new EventArgs() );
+		}
+	}
+
+	public void Rewind() {
+		PlayMode = EPlayMode.Reversed;
+		IsPlaying = true;
+
+		if ( OnPlay != null ) {
+			OnPlay.Invoke( this, new EventArgs() );
+		}
 	}
 
 	public void Pause() {
-		isPlaying = false;
+		IsPlaying = false;
 	}
 
 	public void Stop() {
-		isPlaying = false;
+		IsPlaying = false;
 		CurrentFrame = 0;
 	}
 
@@ -174,6 +230,10 @@ public class TimelineControl : ExtendedControl {
 		} else {
 			markers.Add( frame, color );
 		}
+	}
+
+	public void ClearMarkers() {
+		markers.Clear();
 	}
 
 	public void RemoveMarker( int frame ) {

@@ -102,7 +102,6 @@ public class ListControl : ExtendedControl {
 			}
 		}
 
-
 		if ( mouseDown ) {
 			index = -1;
 

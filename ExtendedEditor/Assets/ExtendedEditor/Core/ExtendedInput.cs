@@ -176,6 +176,18 @@ namespace TNRD {
 			if ( !kStates.ContainsKey( key ) ) return false;
 			return kStates[key].IsUp(); ;
 		}
+
+		public void Reset() {
+			var keyStates = new Dictionary<KeyCode, State<bool>>( kStates );
+			foreach ( var item in keyStates ) {
+				SetValue( item.Key, false );
+			}
+
+			var mouseStates = new Dictionary<EMouseButton, State<bool>>( mStates );
+			foreach ( var item in mouseStates ) {
+				SetValue( item.Key, false );
+			}
+		}
 	}
 }
 #endif

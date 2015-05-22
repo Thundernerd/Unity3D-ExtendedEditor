@@ -149,7 +149,7 @@ namespace TNRD {
 							Camera += ScaleMatrix.inverse.MultiplyVector( Input.MouseDelta );
 						} else if ( Input.ButtonDown( EMouseButton.Right ) ) {
 							var delta = Input.MouseDelta / 1000f;
-							Camera.z -= delta.x;
+							Camera.z += delta.x;
 							Camera.z -= delta.y;
 
 							if ( Camera.z < 0.1f ) {
@@ -163,16 +163,16 @@ namespace TNRD {
 					}
 
 					if ( Input.KeyDown( KeyCode.LeftArrow ) ) {
-						Camera.x += cameraSpeed * Editor.DeltaTime;
+						Camera.x += ( cameraSpeed * ( 1f / Camera.z ) ) * Editor.DeltaTime;
 					}
 					if ( Input.KeyDown( KeyCode.RightArrow ) ) {
-						Camera.x -= cameraSpeed * Editor.DeltaTime;
+						Camera.x -= ( cameraSpeed * ( 1f / Camera.z ) ) * Editor.DeltaTime;
 					}
 					if ( Input.KeyDown( KeyCode.UpArrow ) ) {
-						Camera.y += cameraSpeed * Editor.DeltaTime;
+						Camera.y += ( cameraSpeed * ( 1f / Camera.z ) ) * Editor.DeltaTime;
 					}
 					if ( Input.KeyDown( KeyCode.DownArrow ) ) {
-						Camera.y -= cameraSpeed * Editor.DeltaTime;
+						Camera.y -= ( cameraSpeed * ( 1f / Camera.z ) ) * Editor.DeltaTime;
 					}
 				}
 			}
@@ -212,11 +212,9 @@ namespace TNRD {
 			BeginGUI();
 			OnGUI();
 			EndGUI();
-
 		}
 		public void BeginGUI() {
 			if ( Settings.UseCamera ) {
-				var wRect = WindowRect.ScaleSizeBy( 1f / Camera.z, WindowRect.TopLeft() );
 				var translation = Matrix4x4.TRS( WindowRect.TopLeft(), Quaternion.identity, Vector3.one );
 				var scale = Matrix4x4.Scale( new Vector3( Camera.z, Camera.z, 1f ) );
 				ScaleMatrix = translation * scale * translation.inverse * GUI.matrix;
