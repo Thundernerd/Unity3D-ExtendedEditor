@@ -9,8 +9,8 @@ namespace TNRD {
 
 	public class ExtendedWindow {
 
+		public ExtendedAssets Assets;
 		public ExtendedEditor Editor;
-
 		public ExtendedWindowSettings Settings;
 
 		public bool IsInitialized = false;
@@ -60,6 +60,7 @@ namespace TNRD {
 
 		#region Initialization
 		public virtual void OnInitialize() {
+			Assets = new ExtendedAssets( Settings.AssetPath, this );
 			WindowRect = new Rect( 0, 0, Editor.position.size.x, Editor.position.size.y );
 			IsInitialized = true;
 		}

@@ -9,42 +9,42 @@ using System.IO;
 namespace TNRD {
 	public class ExtendedEditor : EditorWindow {
 
-		[SerializeField]
-		private static Dictionary<Type, bool> instances = new Dictionary<Type, bool>();
-		public static T CreateWindow<T>( string title = "" ) where T : EditorWindow {
-			var t = typeof(T);
-			var attributes = t.GetCustomAttributes( false );
-			var allowMultiple = false;
-			foreach ( var item in attributes ) {
-				if ( item.GetType() == typeof(AllowMultipleWindowsAttribute) ) {
-					allowMultiple = true;
-					break;
-				}
-			}
-			if ( allowMultiple ) {
-				var instance = CreateInstance<T>();
-				if ( !string.IsNullOrEmpty( title ) ) {
-					instance.title = title;
-				}
-				return instance;
-			} else {
-				var type = typeof(T);
-				if ( !instances.ContainsKey( type ) ) {
-					instances.Add( type, false );
-				}
+		//[SerializeField]
+		//private static Dictionary<Type, bool> instances = new Dictionary<Type, bool>();
+		//public static T CreateWindow<T>( string title = "" ) where T : EditorWindow {
+		//	var t = typeof(T);
+		//	var attributes = t.GetCustomAttributes( false );
+		//	var allowMultiple = false;
+		//	foreach ( var item in attributes ) {
+		//		if ( item.GetType() == typeof(AllowMultipleWindowsAttribute) ) {
+		//			allowMultiple = true;
+		//			break;
+		//		}
+		//	}
+		//	if ( allowMultiple ) {
+		//		var instance = CreateInstance<T>();
+		//		if ( !string.IsNullOrEmpty( title ) ) {
+		//			instance.title = title;
+		//		}
+		//		return instance;
+		//	} else {
+		//		var type = typeof(T);
+		//		if ( !instances.ContainsKey( type ) ) {
+		//			instances.Add( type, false );
+		//		}
 
-				if ( instances[type] ) {
-					return GetWindow<T>();
-				} else {
-					instances[type] = true;
-					var instance = CreateInstance<T>();
-					if ( !string.IsNullOrEmpty( title ) ) {
-						instance.title = title;
-					}
-					return instance;
-				}
-			}
-		}
+		//		if ( instances[type] ) {
+		//			return GetWindow<T>();
+		//		} else {
+		//			instances[type] = true;
+		//			var instance = CreateInstance<T>();
+		//			if ( !string.IsNullOrEmpty( title ) ) {
+		//				instance.title = title;
+		//			}
+		//			return instance;
+		//		}
+		//	}
+		//}
 
 		[JsonProperty]
 		protected bool RepaintOnUpdate = false;
@@ -91,7 +91,7 @@ namespace TNRD {
 		}
 
 		protected virtual void OnDestroy() {
-			instances[GetType()] = false;
+			//instances[GetType()] = false;
 		}
 
 		protected virtual void OnFocus() {

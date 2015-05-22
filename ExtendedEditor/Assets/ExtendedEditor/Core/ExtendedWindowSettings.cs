@@ -2,6 +2,11 @@
 namespace TNRD {
 	public class ExtendedWindowSettings {
 
+		/// <summary>
+		/// Default is Assets/.../CurrentEditorFolder/Assets/
+		/// </summary>
+		public string AssetPath = "";
+
 		public bool DrawToolbar = false;
 		//public bool DrawCameraInfo = false;
 
