@@ -1,6 +1,6 @@
-﻿using Newtonsoft.Json;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using TNRD;
+using TNRD.JSON;
 using UnityEditor;
 using UnityEngine;
 
@@ -46,7 +46,7 @@ public class NoteWindow : ExtendedWindow {
 		foreach ( var item in controls ) {
 			notes.Add( NoteControl.Serializable.FromNote( item ) );
 		}
-		var json = JsonConvert.SerializeObject( notes, new ColorConverter() );
+		var json = JsonConvert.SerializeObject( notes );
 		EditorPrefs.SetString( scene, json );
 	}
 
@@ -57,7 +57,7 @@ public class NoteWindow : ExtendedWindow {
 		}
 		var json = EditorPrefs.GetString( EditorApplication.currentScene, "" );
 		if ( !string.IsNullOrEmpty( json ) ) {
-			var notes = JsonConvert.DeserializeObject<List<NoteControl.Serializable>>( json, new ColorConverter() );
+			var notes = JsonConvert.DeserializeObject<List<NoteControl.Serializable>>( json );
 			foreach ( var item in notes ) {
 				AddControl( NoteControl.Serializable.ToNote( item ) );
 			}
