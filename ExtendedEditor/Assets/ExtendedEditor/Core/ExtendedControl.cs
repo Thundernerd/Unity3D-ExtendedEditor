@@ -24,6 +24,9 @@ namespace TNRD {
 		[JsonProperty]
 		private int controlHint = -1;
 
+		[JsonIgnore]
+		private bool initializedGUI = false;
+
 		public ExtendedControl() { }
 
 		public virtual void OnInitialize() {
@@ -31,6 +34,10 @@ namespace TNRD {
 
 			var t = GetType();
 			controlHint = t.Name.GetHashCode();
+		}
+
+		public virtual void OnInitializeGUI() {
+			initializedGUI = true;
 		}
 
 		public virtual void OnDeserialized() {
@@ -45,7 +52,11 @@ namespace TNRD {
 		}
 
 		public virtual void Update( bool hasFocus ) { }
-		public virtual void OnGUI() { }
+		public virtual void OnGUI() {
+			if ( !initializedGUI ) {
+				OnInitializeGUI();
+			}
+		}
 
 		public int GetControlID( FocusType focus ) {
 			return GUIUtility.GetControlID( controlHint, focus );
