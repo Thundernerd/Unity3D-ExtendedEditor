@@ -1,13 +1,14 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System.Reflection;
 using TNRD;
 using UnityEditor;
+using UnityEngine;
 
 public class NoteEditor : ExtendedEditor {
 
 	[MenuItem("Window/Notes")]
 	private static void Create() {
-		var window = GetWindow<NoteEditor>( false, "Notes" );
+		var inspectorType = Assembly.Load( "UnityEditor" ).GetType( "UnityEditor.InspectorWindow" );
+		var window = GetWindow<NoteEditor>( "Notes", true, inspectorType );
 		window.minSize = new Vector2( 400, 400 );
 		window.Show();
 	}

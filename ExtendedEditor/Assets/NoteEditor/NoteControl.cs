@@ -1,8 +1,7 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System;
 using TNRD;
 using UnityEditor;
-using Newtonsoft.Json;
+using UnityEngine;
 
 public class NoteControl : ExtendedControl {
 
@@ -24,10 +23,10 @@ public class NoteControl : ExtendedControl {
 	private Vector2 textSize = new Vector2();
 	private GUIStyle textStyle;
 	private GUIStyle textAreaStyle;
-	
+
 	private Texture2D cross;
 	private Texture2D downArrow;
-	
+
 	private Color color;
 	public string Text { get; private set; }
 
@@ -49,15 +48,16 @@ public class NoteControl : ExtendedControl {
 		downArrow = Window.Assets["DownArrow"];
 	}
 
+	public override void OnInitializeGUI() {
+		base.OnInitializeGUI();
+
+		textStyle = new GUIStyle( GUI.skin.label );
+		textAreaStyle = new GUIStyle( GUI.skin.textArea );
+		textStyle.fontSize = textAreaStyle.fontSize = 20;
+	}
+
 	public override void OnGUI() {
 		base.OnGUI();
-
-		if ( textStyle == null ) {
-			textStyle = new GUIStyle( GUI.skin.label );
-			textAreaStyle = new GUIStyle( GUI.skin.textArea );
-
-			textStyle.fontSize = textAreaStyle.fontSize = 20;
-		}
 
 		var c = GUI.backgroundColor;
 		GUI.backgroundColor = color;
@@ -93,18 +93,15 @@ public class NoteControl : ExtendedControl {
 		GUI.DrawTexture( crossRect, cross );
 
 		if ( isEditing ) {
-			var prev = Text;
 			Text = GUI.TextArea( textRect, Text, textAreaStyle );
-			if ( Text != prev ) {
-				SaveNotes();
-			}
 		} else {
 			GUI.Label( textRect, Text, textStyle );
 		}
 
-		if ( Input.ButtonReleased( EMouseButton.Left ) ) {
+		if ( isEditing && Input.ButtonReleased( EMouseButton.Left ) ) {
 			if ( !textRect.Contains( Input.MousePosition ) ) {
 				isEditing = false;
+				SaveNotes();
 			}
 		}
 
@@ -113,10 +110,15 @@ public class NoteControl : ExtendedControl {
 				isEditing = true;
 			}
 		}
+
+		if ( isEditing && Input.KeyDown( KeyCode.Escape ) ) {
+			Text = Text.Trim( Environment.NewLine.ToCharArray() ).Trim();
+			isEditing = false;
+			SaveNotes();
+		}
 	}
 
 	public override void Update( bool hasFocus ) {
-		base.Update( hasFocus );
 		if ( textStyle == null ) return;
 
 		var boxWidth = Window.Size.x - 20;
@@ -127,12 +129,6 @@ public class NoteControl : ExtendedControl {
 
 		Size.Set( boxWidth, boxHeight );
 		textSize.Set( textWidth, textHeight );
-
-		if ( hasFocus ) {
-			if ( Input.KeyDown( KeyCode.Escape ) ) {
-				isEditing = false;
-			}
-		}
 	}
 
 	private void SetColor( object item ) {

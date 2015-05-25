@@ -1,9 +1,8 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 using TNRD;
 using UnityEditor;
-using System.Collections.Generic;
-using Newtonsoft.Json;
+using UnityEngine;
 
 public class NoteWindow : ExtendedWindow {
 
@@ -18,22 +17,9 @@ public class NoteWindow : ExtendedWindow {
 	}
 
 	public override void OnToolbarGUI() {
-		base.OnToolbarGUI();
-
 		if ( ExtendedGUI.ToolbarButton( "Add note" ) ) {
 			AddControl( new NoteControl() );
-			SaveNotes( EditorApplication.currentScene );
 		}
-	}
-
-	public void SaveNotes( string scene ) {
-		var controls = GetControls<NoteControl>();
-		var notes = new List<NoteControl.Serializable>();
-		foreach ( var item in controls ) {
-			notes.Add( NoteControl.Serializable.FromNote( item ) );
-		}
-		var json = JsonConvert.SerializeObject( notes, new ColorConverter() );
-		EditorPrefs.SetString( scene, json );
 	}
 
 	public override void Update( bool hasFocus ) {
@@ -52,6 +38,16 @@ public class NoteWindow : ExtendedWindow {
 			position.y += item.Size.y;
 			position.y += 10;
 		}
+	}
+
+	public void SaveNotes( string scene ) {
+		var controls = GetControls<NoteControl>();
+		var notes = new List<NoteControl.Serializable>();
+		foreach ( var item in controls ) {
+			notes.Add( NoteControl.Serializable.FromNote( item ) );
+		}
+		var json = JsonConvert.SerializeObject( notes, new ColorConverter() );
+		EditorPrefs.SetString( scene, json );
 	}
 
 	private void ReloadNotes() {
