@@ -41,14 +41,6 @@ namespace TNRD {
 		private static GUIStyle toolbarTextFieldStyle = new GUIStyle( EditorStyles.toolbarTextField );
 		private static GUIStyle dropdownPopupStyle = new GUIStyle( EditorStyles.popup );
 
-		public static void BeginToolbar() {
-			GUILayout.BeginHorizontal( toolbarStyle );
-		}
-		public static void EndToolbar() {
-			GUILayout.FlexibleSpace();
-			GUILayout.EndHorizontal();
-		}
-
 		#region Blocks
 		public static DisabledBlock DisabledBlock( bool disabled ) {
 			return new DisabledBlock( disabled );
@@ -103,6 +95,15 @@ namespace TNRD {
 		}
 		#endregion
 
+		#region Toolbar
+		public static void BeginToolbar() {
+			GUILayout.BeginHorizontal( toolbarStyle );
+		}
+		public static void EndToolbar() {
+			GUILayout.FlexibleSpace();
+			GUILayout.EndHorizontal();
+		}
+
 		public static bool ToolbarButton( string content ) {
 			return GUILayout.Button( content, toolbarButtonStyle );
 		}
@@ -141,10 +142,10 @@ namespace TNRD {
 			for ( int i = 0; i < items.Length; i++ ) {
 				contents[i] = new GUIContent( items[i] );
 			}
-			return doDropdownList( GUILayoutUtility.GetRect( contents[0], EditorStyles.toolbarPopup ), current, contents, toolbarPopupStyle );
+			return InternalDropdownList( GUILayoutUtility.GetRect( contents[0], EditorStyles.toolbarPopup ), current, contents, toolbarPopupStyle );
 		}
 		public static int ToolbarPopup( int current, GUIContent[] items ) {
-			return doDropdownList( GUILayoutUtility.GetRect( items[0], EditorStyles.toolbarPopup ), current, items, toolbarPopupStyle );
+			return InternalDropdownList( GUILayoutUtility.GetRect( items[0], EditorStyles.toolbarPopup ), current, items, toolbarPopupStyle );
 		}
 
 		public static string ToolbarTextfield( string content, float width = 100 ) {
@@ -174,6 +175,7 @@ namespace TNRD {
 			rect.y += 2;
 			return ToolbarSearchField( rect, content );
 		}
+		#endregion
 
 		private static List<Rect> positions = new List<Rect>();
 		private static Rect GetRect( Vector2 size ) {
@@ -348,25 +350,25 @@ namespace TNRD {
 			for ( int i = 0; i < items.Length; i++ ) {
 				contents[i] = new GUIContent( items[i] );
 			}
-			return doDropdownList( rect, current, contents, dropdownPopupStyle );
+			return InternalDropdownList( rect, current, contents, dropdownPopupStyle );
 		}
 		public static int DropdownList( int current, GUIContent[] items ) {
 			var size = GetDropdownSize( items, dropdownPopupStyle );
 			var rect = GetRect( size );
-			return doDropdownList( rect, current, items, dropdownPopupStyle );
+			return InternalDropdownList( rect, current, items, dropdownPopupStyle );
 		}
 		public static int DropdownList( Rect position, int current, string[] items ) {
 			GUIContent[] contents = new GUIContent[items.Length];
 			for ( int i = 0; i < items.Length; i++ ) {
 				contents[i] = new GUIContent( items[i] );
 			}
-			return doDropdownList( position, current, contents, dropdownPopupStyle );
+			return InternalDropdownList( position, current, contents, dropdownPopupStyle );
 		}
 		public static int DropdownList( Rect position, int current, GUIContent[] items ) {
-			return doDropdownList( position, current, items, dropdownPopupStyle );
+			return InternalDropdownList( position, current, items, dropdownPopupStyle );
 		}
 
-		private static int doDropdownList( Rect position, int current, GUIContent[] items, GUIStyle style ) {
+		private static int InternalDropdownList( Rect position, int current, GUIContent[] items, GUIStyle style ) {
 			if ( items.Length == 0 ) {
 				return -1;
 			}
