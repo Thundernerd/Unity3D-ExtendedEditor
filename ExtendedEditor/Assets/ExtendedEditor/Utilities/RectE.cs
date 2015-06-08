@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public static class _RectExtensions {
+public static class _RectE {
 
 	public static Vector2 TopLeft( this Rect rect ) {
 		return new Vector2( rect.xMin, rect.yMin );
