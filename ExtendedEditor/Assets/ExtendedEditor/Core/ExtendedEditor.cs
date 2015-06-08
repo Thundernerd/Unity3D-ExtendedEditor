@@ -3,8 +3,8 @@ using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
 using System;
-using Newtonsoft.Json;
 using System.IO;
+using TNRD.Json;
 
 namespace TNRD {
 	public class ExtendedEditor : EditorWindow {
@@ -413,7 +413,6 @@ namespace TNRD {
 
 		public void Deserialize<T>( string value ) where T : ExtendedEditor {
 			var settings = new JsonSerializerSettings();
-			settings.Converters.Add( new ExtendedEditorConverter() );
 			settings.TypeNameHandling = TypeNameHandling.Auto;
 
 			ExtendedEditor deserialized = null;

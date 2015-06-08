@@ -2,7 +2,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System;
-using Newtonsoft.Json;
+using TNRD.Json;
 using UnityEditor;
 
 namespace TNRD {

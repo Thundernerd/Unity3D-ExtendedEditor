@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using TNRD;
-using TNRD.JSON;
+using TNRD.Json;
 using UnityEditor;
 using UnityEngine;
 

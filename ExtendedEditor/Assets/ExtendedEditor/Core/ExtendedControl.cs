@@ -1,6 +1,6 @@
 ﻿#if UNITY_EDITOR
 using UnityEngine;
-using Newtonsoft.Json;
+using TNRD.Json;
 
 namespace TNRD {
 	public class ExtendedControl {

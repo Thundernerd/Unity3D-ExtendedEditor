@@ -1,7 +1,7 @@
 ﻿#if UNITY_EDITOR
 using UnityEngine;
 using System.Collections.Generic;
-using Newtonsoft.Json;
+using TNRD.Json;
 
 namespace TNRD {
 	public class SelectorControl : ExtendedControl {
