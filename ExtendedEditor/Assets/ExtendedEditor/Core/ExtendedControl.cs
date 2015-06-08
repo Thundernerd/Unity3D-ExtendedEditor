@@ -1,6 +1,7 @@
 ﻿#if UNITY_EDITOR
-using UnityEngine;
 using TNRD.Json;
+using UnityEditor;
+using UnityEngine;
 
 namespace TNRD {
 	public class ExtendedControl {
@@ -57,6 +58,7 @@ namespace TNRD {
 				OnInitializeGUI();
 			}
 		}
+		public virtual void OnSceneGUI( SceneView view ) { }
 
 		public int GetControlID( FocusType focus ) {
 			return GUIUtility.GetControlID( controlHint, focus );

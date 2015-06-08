@@ -13,6 +13,7 @@ namespace TNRD {
 		public bool IsFullscreen = true;
 
 		public bool UseCamera = false;
+		public bool UseOnSceneGUI = false;
 	}
 }
 #endif

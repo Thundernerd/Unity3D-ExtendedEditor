@@ -1,9 +1,9 @@
 ﻿#if UNITY_EDITOR
-using UnityEngine;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 using TNRD.Json;
 using UnityEditor;
+using UnityEngine;
 
 namespace TNRD {
 
@@ -61,6 +61,9 @@ namespace TNRD {
 		#region Initialization
 		public virtual void OnInitialize() {
 			Assets = new ExtendedAssets( Settings.AssetPath, this );
+			if ( Settings.UseOnSceneGUI ) {
+				SceneView.onSceneGUIDelegate += OnSceneGUI;
+			}
 			WindowRect = new Rect( 0, 0, Editor.position.size.x, Editor.position.size.y );
 			IsInitialized = true;
 		}
@@ -107,6 +110,10 @@ namespace TNRD {
 		}
 
 		public virtual void OnDestroy() {
+			if ( Settings.UseOnSceneGUI ) {
+				SceneView.onSceneGUIDelegate -= OnSceneGUI;
+			}
+
 			IsInitialized = false;
 		}
 		#endregion
@@ -176,6 +183,12 @@ namespace TNRD {
 						Camera.y -= ( cameraSpeed * ( 1f / Camera.z ) ) * Editor.DeltaTime;
 					}
 				}
+			}
+		}
+
+		public virtual void OnSceneGUI( SceneView view ) {
+			foreach ( var item in Controls ) {
+				item.OnSceneGUI( view );
 			}
 		}
 
