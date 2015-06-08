@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using TNRD;
 using TNRD.Json;
 using UnityEditor;
@@ -40,14 +41,14 @@ public class NoteWindow : ExtendedWindow {
 		}
 	}
 
-	public void SaveNotes( string scene ) {
+	public void SaveNotes() {
 		var controls = GetControls<NoteControl>();
 		var notes = new List<NoteControl.Serializable>();
 		foreach ( var item in controls ) {
 			notes.Add( NoteControl.Serializable.FromNote( item ) );
 		}
 		var json = JsonConvert.SerializeObject( notes );
-		EditorPrefs.SetString( scene, json );
+		File.WriteAllText( GetNotePath(), json );
 	}
 
 	private void ReloadNotes() {
@@ -55,12 +56,22 @@ public class NoteWindow : ExtendedWindow {
 		foreach ( var item in controls ) {
 			RemoveControl( item );
 		}
-		var json = EditorPrefs.GetString( EditorApplication.currentScene, "" );
-		if ( !string.IsNullOrEmpty( json ) ) {
-			var notes = JsonConvert.DeserializeObject<List<NoteControl.Serializable>>( json );
-			foreach ( var item in notes ) {
-				AddControl( NoteControl.Serializable.ToNote( item ) );
+		//var json = EditorPrefs.GetString( EditorApplication.currentScene, "" );
+		if ( File.Exists( GetNotePath() ) ) {
+			var json = File.ReadAllText( GetNotePath() );
+			if ( !string.IsNullOrEmpty( json ) ) {
+				var notes = JsonConvert.DeserializeObject<List<NoteControl.Serializable>>( json );
+				foreach ( var item in notes ) {
+					AddControl( NoteControl.Serializable.ToNote( item ) );
+				}
 			}
 		}
+	}
+
+	private string GetNotePath() {
+		var scenePath = EditorApplication.currentScene;
+		var sceneName = Path.GetFileNameWithoutExtension( scenePath );
+		var folderPath = Path.GetDirectoryName( scenePath );
+		return Path.Combine( folderPath, sceneName + ".notes" );
 	}
 }

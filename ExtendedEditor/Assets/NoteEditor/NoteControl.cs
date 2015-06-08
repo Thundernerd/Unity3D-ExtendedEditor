@@ -137,6 +137,6 @@ public class NoteControl : ExtendedControl {
 	}
 
 	private void SaveNotes() {
-		( Window as NoteWindow ).SaveNotes( EditorApplication.currentScene );
+		( Window as NoteWindow ).SaveNotes();
 	}
 }
