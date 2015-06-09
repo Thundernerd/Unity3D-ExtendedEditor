@@ -3,11 +3,17 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using Newtonsoft.Json;
 
 namespace TNRD {
 	public class ExtendedAssets {
 		private Dictionary<string, Texture2D> textures;
+		[JsonProperty]
 		private string path;
+
+		public ExtendedAssets() {
+			textures = new Dictionary<string, Texture2D>();
+		}
 
 		public ExtendedAssets( string path, ExtendedWindow window ) {
 			if ( string.IsNullOrEmpty( path ) ) {

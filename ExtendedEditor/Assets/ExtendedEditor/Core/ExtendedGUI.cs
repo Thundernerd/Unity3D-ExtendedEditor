@@ -77,7 +77,7 @@ namespace TNRD {
 		public static ScrollBlock ScrollBlock( ref Vector2 scrollPosition, bool alwaysShowHorizontal, bool alwaysShowVertical, GUIStyle horizontalScrollbar, GUIStyle verticalScrollbar, GUIStyle background, params GUILayoutOption[] options ) {
 			return new ScrollBlock( ref scrollPosition, alwaysShowHorizontal, alwaysShowVertical, horizontalScrollbar, verticalScrollbar, background, options );
 		}
-		
+
 		public static ToggleBlock ToggleBlock( string label, ref bool toggle ) {
 			return new ToggleBlock( label, ref toggle );
 		}
@@ -343,6 +343,22 @@ namespace TNRD {
 			return new Vector2( width * 1.1f, height );
 		}
 
+		public static int DropdownList( string label, int current, string[] items ) {
+			var rect = EditorGUILayout.GetControlRect();
+			var rwidth = 150;
+			var labelRect = new Rect( rect.x, rect.y, rwidth, rect.height );
+			var dropdownRect = new Rect( rect.x + rwidth, rect.y, rect.width - rwidth, rect.height );
+			EditorGUI.LabelField( labelRect, "Platform material" );
+			return DropdownList( dropdownRect, current, items );
+		}
+		public static int DropdownList( string label, int current, GUIContent[] items ) {
+			var rect = EditorGUILayout.GetControlRect();
+			var rwidth = 150;
+			var labelRect = new Rect( rect.x, rect.y, rwidth, rect.height );
+			var dropdownRect = new Rect( rect.x + rwidth, rect.y, rect.width - rwidth, rect.height );
+			EditorGUI.LabelField( labelRect, "Platform material" );
+			return DropdownList( dropdownRect, current, items );
+		}
 		public static int DropdownList( int current, string[] items ) {
 			var size = GetDropdownSize( items, dropdownPopupStyle );
 			var rect = GetRect( size );
@@ -370,7 +386,7 @@ namespace TNRD {
 
 		private static int InternalDropdownList( Rect position, int current, GUIContent[] items, GUIStyle style ) {
 			if ( items.Length == 0 ) {
-				return -1;
+				items = new GUIContent[] { new GUIContent( "-" ) };
 			}
 
 			int controlID = GUIUtility.GetControlID( dropdownHash, FocusType.Native, position );

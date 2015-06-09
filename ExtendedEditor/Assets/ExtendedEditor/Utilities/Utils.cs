@@ -1,7 +1,9 @@
 ﻿#if UNITY_EDITOR
 using System;
+using System.IO;
 using System.Reflection;
 using UnityEditor;
+using UnityEngine;
 
 namespace TNRD {
 	public class Utils {
@@ -69,6 +71,54 @@ namespace TNRD {
 			get {
 				return Assembly.Load( "UnityEditor" ).GetType( "UnityEditor.AudioMixerWindow" );
 			}
+		}
+
+		/// <summary>
+		/// Returns an array of file names that are formatted for <see cref="ExtendedGUI.DropdownList(int, string[])"/>
+		/// </summary>
+		/// <param name="directory">The directory to search for files</param>
+		/// <param name="searchPattern">The search string. For example "System*" can be used for all directories that start with word "System". </param>
+		/// <param name="searchOption">One of the enumeration values that specifies whether the search operation should include only the current directory or all subdirectories.</param>
+		/// <returns></returns>
+		public static string[] GetFiles( string directory, string searchPattern = "*", SearchOption searchOption = SearchOption.TopDirectoryOnly ) {
+			directory = directory.Trim( '/', '\\' );
+			directory += "/";
+
+			var dirInfo = new DirectoryInfo( string.Format( "{0}/{1}", Application.dataPath, directory ) );
+			var files = dirInfo.GetFiles( searchPattern, searchOption );
+			var values = new string[files.Length];
+
+			var dir = string.Format( "{0}/{1}", Application.dataPath, directory ).Replace( '/', '\\' );
+			for ( int i = 0; i < files.Length; i++ ) {
+				var value = files[i].FullName.Replace( dir, "" ).Replace( ".prefab", "" );
+				values[i] = value.Replace( '\\', '/' );
+			}
+
+			return values;
+		}
+
+		/// <summary>
+		/// Returns an array of directory names that are formatted for <see cref="ExtendedGUI.DropdownList(int, string[])"/>
+		/// </summary>
+		/// <param name="directory">The directory to search for directories</param>
+		/// <param name="searchPattern">The search string. For example "System*" can be used for all directories that start with word "System". </param>
+		/// <param name="searchOption">One of the enumeration values that specifies whether the search operation should include only the current directory or all subdirectories.</param>
+		/// <returns></returns>
+		public static string[] GetDirectories( string directory, string searchPattern = "*", SearchOption searchOption = SearchOption.TopDirectoryOnly ) {
+			directory = directory.Trim( '/', '\\' );
+			directory += "/";
+
+			var dirInfo = new DirectoryInfo( string.Format( "{0}/{1}", Application.dataPath, directory ) );
+			var directories = dirInfo.GetDirectories( searchPattern, searchOption );
+			var values = new string[directories.Length];
+
+			var dir = string.Format( "{0}/{1}", Application.dataPath, directory ).Replace( '/', '\\' );
+			for ( int i = 0; i < directories.Length; i++ ) {
+				var value = directories[i].FullName.Replace( dir, "" ).Replace( ".prefab", "" );
+				values[i] = value.Replace( '\\', '/' );
+			}
+
+			return values;
 		}
 	}
 }
