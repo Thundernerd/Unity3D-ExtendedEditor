@@ -1,11 +1,10 @@
 ﻿#if UNITY_EDITOR
-using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using Newtonsoft.Json;
+using TNRD.Json;
+using UnityEngine;
 
-namespace TNRD {
+namespace TNRD.Editor {
 	public class ExtendedAssets {
 		private Dictionary<string, Texture2D> textures;
 		[JsonProperty]

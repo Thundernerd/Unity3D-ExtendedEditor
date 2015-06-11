@@ -1,5 +1,6 @@
 ﻿#if UNITY_EDITOR
-namespace TNRD {
+
+namespace TNRD.Editor {
 	public enum EMouseButton {
 		None = -1,
 		Left = 0,

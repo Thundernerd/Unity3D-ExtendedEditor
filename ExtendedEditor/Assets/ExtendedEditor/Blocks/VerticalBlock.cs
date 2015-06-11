@@ -5,7 +5,7 @@ using UnityEngine;
 
 // Taken from https://github.com/nickgravelyn/UnityToolbag/tree/master/EditorTools
 
-namespace TNRD {
+namespace TNRD.Editor {
 	public class VerticalBlock : IDisposable {
 
 		public VerticalBlock( params GUILayoutOption[] options ) {

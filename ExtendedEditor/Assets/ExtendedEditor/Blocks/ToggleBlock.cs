@@ -5,7 +5,7 @@ using UnityEngine;
 
 // Inspired by https://github.com/nickgravelyn/UnityToolbag/tree/master/EditorTools
 
-namespace TNRD {
+namespace TNRD.Editor {
 	public class ToggleBlock : IDisposable {
 
 		public ToggleBlock( string label, ref bool toggle ) {

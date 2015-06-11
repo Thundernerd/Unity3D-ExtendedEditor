@@ -3,7 +3,7 @@ using TNRD.Json;
 using UnityEditor;
 using UnityEngine;
 
-namespace TNRD {
+namespace TNRD.Editor {
 	public class ExtendedControl {
 
 		public ExtendedWindow Window;

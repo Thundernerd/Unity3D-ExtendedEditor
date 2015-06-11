@@ -4,7 +4,7 @@ using UnityEditor;
 
 // Inspired by https://github.com/nickgravelyn/UnityToolbag/tree/master/EditorTools
 
-namespace TNRD {
+namespace TNRD.Editor {
 	public class DisabledBlock : IDisposable {
 
 		public DisabledBlock( bool disabled ) {

@@ -3,7 +3,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using TNRD.Json;
 
-namespace TNRD {
+namespace TNRD.Editor {
 	public class SelectorControl : ExtendedControl {
 
 		[JsonIgnore]

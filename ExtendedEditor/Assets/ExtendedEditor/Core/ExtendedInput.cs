@@ -3,7 +3,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System;
 
-namespace TNRD {
+namespace TNRD.Editor {
 	public class ExtendedInput {
 
 		private Dictionary<KeyCode, State<bool>> kStates = new Dictionary<KeyCode, State<bool>>();

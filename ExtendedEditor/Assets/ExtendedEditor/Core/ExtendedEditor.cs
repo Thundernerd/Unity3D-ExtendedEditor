@@ -6,7 +6,7 @@ using System;
 using System.IO;
 using TNRD.Json;
 
-namespace TNRD {
+namespace TNRD.Editor {
 	public class ExtendedEditor : EditorWindow {
 
 		[JsonProperty]

@@ -1,6 +1,7 @@
 ﻿#if UNITY_EDITOR
 using UnityEngine;
-namespace TNRD {
+
+namespace TNRD.Editor {
 	public class ExtendedInputDialog : ExtendedModalWindow {
 
 		public string InputText = "";

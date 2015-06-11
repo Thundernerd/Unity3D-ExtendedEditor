@@ -5,7 +5,7 @@ using UnityEditor;
 using System.Reflection;
 using System;
 
-namespace TNRD {
+namespace TNRD.Editor {
 	public class ExtendedGUI {
 
 		#region Horizontal Line

@@ -1,5 +1,6 @@
 ﻿#if UNITY_EDITOR
-namespace TNRD {
+
+namespace TNRD.Editor {
 	public class ExtendedWindowSettings {
 
 		/// <summary>

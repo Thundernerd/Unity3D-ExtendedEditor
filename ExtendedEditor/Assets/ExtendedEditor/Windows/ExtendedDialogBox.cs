@@ -1,7 +1,7 @@
 ﻿#if UNITY_EDITOR
 using UnityEngine;
 
-namespace TNRD {
+namespace TNRD.Editor {
 	public class ExtendedDialogBox : ExtendedModalWindow {
 
 		private string message = "";
