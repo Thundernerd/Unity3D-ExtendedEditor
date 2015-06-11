@@ -58,6 +58,12 @@ namespace TNRD.Editor {
 			textures.Add( key, tex );
 			return textures[key];
 		}
+
+		public void Destroy( ExtendedWindow window ) {
+			foreach ( var item in textures ) {
+				window.Editor.DestroyAsset( item.Value );
+			}
+		}
 	}
 }
 #endif

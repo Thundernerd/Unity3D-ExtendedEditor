@@ -114,6 +114,8 @@ namespace TNRD.Editor {
 				SceneView.onSceneGUIDelegate -= OnSceneGUI;
 			}
 
+			Assets.Destroy( this );
+
 			IsInitialized = false;
 		}
 		#endregion
