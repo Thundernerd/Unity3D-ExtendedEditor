@@ -1,38 +1,35 @@
-﻿using UnityEngine;
-using System.Collections;
-using System;
+﻿using TNRD.Editor;
+using UnityEngine;
 
-namespace TNRD {
-	public class TestDraggableControl : SelectableControl {
+public class TestDraggableControl : SelectableControl {
 
-		public override Vector2 Center() {
-			return Rectangle.center;
-		}
+	public override Vector2 Center() {
+		return Rectangle.center;
+	}
 
-		public override bool Contains( Vector2 value ) {
-			return Rectangle.Contains( value );
-		}
+	public override bool Contains( Vector2 value ) {
+		return Rectangle.Contains( value );
+	}
 
-		private Color color = Color.red;
+	private Color color = Color.red;
 
-		public override void OnSelect() {
-			base.OnSelect();
-			color = Color.green;
-		}
+	public override void OnSelect() {
+		base.OnSelect();
+		color = Color.green;
+	}
 
-		public override void OnDeselect() {
-			base.OnDeselect();
-			color = Color.red;
-		}
+	public override void OnDeselect() {
+		base.OnDeselect();
+		color = Color.red;
+	}
 
-		public override void OnGUI() {
-			base.OnGUI();
+	public override void OnGUI() {
+		base.OnGUI();
 
-			var c = GUI.color;
-			GUI.color = color;
-			GUI.Box( Rectangle, "" );
-			GUI.Box( Rectangle, "" );
-			GUI.color = c;
-		}
+		var c = GUI.color;
+		GUI.color = color;
+		GUI.Box( Rectangle, "" );
+		GUI.Box( Rectangle, "" );
+		GUI.color = c;
 	}
 }

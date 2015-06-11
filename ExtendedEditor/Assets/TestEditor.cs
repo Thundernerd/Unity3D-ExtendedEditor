@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-using System.Collections;
-using TNRD;
+﻿using TNRD.Editor;
 using UnityEditor;
 
 public class TestEditor : ExtendedEditor {
