@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿if UNITY_EDITOR
+using UnityEngine;
 using System.Collections.Generic;
 using UnityEditor;
 using System;
@@ -166,3 +167,4 @@ namespace TNRD.Editor {
 		}
 	}
 }
+#endif

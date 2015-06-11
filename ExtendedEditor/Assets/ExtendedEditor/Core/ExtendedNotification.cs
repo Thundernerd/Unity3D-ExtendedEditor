@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿#if UNITY_EDITOR
+using UnityEngine;
 
 public class ExtendedNotification {
 	public GUIContent Text;
@@ -15,3 +16,4 @@ public class ExtendedNotification {
 		Size.y = style.CalcHeight( Text, Size.x );
 	}
 }
+#endif
