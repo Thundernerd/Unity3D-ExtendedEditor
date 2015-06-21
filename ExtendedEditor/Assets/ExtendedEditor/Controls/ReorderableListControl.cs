@@ -8,6 +8,17 @@ using UnityEngine;
 namespace TNRD.Editor {
 	public class ReorderableListControl<T> : ExtendedControl {
 
+		public class ReorderableListEventArgs : EventArgs {
+			public readonly ReorderableList List;
+			public readonly T Item;
+
+			public ReorderableListEventArgs() : base() { }
+			public ReorderableListEventArgs( ReorderableList list, T item ) : this() {
+				List = list;
+				Item = item;
+			}
+		}
+
 		private enum EListType {
 			Int,
 			Float,
@@ -30,6 +41,9 @@ namespace TNRD.Editor {
 		/// Enables custom drawing for every element. Parameters are: rect, index, isActive, isFocused
 		/// </summary>
 		public Action<Rect, int, bool, bool> DrawElement;
+
+		public event EventHandler<ReorderableListEventArgs> OnAddedItem;
+		public event EventHandler<ReorderableListEventArgs> OnRemovedItem;
 
 		public ReorderableListControl( string label = "" )
 			: this( label, new List<T>() ) { }
@@ -86,15 +100,11 @@ namespace TNRD.Editor {
 
 			if ( Input.ButtonReleased( EMouseButton.Left ) ) {
 				if ( !Rectangle.Contains( Input.MousePosition ) ) {
-					GUIUtility.hotControl = 0;
-					GUIUtility.keyboardControl = 0;
 					rList.index = -1;
 				}
 			}
 
 			if ( Input.KeyReleased( KeyCode.Escape ) ) {
-				GUIUtility.hotControl = 0;
-				GUIUtility.keyboardControl = 0;
 				rList.index = -1;
 				Event.current.Use();
 			}
@@ -114,12 +124,22 @@ namespace TNRD.Editor {
 			rList.list.RemoveAt( index );
 		}
 
-		public List<T> GetList() {
-			return (List<T>)rList.list;
+		public void Clear() {
+			rList.list.Clear();
+		}
+
+		public List<T> Items {
+			get {
+				return (List<T>)rList.list;
+			}
 		}
 
 		protected void AddInternal( ReorderableList list ) {
-			list.list.Add( default(T) );
+			try {
+				list.list.Add( Activator.CreateInstance<T>() );
+			} catch ( MissingMethodException) {
+				list.list.Add( default(T) );
+			}
 		}
 
 		private void RemoveInternal( ReorderableList list ) {
