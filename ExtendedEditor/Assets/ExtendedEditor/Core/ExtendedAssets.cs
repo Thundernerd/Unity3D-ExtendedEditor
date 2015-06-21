@@ -4,7 +4,7 @@ using System.IO;
 using TNRD.Json;
 using UnityEngine;
 
-namespace TNRD.Editor {
+namespace TNRD.Editor.Core {
 	public class ExtendedAssets {
 		private Dictionary<string, Texture2D> textures;
 		[JsonProperty]

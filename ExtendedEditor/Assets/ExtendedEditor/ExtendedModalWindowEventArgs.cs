@@ -1,7 +1,7 @@
 ﻿#if UNITY_EDITOR
 using System;
 
-namespace TNRD.Editor {
+namespace TNRD.Editor.Core {
 	public class ExtendedModalWindowEventArgs : EventArgs {
 
 		public ExtendedModalWindow Window { get; private set; }

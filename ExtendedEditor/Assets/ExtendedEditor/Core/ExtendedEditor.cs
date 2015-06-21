@@ -1,12 +1,12 @@
 ﻿#if UNITY_EDITOR
-using UnityEngine;
-using UnityEditor;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using TNRD.Json;
+using UnityEditor;
+using UnityEngine;
 
-namespace TNRD.Editor {
+namespace TNRD.Editor.Core {
 	public class ExtendedEditor : EditorWindow {
 
 		[JsonProperty]

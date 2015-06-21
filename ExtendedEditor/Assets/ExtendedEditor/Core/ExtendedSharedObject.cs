@@ -1,6 +1,6 @@
 ﻿#if UNITY_EDITOR
 
-namespace TNRD.Editor {
+namespace TNRD.Editor.Core {
 	public class ExtendedSharedObject {
 
 		public ExtendedSharedObject() { }

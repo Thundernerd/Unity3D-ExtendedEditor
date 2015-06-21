@@ -1,9 +1,10 @@
 ﻿#if UNITY_EDITOR
-using UnityEngine;
 using System.Collections.Generic;
+using TNRD.Editor.Core;
 using TNRD.Json;
+using UnityEngine;
 
-namespace TNRD.Editor {
+namespace TNRD.Editor.Controls {
 	public class SelectorControl : ExtendedControl {
 
 		[JsonIgnore]

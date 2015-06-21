@@ -5,7 +5,7 @@ using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
-namespace TNRD.Editor {
+namespace TNRD.Editor.Utilities {
 	public class Utils {
 
 		/// <summary>

@@ -1,9 +1,9 @@
 ﻿#if UNITY_EDITOR
-using UnityEngine;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
+using UnityEngine;
 
-namespace TNRD.Editor {
+namespace TNRD.Editor.Core {
 	public class ExtendedInput {
 
 		private Dictionary<KeyCode, State<bool>> kStates = new Dictionary<KeyCode, State<bool>>();

@@ -1,7 +1,7 @@
 ﻿#if UNITY_EDITOR
 using UnityEngine;
 
-namespace TNRD.Editor {
+namespace TNRD.Editor.Core {
 	public class ExtendedModalWindow {
 
 		public ExtendedEditor Editor;

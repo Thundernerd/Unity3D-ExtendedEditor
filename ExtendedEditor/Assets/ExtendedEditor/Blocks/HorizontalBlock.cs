@@ -5,7 +5,7 @@ using UnityEditor;
 
 // Taken from https://github.com/nickgravelyn/UnityToolbag/tree/master/EditorTools
 
-namespace TNRD.Editor {
+namespace TNRD.Editor.Blocks {
 	public class HorizontalBlock : IDisposable {
 
 		public HorizontalBlock( params GUILayoutOption[] options ) {

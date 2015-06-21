@@ -4,7 +4,7 @@ using UnityEditor;
 
 // Taken from https://github.com/nickgravelyn/UnityToolbag/tree/master/EditorTools
 
-namespace TNRD.Editor {
+namespace TNRD.Editor.Blocks {
 	public class IndentBlock : IDisposable {
 
 		private int indent = 1;

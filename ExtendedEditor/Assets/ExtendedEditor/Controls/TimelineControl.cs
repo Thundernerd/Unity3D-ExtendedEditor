@@ -1,10 +1,11 @@
 ﻿#if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
+using TNRD.Editor.Core;
 using UnityEditor;
 using UnityEngine;
 
-namespace TNRD.Editor {
+namespace TNRD.Editor.Controls {
 	public class TimelineControl : ExtendedControl {
 
 		public enum EPlayMode {

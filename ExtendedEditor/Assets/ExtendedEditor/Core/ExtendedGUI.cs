@@ -1,11 +1,12 @@
 ﻿#if UNITY_EDITOR
-using UnityEngine;
-using System.Collections.Generic;
-using UnityEditor;
-using System.Reflection;
 using System;
+using System.Collections.Generic;
+using System.Reflection;
+using TNRD.Editor.Blocks;
+using UnityEditor;
+using UnityEngine;
 
-namespace TNRD.Editor {
+namespace TNRD.Editor.Core {
 	public class ExtendedGUI {
 
 		#region Horizontal Line
