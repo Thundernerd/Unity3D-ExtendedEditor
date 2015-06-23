@@ -10,6 +10,7 @@ namespace TNRD.Editor.Core {
 	public class ExtendedWindow {
 
 		public ExtendedAssets Assets;
+		[JsonIgnore]
 		public ExtendedEditor Editor;
 		public ExtendedWindowSettings Settings;
 
@@ -21,11 +22,13 @@ namespace TNRD.Editor.Core {
 		public GUIStyle WindowStyle = null;
 		#endregion
 
+		[JsonIgnore]
 		public Vector2 Position {
 			get {
 				return WindowRect.position;
 			}
 		}
+		[JsonIgnore]
 		public Vector2 Size {
 			get {
 				return WindowRect.size;
@@ -35,7 +38,7 @@ namespace TNRD.Editor.Core {
 		public Vector3 Camera = new Vector3( 0, 0, 1 );
 		[JsonIgnore]
 		public Matrix4x4 ScaleMatrix = Matrix4x4.identity;
-
+		[JsonIgnore]
 		public ExtendedInput Input { get { return Editor.Input; } }
 
 		[JsonProperty]
@@ -61,9 +64,11 @@ namespace TNRD.Editor.Core {
 		#region Initialization
 		public virtual void OnInitialize() {
 			Assets = new ExtendedAssets( Settings.AssetPath, this );
+
 			if ( Settings.UseOnSceneGUI ) {
 				SceneView.onSceneGUIDelegate += OnSceneGUI;
 			}
+
 			WindowRect = new Rect( 0, 0, Editor.position.size.x, Editor.position.size.y );
 			IsInitialized = true;
 		}
@@ -77,6 +82,8 @@ namespace TNRD.Editor.Core {
 		}
 
 		public virtual void OnDeserialized() {
+			Assets = new ExtendedAssets( Settings.AssetPath, this );
+
 			for ( int i = 0; i < Controls.Count; i++ ) {
 				if ( Controls[i] != null ) {
 					Controls[i].Window = this;
@@ -260,6 +267,7 @@ namespace TNRD.Editor.Core {
 			}
 
 			GUILayout.BeginArea( area );
+			ExtendedGUI.BeginArea( new ExtendedGUIOption() { Type = ExtendedGUIOption.EType.WindowSize, Value = area.size } );
 
 			foreach ( var item in ControlsToProcess ) {
 				item.OnGUI();
@@ -273,7 +281,8 @@ namespace TNRD.Editor.Core {
 				pos.y += 17.5f;
 				Input.MousePosition = pos;
 			}
-			// End the area started in BeginGUI
+
+			ExtendedGUI.EndArea();
 			GUILayout.EndArea();
 
 			var backgroundColor = GUI.backgroundColor;

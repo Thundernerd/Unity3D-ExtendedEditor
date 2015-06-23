@@ -43,6 +43,10 @@ namespace TNRD.Editor.Core {
 		private static GUIStyle dropdownPopupStyle = new GUIStyle( EditorStyles.popup );
 
 		#region Blocks
+		public static AreaBlock AreaBlock( params ExtendedGUIOption[] options ) {
+			return new AreaBlock( options );
+		}
+
 		public static DisabledBlock DisabledBlock( bool disabled ) {
 			return new DisabledBlock( disabled );
 		}
@@ -178,91 +182,66 @@ namespace TNRD.Editor.Core {
 		}
 		#endregion
 
-		private static List<Rect> positions = new List<Rect>();
-		private static Rect GetRect( Vector2 size ) {
-			if ( positions.Count == 0 ) {
-				Debug.LogError( "You have to begin a group first!" );
-				return new Rect();
+		#region ControlRect
+		private static Vector2 windowSize;
+
+		public static void BeginArea( params ExtendedGUIOption[] options ) {
+			float x = 0, y = 0, w = 0, h = 0;
+			foreach ( var item in options ) {
+				switch ( item.Type ) {
+					case ExtendedGUIOption.EType.Width:
+						w = (float)item.Value;
+						break;
+					case ExtendedGUIOption.EType.Height:
+						h = (float)item.Value;
+						break;
+					case ExtendedGUIOption.EType.HorizontalPosition:
+						x = (float)item.Value;
+						break;
+					case ExtendedGUIOption.EType.VerticalPosition:
+						y = (float)item.Value;
+						break;
+					case ExtendedGUIOption.EType.Position:
+						var v = (Vector2)item.Value;
+						x = v.x;
+						y = v.y;
+						break;
+					case ExtendedGUIOption.EType.WindowSize:
+						windowSize = (Vector2)item.Value;
+						break;
+				}
 			}
 
-			var r = positions[positions.Count - 1];
-			var r2 = new Rect( r.x, r.y, size.x, size.y );
-			r.y += size.y;
-			positions[positions.Count - 1] = r;
-			return r2;
-		}
-		public static void Clear() {
-			positions.Clear();
-		}
-
-		public static void BeginGroup( Rect position ) {
-			positions.Add( position );
-		}
-		public static void BeginGroup( Rect position, Vector2 offset ) {
-			position.position += offset;
-			positions.Add( position );
-		}
-		public static void EndGroup() {
-			if ( positions.Count > 0 ) {
-				positions.RemoveAt( positions.Count - 1 );
+			if ( w == 0 ) {
+				w = windowSize.x - x;
 			}
-		}
-
-		public static void Space() {
-			Space( 5 );
-		}
-		public static void Space( float pixels ) {
-			if ( positions.Count > 0 ) {
-				Offset( 0, pixels );
+			if ( h == 0 ) {
+				h = windowSize.y - y;
 			}
-		}
-		public static void Offset( float x, float y ) {
-			if ( positions.Count > 0 ) {
-				var r = positions[positions.Count - 1];
-				r.x += x;
-				r.width -= x * 2;
-				r.y += y;
-				positions[positions.Count - 1] = r;
-			}
-		}
 
-		public static void Label( string content ) {
-			var size = GUI.skin.label.CalcSize( new GUIContent( content ) );
-			var rect = GetRect( size );
-			GUI.Label( rect, content );
+			GUILayout.BeginArea( new Rect( x, y, w, h ) );
 		}
+		public static void EndArea() {
+			GUILayout.EndArea();
+		}
+		
+		public static Rect GetControlRect( params GUILayoutOption[] options ) {
+			return GUILayoutUtility.GetRect( GUIContent.none, EditorStyles.layerMaskField, options );
+		}
+		public static Rect GetControlRect( GUIContent content, params GUILayoutOption[] options ) {
+			return GUILayoutUtility.GetRect( content, EditorStyles.layerMaskField, options );
+		}
+		public static Rect GetControlRect( GUIContent content, GUIStyle style, params GUILayoutOption[] options ) {
+			return GUILayoutUtility.GetRect( content, style, options );
+		}
+		#endregion
+
 		public static void Label( string content, int fontSize ) {
 			var pFontSize = GUI.skin.label.fontSize;
 			GUI.skin.label.fontSize = fontSize;
-			Label( content );
+			var gc = new GUIContent( content );
+			GUI.Label( GetControlRect( gc, GUI.skin.label ), gc ); ;
 			GUI.skin.label.fontSize = pFontSize;
-		}
-
-		public static string TextField( string content ) {
-			var r = positions[positions.Count - 1];
-			var size = GUI.skin.textField.CalcSize( new GUIContent( content ) );
-			size.x = r.width;
-			var rect = GetRect( size );
-			return GUI.TextField( rect, content );
-		}
-
-		public static int IntSlider( int value, int min, int max ) {
-			var size = new Vector2( positions[positions.Count - 1].width, GUI.skin.horizontalSlider.lineHeight );
-			var rect = GetRect( size );
-			Space();
-			return (int)GUI.HorizontalSlider( rect, value, min, max );
-		}
-
-		public static bool Toggle( bool value, string content ) {
-			var size = GUI.skin.toggle.CalcSize( new GUIContent( content ) );
-			var rect = GetRect( size );
-			return EditorGUI.Toggle( rect, content, value );
-		}
-
-		public static bool ToggleLeft( string content, bool value ) {
-			var size = GUI.skin.toggle.CalcSize( new GUIContent( content ) );
-			var rect = GetRect( size );
-			return EditorGUI.ToggleLeft( rect, content, value );
 		}
 
 		#region Dropdown extras
@@ -361,8 +340,7 @@ namespace TNRD.Editor.Core {
 			return DropdownList( dropdownRect, current, items );
 		}
 		public static int DropdownList( int current, string[] items ) {
-			var size = GetDropdownSize( items, dropdownPopupStyle );
-			var rect = GetRect( size );
+			var rect = GetControlRect();
 			GUIContent[] contents = new GUIContent[items.Length];
 			for ( int i = 0; i < items.Length; i++ ) {
 				contents[i] = new GUIContent( items[i] );
@@ -370,8 +348,7 @@ namespace TNRD.Editor.Core {
 			return InternalDropdownList( rect, current, contents, dropdownPopupStyle );
 		}
 		public static int DropdownList( int current, GUIContent[] items ) {
-			var size = GetDropdownSize( items, dropdownPopupStyle );
-			var rect = GetRect( size );
+			var rect = GetControlRect();
 			return InternalDropdownList( rect, current, items, dropdownPopupStyle );
 		}
 		public static int DropdownList( Rect position, int current, string[] items ) {
