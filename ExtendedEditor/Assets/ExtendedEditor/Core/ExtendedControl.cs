@@ -6,7 +6,9 @@ using UnityEngine;
 namespace TNRD.Editor.Core {
 	public class ExtendedControl {
 
+		[JsonIgnore]
 		public ExtendedWindow Window;
+		[JsonIgnore]
 		public ExtendedInput Input { get { return Window.Input; } }
 
 		public bool IsInitialized;
