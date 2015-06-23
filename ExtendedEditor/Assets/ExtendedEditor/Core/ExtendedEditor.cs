@@ -317,17 +317,26 @@ namespace TNRD.Editor.Core {
 		}
 
 		public bool SaveToPreferences( string key ) {
+			var content = Serialize();
+			if ( string.IsNullOrEmpty( content ) ) {
+				Debug.LogError( "Unable to save to preferences, error while serializing." );
+				return false;
+			} else {
+				return SaveToPreferences( key, content );
+			}
+		}
+
+		public bool SaveToPreferences( string key, string content ) {
 			try {
-				var serialized = Serialize();
 				if ( string.IsNullOrEmpty( key ) ) {
 					Debug.LogError( "Unable to save to preferences, key cannot be empty." );
 					return false;
-				} else if ( string.IsNullOrEmpty( serialized ) ) {
-					Debug.LogError( "Unable to save to preferences, error while serializing." );
+				} else if ( string.IsNullOrEmpty( content ) ) {
+					Debug.LogError( "Unable to save to preferences, content cannot be empty." );
 					return false;
 				}
 
-				PlayerPrefs.SetString( key, serialized );
+				PlayerPrefs.SetString( key, content );
 				PlayerPrefs.Save();
 				return true;
 			} catch ( PlayerPrefsException) {
@@ -337,19 +346,26 @@ namespace TNRD.Editor.Core {
 		}
 
 		public bool SaveToFile( string path ) {
-			if ( string.IsNullOrEmpty( path ) ) return false;
+			var content = Serialize();
+			if ( string.IsNullOrEmpty( content ) ) {
+				Debug.LogError( "Unable to save to file, error while serializing" );
+				return false;
+			} else {
+				return SaveToFile( path, content );
+			}
+		}
 
+		public bool SaveToFile( string path, string content ) {
 			try {
-				var serialized = Serialize();
 				if ( string.IsNullOrEmpty( path ) ) {
 					Debug.LogError( "Unable to save to file, path cannot be empty." );
 					return false;
-				} else if ( string.IsNullOrEmpty( serialized ) ) {
-					Debug.LogError( "Unable to save to file, error while serializing." );
+				} else if ( string.IsNullOrEmpty( content ) ) {
+					Debug.LogError( "Unable to save to file, content cannot be empty." );
 					return false;
 				}
 
-				File.WriteAllText( path, serialized );
+				File.WriteAllText( path, content );
 				return true;
 			} catch ( PathTooLongException) {
 				Debug.LogError( "Unable to save to file, path is too long." );
@@ -396,11 +412,10 @@ namespace TNRD.Editor.Core {
 					windowsDict = new Dictionary<Type, List<ExtendedWindow>>();
 				}
 
-				for ( int i = 0; i < Windows.Count; i++ ) {
+				for ( int i = Windows.Count - 1; i >= 0; i-- ) {
 					var w = Windows[i];
 
 					w.Editor = this;
-					w.OnDeserialized();
 
 					var t = w.GetType();
 
@@ -411,6 +426,8 @@ namespace TNRD.Editor.Core {
 					if ( !windowsDict[t].Contains( w ) ) {
 						windowsDict[t].Add( w );
 					}
+
+					w.OnDeserialized();
 				}
 			}
 		}
