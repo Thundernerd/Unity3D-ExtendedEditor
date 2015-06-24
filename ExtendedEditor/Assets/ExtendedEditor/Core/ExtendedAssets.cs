@@ -6,6 +6,8 @@ using UnityEngine;
 
 namespace TNRD.Editor.Core {
 	public class ExtendedAssets {
+
+		[JsonIgnore]
 		private Dictionary<string, Texture2D> textures;
 		[JsonProperty]
 		private string path;
@@ -16,9 +18,8 @@ namespace TNRD.Editor.Core {
 
 		public ExtendedAssets( string path, ExtendedWindow window ) {
 			if ( string.IsNullOrEmpty( path ) ) {
-				// Figure the path out with reflection
-				var t = window.Editor.GetType();
-				var files = Directory.GetFiles( Application.dataPath, string.Format( "*{0}.cs", t.Name ), SearchOption.AllDirectories );
+				var type = window.Editor.GetType();
+				var files = Directory.GetFiles( Application.dataPath, string.Format( "*{0}.cs", type.Name ), SearchOption.AllDirectories );
 				if ( files.Length == 1 ) {
 					var f = files[0];
 					var fi = new FileInfo( f );

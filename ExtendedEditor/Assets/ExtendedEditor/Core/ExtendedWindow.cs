@@ -9,9 +9,11 @@ namespace TNRD.Editor.Core {
 
 	public class ExtendedWindow {
 
+		[JsonProperty]
 		public ExtendedAssets Assets;
 		[JsonIgnore]
 		public ExtendedEditor Editor;
+		[JsonProperty]
 		public ExtendedWindowSettings Settings;
 
 		public bool IsInitialized = false;
@@ -82,7 +84,9 @@ namespace TNRD.Editor.Core {
 		}
 
 		public virtual void OnDeserialized() {
-			Assets = new ExtendedAssets( Settings.AssetPath, this );
+			if ( Assets == null ) {
+				Assets = new ExtendedAssets( Settings.AssetPath, this );
+			}
 
 			for ( int i = 0; i < Controls.Count; i++ ) {
 				if ( Controls[i] != null ) {
@@ -91,10 +95,10 @@ namespace TNRD.Editor.Core {
 				}
 			}
 
-			ClearNullers();
+			RemoveBrokenControls();
 		}
 
-		private void ClearNullers() {
+		private void RemoveBrokenControls() {
 			int removed = 0;
 			for ( int i = Controls.Count - 1; i >= 0; i-- ) {
 				if ( Controls[i] == null ) {
