@@ -84,9 +84,7 @@ namespace TNRD.Editor.Core {
 		}
 
 		public virtual void OnDeserialized() {
-			if ( Assets == null ) {
-				Assets = new ExtendedAssets( Settings.AssetPath, this );
-			}
+			Assets = new ExtendedAssets( Settings.AssetPath, this );
 
 			for ( int i = 0; i < Controls.Count; i++ ) {
 				if ( Controls[i] != null ) {
@@ -121,6 +119,10 @@ namespace TNRD.Editor.Core {
 		}
 
 		public virtual void OnDestroy() {
+			for ( int i = Controls.Count - 1; i >= 0; i-- ) {
+				Controls[i].OnDestroy();
+			}
+
 			if ( Settings.UseOnSceneGUI ) {
 				SceneView.onSceneGUIDelegate -= OnSceneGUI;
 			}
@@ -200,9 +202,13 @@ namespace TNRD.Editor.Core {
 		}
 
 		public virtual void OnSceneGUI( SceneView view ) {
+			Handles.BeginGUI();
+
 			foreach ( var item in Controls ) {
 				item.OnSceneGUI( view );
 			}
+
+			Handles.EndGUI();
 		}
 
 		#region GUI

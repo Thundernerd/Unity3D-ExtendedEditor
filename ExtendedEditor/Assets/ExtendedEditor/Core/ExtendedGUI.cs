@@ -22,7 +22,8 @@ namespace TNRD.Editor.Core {
 		}
 
 		public static void HorizontalLine( Color color, float thickness = 1 ) {
-			Rect position = GUILayoutUtility.GetRect( GUIContent.none, horizontalLineStyle, GUILayout.Height( thickness ) );
+			Rect position = EditorGUI.IndentedRect( GUILayoutUtility.GetRect( GUIContent.none, horizontalLineStyle, GUILayout.Height( thickness ) ) );
+
 			if ( Event.current.type == EventType.Repaint ) {
 				var guiColor = GUI.color;
 				GUI.color = color;

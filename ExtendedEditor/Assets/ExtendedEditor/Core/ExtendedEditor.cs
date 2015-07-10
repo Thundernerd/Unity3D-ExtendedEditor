@@ -53,7 +53,11 @@ namespace TNRD.Editor.Core {
 			wantsMouseMove = true;
 		}
 
-		protected virtual void OnDestroy() { }
+		protected virtual void OnDestroy() {
+			for ( int i = Windows.Count - 1; i >= 0; i-- ) {
+				Windows[i].OnDestroy();
+			}
+		}
 
 		protected virtual void OnFocus() {
 			for ( int i = Windows.Count - 1; i >= 0; i-- ) {

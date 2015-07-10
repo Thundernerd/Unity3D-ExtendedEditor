@@ -164,17 +164,88 @@ namespace TNRD.Editor.Core {
 			if ( !kStates.ContainsKey( key ) ) return false;
 			return kStates[key].IsPressed();
 		}
+		public bool KeyPressed( params KeyCode[] keys ) {
+			foreach ( var key in keys ) {
+				if ( kStates.ContainsKey( key ) ) {
+					if ( kStates[key].IsPressed() ) {
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+		public bool KeysPressed( params KeyCode[] keys ) {
+			foreach ( var key in keys ) {
+				if ( !kStates.ContainsKey( key ) ) return false;
+				if ( !kStates[key].IsPressed() ) return false;
+			}
+			return true;
+		}
+
 		public bool KeyReleased( KeyCode key ) {
 			if ( !kStates.ContainsKey( key ) ) return false;
 			return kStates[key].IsReleased();
 		}
+		public bool KeyReleased( params KeyCode[] keys ) {
+			foreach ( var key in keys ) {
+				if ( kStates.ContainsKey( key ) ) {
+					if ( kStates[key].IsReleased() ) {
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+		public bool KeysReleased( params KeyCode[] keys ) {
+			foreach ( var key in keys ) {
+				if ( !kStates.ContainsKey( key ) ) return false;
+				if ( !kStates[key].IsReleased() ) return false;
+			}
+			return true;
+		}
+
 		public bool KeyDown( KeyCode key ) {
 			if ( !kStates.ContainsKey( key ) ) return false;
 			return kStates[key].IsDown();
 		}
+		public bool KeyDown( params KeyCode[] keys ) {
+			foreach ( var key in keys ) {
+				if ( kStates.ContainsKey( key ) ) {
+					if ( kStates[key].IsDown() ) {
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+		public bool KeysDown( params KeyCode[] keys ) {
+			foreach ( var key in keys ) {
+				if ( !kStates.ContainsKey( key ) ) return false;
+				if ( !kStates[key].IsDown() ) return false;
+			}
+			return true;
+		}
+
 		public bool KeyUp( KeyCode key ) {
 			if ( !kStates.ContainsKey( key ) ) return false;
 			return kStates[key].IsUp(); ;
+		}
+		public bool KeyUp( params KeyCode[] keys ) {
+			foreach ( var key in keys ) {
+				if ( kStates.ContainsKey( key ) ) {
+					if ( kStates[key].IsUp() ) {
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+		public bool KeysUp( params KeyCode[] keys ) {
+			foreach ( var key in keys ) {
+				if ( !kStates.ContainsKey( key ) ) return false;
+				if ( !kStates[key].IsUp() ) return false;
+			}
+			return true;
 		}
 
 		public void Reset() {

@@ -90,7 +90,7 @@ namespace TNRD.Editor.Utilities {
 
 			var dir = string.Format( "{0}/{1}", Application.dataPath, directory ).Replace( '/', '\\' );
 			for ( int i = 0; i < files.Length; i++ ) {
-				var value = files[i].FullName.Replace( dir, "" ).Replace( ".prefab", "" );
+				var value = files[i].FullName.Replace( dir, "" ).Replace( files[i].Extension, "" );
 				values[i] = value.Replace( '\\', '/' );
 			}
 
