@@ -30,7 +30,7 @@ namespace TNRD.Editor.Controls {
 			if ( Input.KeyDown( KeyCode.LeftAlt ) || Input.KeyDown( KeyCode.RightAlt ) ) return;
 
 			if ( ( Input.KeyDown( KeyCode.LeftShift ) || Input.KeyDown( KeyCode.RightShift ) ) && Input.ButtonReleased( EMouseButton.Left ) ) {
-				var controls = Window.GetControlsSlow<SelectableControl>();
+				var controls = Window.GetControlsByBaseType<SelectableControl>();
 				foreach ( var item in controls ) {
 					if ( item.Contains( Input.MousePosition ) ) {
 						item.OnSelect();
@@ -42,7 +42,7 @@ namespace TNRD.Editor.Controls {
 
 			if ( Input.ButtonDown( EMouseButton.Left ) ) {
 				if ( SelectedControls.Count < 2 ) {
-					var controls = Window.GetControlsSlow<SelectableControl>();
+					var controls = Window.GetControlsByBaseType<SelectableControl>();
 					var newControls = new List<SelectableControl>();
 
 					for ( int i = 0; i < controls.Count; i++ ) {
@@ -64,7 +64,7 @@ namespace TNRD.Editor.Controls {
 			}
 
 			if ( Input.Type == EventType.MouseDrag && Input.ButtonDown( EMouseButton.Left ) ) {
-				var controls = Window.GetControlsSlow<SelectableControl>();
+				var controls = Window.GetControlsByBaseType<SelectableControl>();
 
 				var delta = Input.MouseDelta;
 				if ( Window.Settings.UseCamera ) {

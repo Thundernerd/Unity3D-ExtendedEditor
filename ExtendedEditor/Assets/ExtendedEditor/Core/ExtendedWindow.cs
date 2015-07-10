@@ -68,7 +68,7 @@ namespace TNRD.Editor.Core {
 			Assets = new ExtendedAssets( Settings.AssetPath, this );
 
 			if ( Settings.UseOnSceneGUI ) {
-				SceneView.onSceneGUIDelegate += OnSceneGUI;
+				SceneView.onSceneGUIDelegate += InternalSceneGUI;
 			}
 
 			WindowRect = new Rect( 0, 0, Editor.position.size.x, Editor.position.size.y );
@@ -124,7 +124,7 @@ namespace TNRD.Editor.Core {
 			}
 
 			if ( Settings.UseOnSceneGUI ) {
-				SceneView.onSceneGUIDelegate -= OnSceneGUI;
+				SceneView.onSceneGUIDelegate -= InternalSceneGUI;
 			}
 
 			Assets.Destroy( this );
@@ -201,15 +201,18 @@ namespace TNRD.Editor.Core {
 			}
 		}
 
-		public virtual void OnSceneGUI( SceneView view ) {
+		#region SceneGUI
+		public void InternalSceneGUI( SceneView view ) {
 			Handles.BeginGUI();
-
+			OnSceneGUI( view );
+			Handles.EndGUI();
+		}
+		public virtual void OnSceneGUI( SceneView view ) {
 			foreach ( var item in Controls ) {
 				item.OnSceneGUI( view );
 			}
-
-			Handles.EndGUI();
 		}
+		#endregion
 
 		#region GUI
 		public void InternalGUI( int id ) {
@@ -336,7 +339,6 @@ namespace TNRD.Editor.Core {
 			controlsDict[type].Add( control );
 			Controls.Add( control );
 		}
-
 		public virtual void RemoveControl( ExtendedControl control ) {
 			if ( control.IsInitialized ) {
 				control.OnDestroy();
@@ -346,7 +348,7 @@ namespace TNRD.Editor.Core {
 			Controls.Remove( control );
 		}
 
-		public List<T> GetControls<T>() where T : ExtendedControl {
+		public List<T> GetControlsByType<T>() where T : ExtendedControl {
 			var type = typeof(T);
 			if ( controlsDict.ContainsKey( type ) ) {
 				var items = new List<T>();
@@ -358,8 +360,7 @@ namespace TNRD.Editor.Core {
 				return new List<T>();
 			}
 		}
-
-		public List<ExtendedControl> GetControls( Type type ) {
+		public List<ExtendedControl> GetControlsByType( Type type ) {
 			if ( controlsDict.ContainsKey( type ) ) {
 				return controlsDict[type];
 			} else {
@@ -367,7 +368,7 @@ namespace TNRD.Editor.Core {
 			}
 		}
 
-		public List<T> GetControlsSlow<T>() where T : ExtendedControl {
+		public List<T> GetControlsByBaseType<T>() where T : ExtendedControl {
 			var type = typeof(T);
 			var list = new List<T>();
 
@@ -384,8 +385,7 @@ namespace TNRD.Editor.Core {
 
 			return list;
 		}
-
-		public List<ExtendedControl> GetControlsSlow( Type type ) {
+		public List<ExtendedControl> GetControlsByBaseType( Type type ) {
 			var list = new List<ExtendedControl>();
 
 			foreach ( var item in Controls ) {
