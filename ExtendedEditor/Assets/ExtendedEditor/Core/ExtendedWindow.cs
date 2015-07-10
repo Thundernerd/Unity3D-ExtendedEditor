@@ -11,11 +11,14 @@ namespace TNRD.Editor.Core {
 
 		[JsonProperty]
 		public ExtendedAssets Assets;
+
 		[JsonIgnore]
 		public ExtendedEditor Editor;
+
 		[JsonProperty]
 		public ExtendedWindowSettings Settings;
 
+		[JsonProperty]
 		public bool IsInitialized = false;
 
 		#region GUI.Window 
@@ -30,30 +33,35 @@ namespace TNRD.Editor.Core {
 				return WindowRect.position;
 			}
 		}
+
 		[JsonIgnore]
 		public Vector2 Size {
 			get {
 				return WindowRect.size;
 			}
 		}
+
 		[JsonIgnore]
 		public Vector3 Camera = new Vector3( 0, 0, 1 );
+
 		[JsonIgnore]
 		public Matrix4x4 ScaleMatrix = Matrix4x4.identity;
+
 		[JsonIgnore]
 		public ExtendedInput Input { get { return Editor.Input; } }
 
 		[JsonProperty]
 		protected List<ExtendedControl> Controls = new List<ExtendedControl>();
+
 		[JsonIgnore]
 		protected List<ExtendedControl> ControlsToProcess = new List<ExtendedControl>();
-		[JsonProperty]
+		
+		private List<ExtendedControl> controlsToRemove = new List<ExtendedControl>();
+		
 		private Dictionary<Type, List<ExtendedControl>> controlsDict = new Dictionary<Type, List<ExtendedControl>>();
-
-		[JsonIgnore]
+		
 		private Vector2 previousEditorSize;
-
-		[JsonIgnore]
+		
 		private bool initializedGUI = false;
 
 		private const int cameraSpeed = 500;
@@ -199,6 +207,17 @@ namespace TNRD.Editor.Core {
 					}
 				}
 			}
+
+			if ( controlsToRemove.Count > 0 ) {
+				foreach ( var control in controlsToRemove ) {
+					if ( control.IsInitialized ) {
+						control.OnDestroy();
+					}
+
+					controlsDict[control.GetType()].Remove( control );
+					Controls.Remove( control );
+				}
+			}
 		}
 
 		#region SceneGUI
@@ -239,9 +258,6 @@ namespace TNRD.Editor.Core {
 			switch ( e.type ) {
 				case EventType.DragExited:
 					OnDragExited();
-					break;
-				case EventType.ScrollWheel:
-					OnScrollWheel( e.delta );
 					break;
 			}
 
@@ -318,6 +334,15 @@ namespace TNRD.Editor.Core {
 				OnToolbarGUI();
 				ExtendedGUI.EndToolbar();
 			}
+
+			if ( Input.Type == EventType.ScrollWheel && Settings.UseCamera ) {
+				var delta = Input.ScrollDelta.y;
+				if ( delta > 0 ) {
+					Camera.z *= 0.9f;
+				} else if ( delta < 0 ) {
+					Camera.z *= 1.1f;
+				}
+			}
 		}
 		#endregion
 
@@ -340,12 +365,10 @@ namespace TNRD.Editor.Core {
 			Controls.Add( control );
 		}
 		public virtual void RemoveControl( ExtendedControl control ) {
-			if ( control.IsInitialized ) {
-				control.OnDestroy();
-			}
-
-			controlsDict[control.GetType()].Remove( control );
-			Controls.Remove( control );
+			controlsToRemove.Add( control );
+		}
+		public virtual void ClearControls() {
+			controlsToRemove.AddRange( Controls );
 		}
 
 		public List<T> GetControlsByType<T>() where T : ExtendedControl {
@@ -430,19 +453,6 @@ namespace TNRD.Editor.Core {
 		public virtual void OnDragUpdate( string[] paths, Vector2 position ) {
 			for ( int i = ControlsToProcess.Count - 1; i >= 0; i-- ) {
 				ControlsToProcess[i].OnDragUpdate( paths, position );
-			}
-		}
-		public virtual void OnScrollWheel( Vector2 delta ) {
-			if ( Settings.UseCamera ) {
-				var mDelta = Input.MouseDelta.y;
-				if ( mDelta > 0 ) {
-					Camera.z *= 0.9f;
-				} else if ( mDelta < 0 ) {
-					Camera.z *= 1.1f;
-				}
-			}
-			for ( int i = ControlsToProcess.Count - 1; i >= 0; i-- ) {
-				ControlsToProcess[i].OnScrollWheel( delta );
 			}
 		}
 		#endregion

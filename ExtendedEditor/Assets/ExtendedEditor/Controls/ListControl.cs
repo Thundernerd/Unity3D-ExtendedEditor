@@ -37,8 +37,7 @@ namespace TNRD.Editor.Controls {
 		private bool scrollable = true;
 		private bool searchable = false;
 		private string searchText = "";
-
-		private Vector2 doubleClickPosition;
+		
 		private Vector2 scrollPosition;
 
 		private Color highlightColor = new Color( 0.243f, 0.372f, 0.588f );

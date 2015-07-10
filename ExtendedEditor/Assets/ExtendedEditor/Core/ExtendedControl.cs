@@ -71,7 +71,6 @@ namespace TNRD.Editor.Core {
 		public virtual void OnDragExited() { }
 		public virtual void OnDragPerform( string[] paths, Vector2 position ) { }
 		public virtual void OnDragUpdate( string[] paths, Vector2 position ) { }
-		public virtual void OnScrollWheel( Vector2 delta ) { }
 		#endregion
 	}
 }

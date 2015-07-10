@@ -17,31 +17,33 @@ namespace TNRD.Editor.Core {
 
 		[JsonProperty]
 		protected List<ExtendedWindow> Windows = new List<ExtendedWindow>();
+
 		[JsonIgnore]
 		protected List<ExtendedWindow> WindowsToProcess = new List<ExtendedWindow>();
-		[JsonProperty]
+
+		private List<ExtendedWindow> windowsToRemove = new List<ExtendedWindow>();
+
 		private Dictionary<Type, List<ExtendedWindow>> windowsDict = new Dictionary<Type, List<ExtendedWindow>>();
-		[JsonIgnore]
+
 		private ExtendedModalWindow modalWindow;
-		[JsonIgnore]
+
 		private Action<ExtendedModalWindowEventArgs> modalWindowCallback;
-		[JsonIgnore]
+
 		private double previousTime = 0;
+
 		[JsonIgnore]
 		public float DeltaTime = 0;
 
 		[JsonIgnore]
 		public ExtendedInput Input { get; private set; }
+
 		[JsonIgnore]
 		public Event CurrentEvent { get; private set; }
-
-		/// <summary>
-		/// Dirtiest variable; it is 50 percent of a recompilation check
-		/// </summary>
-		private object initializedCheck;
+		
+		private object initializer;
 
 		protected virtual void OnInitialize() {
-			initializedCheck = new object();
+			initializer = new object();
 
 			Input = new ExtendedInput();
 
@@ -74,9 +76,7 @@ namespace TNRD.Editor.Core {
 		}
 
 		protected virtual void Update() {
-			// The other 50 percent
-			if ( initializedCheck == null ) {
-				// Horribleeeee!
+			if ( initializer == null ) {
 				OnInitialize();
 			}
 
@@ -108,10 +108,21 @@ namespace TNRD.Editor.Core {
 			if ( RepaintOnUpdate ) {
 				Repaint();
 			}
+
+			if ( windowsToRemove.Count > 0 ) {
+				foreach ( var window in windowsToRemove ) {
+					if ( window.IsInitialized ) {
+						window.OnDestroy();
+					}
+
+					windowsDict[window.GetType()].Remove( window );
+					Windows.Remove( window );
+				}
+			}
 		}
 
 		protected virtual void OnGUI() {
-			if ( initializedCheck == null ) return;
+			if ( initializer == null ) return;
 
 			CurrentEvent = Event.current;
 			Input.OnGUI( CurrentEvent );
@@ -129,9 +140,6 @@ namespace TNRD.Editor.Core {
 						break;
 					case EventType.DragUpdated:
 						OnDragUpdate( DragAndDrop.paths, CurrentEvent.mousePosition );
-						break;
-					case EventType.ScrollWheel:
-						OnScrollWheel( CurrentEvent.delta );
 						break;
 				}
 			}
@@ -194,17 +202,14 @@ namespace TNRD.Editor.Core {
 			windowsDict[type].Add( window );
 			Windows.Add( window );
 		}
-
 		public virtual void RemoveWindow( ExtendedWindow window ) {
-			if ( window.IsInitialized ) {
-				window.OnDestroy();
-			}
-
-			windowsDict[window.GetType()].Remove( window );
-			Windows.Remove( window );
+			windowsToRemove.Add( window );
+		}
+		public virtual void ClearWindows() {
+			windowsToRemove.AddRange( Windows );
 		}
 
-		public List<T> GetWindows<T>() where T : ExtendedWindow {
+		public List<T> GetWindowsByType<T>() where T : ExtendedWindow {
 			var type = typeof(T);
 			if ( windowsDict.ContainsKey( type ) ) {
 				var items = new List<T>();
@@ -216,13 +221,45 @@ namespace TNRD.Editor.Core {
 				return new List<T>();
 			}
 		}
-
-		public List<ExtendedWindow> GetWindows( Type type ) {
+		public List<ExtendedWindow> GetWindowsByType( Type type ) {
 			if ( windowsDict.ContainsKey( type ) ) {
 				return windowsDict[type];
 			} else {
 				return new List<ExtendedWindow>();
 			}
+		}
+		public List<T> GetWindowsByBaseType<T>() where T : ExtendedWindow {
+			var type = typeof(T);
+			var list = new List<T>();
+
+			foreach ( var item in Windows ) {
+				var baseType = item.GetType().BaseType;
+				while ( baseType != null ) {
+					if ( baseType == type ) {
+						list.Add( item as T );
+						break;
+					}
+					baseType = baseType.BaseType;
+				}
+			}
+
+			return list;
+		}
+		public List<ExtendedWindow> GetWindowsByBaseType( Type type ) {
+			var list = new List<ExtendedWindow>();
+
+			foreach ( var item in Windows ) {
+				var baseType = item.GetType().BaseType;
+				while ( baseType != null ) {
+					if ( baseType == type ) {
+						list.Add( item );
+						break;
+					}
+					baseType = baseType.BaseType;
+				}
+			}
+
+			return list;
 		}
 		#endregion
 
@@ -233,7 +270,6 @@ namespace TNRD.Editor.Core {
 
 			modalWindowCallback = callback;
 		}
-
 		public void ShowModalWindow( ExtendedModalWindow window ) {
 			ShowModalWindow( window, null );
 		}
@@ -243,7 +279,6 @@ namespace TNRD.Editor.Core {
 		public virtual void AddSharedObject( string key, ExtendedSharedObject value ) {
 			AddSharedObject( key, value, true );
 		}
-
 		public virtual void AddSharedObject( string key, ExtendedSharedObject value, bool overwrite ) {
 			if ( SharedObjects.ContainsKey( key ) && !overwrite ) return;
 
@@ -253,6 +288,13 @@ namespace TNRD.Editor.Core {
 				SharedObjects.Add( key, value );
 			}
 		}
+		public virtual void RemoveSharedObject( string key ) {
+			if ( !SharedObjects.ContainsKey( key ) ) return;
+			SharedObjects.Remove( key );
+		}
+		public virtual void ClearSharedObjects() {
+			SharedObjects.Clear();
+		}
 
 		public ExtendedSharedObject GetSharedObject( string key ) {
 			if ( SharedObjects.ContainsKey( key ) ) {
@@ -261,18 +303,12 @@ namespace TNRD.Editor.Core {
 				return null;
 			}
 		}
-
 		public T GetSharedObject<T>( string key ) where T : ExtendedSharedObject {
 			if ( SharedObjects.ContainsKey( key ) ) {
 				return SharedObjects[key] as T;
 			} else {
 				return default(T);
 			}
-		}
-
-		public virtual void RemoveSharedObject( string key ) {
-			if ( !SharedObjects.ContainsKey( key ) ) return;
-			SharedObjects.Remove( key );
 		}
 		#endregion
 
@@ -295,11 +331,6 @@ namespace TNRD.Editor.Core {
 		protected virtual void OnDragUpdate( string[] paths, Vector2 position ) {
 			if ( modalWindow != null ) {
 				modalWindow.OnDragUpdate( paths, position );
-			}
-		}
-		protected virtual void OnScrollWheel( Vector2 delta ) {
-			if ( modalWindow != null ) {
-				modalWindow.OnScrollWheel( delta );
 			}
 		}
 		#endregion

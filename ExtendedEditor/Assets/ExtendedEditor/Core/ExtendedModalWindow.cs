@@ -112,11 +112,9 @@ namespace TNRD.Editor.Core {
 
 		#region Events
 		public virtual void OnContextClick( Vector2 position ) { }
-		public virtual void OnDoubleClick( EMouseButton button, Vector2 position ) { }
 		public virtual void OnDragExited() { }
 		public virtual void OnDragPerform( string[] paths, Vector2 position ) { }
 		public virtual void OnDragUpdate( string[] paths, Vector2 position ) { }
-		public virtual void OnScrollWheel( Vector2 delta ) { }
 		#endregion
 	}
 }

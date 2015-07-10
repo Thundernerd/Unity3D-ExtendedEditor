@@ -29,7 +29,6 @@ namespace TNRD.Editor.Controls {
 		}
 
 		private List<T> collection;
-		private bool ignoreEdit;
 		private string label;
 		private EListType listType;
 		private ReorderableList rList;

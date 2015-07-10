@@ -12,6 +12,9 @@ namespace TNRD.Editor.Core {
 		public Vector2 MousePosition { get; set; }
 		public Vector2 MouseDelta { get; private set; }
 
+		private Vector2 scrollDelta;
+		public Vector2 ScrollDelta { get { return scrollDelta; } }
+
 		public bool IsDoubleClick { get; private set; }
 		public EMouseButton Button { get; private set; }
 
@@ -53,7 +56,6 @@ namespace TNRD.Editor.Core {
 		}
 
 		private void HandleKeys( Event e ) {
-
 			switch ( e.type ) {
 				case EventType.KeyDown:
 					SetValue( e.keyCode, true );
@@ -85,6 +87,8 @@ namespace TNRD.Editor.Core {
 		}
 
 		private void HandleMouse( Event e ) {
+			scrollDelta.x = scrollDelta.y = 0;
+
 			switch ( e.type ) {
 				case EventType.MouseDown:
 					var click = DateTime.Now.Ticks;
@@ -102,6 +106,9 @@ namespace TNRD.Editor.Core {
 					break;
 				case EventType.MouseUp:
 					SetValue( (EMouseButton)e.button, false );
+					break;
+				case EventType.ScrollWheel:
+					scrollDelta = e.delta;
 					break;
 				default:
 					break;
