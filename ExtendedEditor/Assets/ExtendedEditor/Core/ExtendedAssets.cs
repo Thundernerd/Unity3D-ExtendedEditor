@@ -43,11 +43,15 @@ namespace TNRD.Editor.Core {
 		}
 
 		public Texture2D Load( string key ) {
+			return Load( key, path );
+		}
+
+		public Texture2D Load( string key, string location ) {
 			if ( textures.ContainsKey( key ) ) {
 				return textures[key];
 			}
 
-			var path = Path.Combine( this.path, key + ".png" );
+			var path = Path.Combine( location, key + ".png" );
 			if ( !File.Exists( path ) ) return null;
 
 			var tex = new Texture2D( 1, 1 );
