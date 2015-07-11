@@ -7,6 +7,8 @@ namespace TNRD.Editor.Core {
 		/// Default is Assets/.../CurrentEditorFolder/Assets/
 		/// </summary>
 		public string AssetPath = "";
+		public bool AllowResize = true;
+		public bool AllowRepositioning = true;
 
 		public bool DrawToolbar = false;
 

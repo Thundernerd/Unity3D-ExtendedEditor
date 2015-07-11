@@ -23,6 +23,7 @@ namespace TNRD.Editor.Core {
 
 		#region GUI.Window 
 		public GUIContent WindowContent = new GUIContent();
+		public int WindowID = -1;
 		public Rect WindowRect = new Rect();
 		public GUIStyle WindowStyle = null;
 		#endregion
@@ -32,12 +33,20 @@ namespace TNRD.Editor.Core {
 			get {
 				return WindowRect.position;
 			}
+			set {
+				Settings.IsFullscreen = false;
+				WindowRect.position = value;
+			}
 		}
 
 		[JsonIgnore]
 		public Vector2 Size {
 			get {
 				return WindowRect.size;
+			}
+			set {
+				Settings.IsFullscreen = false;
+				WindowRect.size = value;
 			}
 		}
 
@@ -48,21 +57,23 @@ namespace TNRD.Editor.Core {
 		public Matrix4x4 ScaleMatrix = Matrix4x4.identity;
 
 		[JsonIgnore]
-		public ExtendedInput Input { get { return Editor.Input; } }
+		public ExtendedInput Input = new ExtendedInput();
 
 		[JsonProperty]
 		protected List<ExtendedControl> Controls = new List<ExtendedControl>();
 
 		[JsonIgnore]
 		protected List<ExtendedControl> ControlsToProcess = new List<ExtendedControl>();
-		
+
 		private List<ExtendedControl> controlsToRemove = new List<ExtendedControl>();
-		
+
 		private Dictionary<Type, List<ExtendedControl>> controlsDict = new Dictionary<Type, List<ExtendedControl>>();
-		
+
 		private Vector2 previousEditorSize;
-		
+
 		private bool initializedGUI = false;
+
+		private bool doResize = false;
 
 		private const int cameraSpeed = 500;
 
@@ -153,6 +164,10 @@ namespace TNRD.Editor.Core {
 					WindowRect.size = currentEditorSize;
 				}
 
+				if ( WindowRect.position.x != 0 && WindowRect.position.y != 0 ) {
+					WindowRect.position = new Vector2( 0, 0 );
+				}
+
 				previousEditorSize = currentEditorSize;
 			}
 
@@ -218,6 +233,8 @@ namespace TNRD.Editor.Core {
 					Controls.Remove( control );
 				}
 			}
+
+			Input.Update();
 		}
 
 		#region SceneGUI
@@ -240,6 +257,7 @@ namespace TNRD.Editor.Core {
 			}
 
 			var e = Editor.CurrentEvent;
+			Input.OnGUI( e );
 
 			if ( WindowRect.Contains( e.mousePosition ) ) {
 				switch ( e.type ) {
@@ -285,15 +303,21 @@ namespace TNRD.Editor.Core {
 			}
 
 			Rect area = WindowRect;
+			area.position = new Vector2( 0, 0 );
+
+			var mousePosition = Input.MousePosition;
+			if ( WindowStyle != null && WindowStyle.name == "window" ) {
+				area.y += 17.5f;
+				area.height -= 17.5f;
+				mousePosition.y -= 17.5f;
+			}
 			if ( Settings.DrawToolbar ) {
 				area.y += 17.5f;
 				area.height -= 17.5f;
-
-				// Feels a bit weird, but it has to be I guess
-				var pos = Input.MousePosition;
-				pos.y -= 17.5f;
-				Input.MousePosition = pos;
+				mousePosition.y -= 17.5f;
 			}
+			//mousePosition -= Position;
+			Input.MousePosition = mousePosition;
 
 			GUILayout.BeginArea( area );
 			ExtendedGUI.BeginArea( new ExtendedGUIOption() { Type = ExtendedGUIOption.EType.WindowSize, Value = area.size } );

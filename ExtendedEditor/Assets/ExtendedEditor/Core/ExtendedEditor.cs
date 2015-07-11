@@ -31,6 +31,10 @@ namespace TNRD.Editor.Core {
 
 		private double previousTime = 0;
 
+		private ExtendedWindow windowToResize = null;
+
+		private ExtendedWindow windowToDrag = null;
+
 		[JsonIgnore]
 		public float DeltaTime = 0;
 
@@ -39,7 +43,7 @@ namespace TNRD.Editor.Core {
 
 		[JsonIgnore]
 		public Event CurrentEvent { get; private set; }
-		
+
 		private object initializer;
 
 		protected virtual void OnInitialize() {
@@ -52,7 +56,7 @@ namespace TNRD.Editor.Core {
 			modalWindow = null;
 			modalWindowCallback = null;
 
-			wantsMouseMove = true;
+			wantsMouseMove = false;
 		}
 
 		protected virtual void OnDestroy() {
@@ -121,6 +125,7 @@ namespace TNRD.Editor.Core {
 			}
 		}
 
+		#region GUI
 		protected virtual void OnGUI() {
 			if ( initializer == null ) return;
 
@@ -147,19 +152,30 @@ namespace TNRD.Editor.Core {
 			WindowsToProcess = new List<ExtendedWindow>( Windows );
 
 			BeginWindows();
+			WindowsGUI();
+			ModalWindowGUI();
+			EndWindows();
+
+			HandleWindowDragAndResize();
+		}
+
+		private void WindowsGUI() {
 			for ( int i = WindowsToProcess.Count - 1; i >= 0; i-- ) {
 				var w = WindowsToProcess[i];
+				w.WindowID = i;
+
 				if ( w.WindowStyle == null ) {
-					GUI.Window( i, w.WindowRect, w.InternalGUI, w.WindowContent );
+					GUI.Window( w.WindowID, w.WindowRect, w.InternalGUI, w.WindowContent );
 				} else {
-					GUI.Window( i, w.WindowRect, w.InternalGUI, w.WindowContent, w.WindowStyle );
+					GUI.Window( w.WindowID, w.WindowRect, w.InternalGUI, w.WindowContent, w.WindowStyle );
 				}
 
 				if ( w.Settings.IsBlocking ) {
 					break;
 				}
 			}
-
+		}
+		private void ModalWindowGUI() {
 			if ( modalWindow != null ) {
 				GUI.BringWindowToFront( WindowsToProcess.Count );
 				var p1 = modalWindow.WindowRect;
@@ -181,8 +197,50 @@ namespace TNRD.Editor.Core {
 					}
 				}
 			}
-			EndWindows();
 		}
+		private void HandleWindowDragAndResize() {
+			for ( int i = 0; i < WindowsToProcess.Count; i++ ) {
+				var window = WindowsToProcess[i];
+				if ( window.Settings.AllowResize ) {
+					var rect = new Rect( window.WindowRect.position + window.WindowRect.size - new Vector2( 16, 16 ), new Vector2( 24, 24 ) );
+					if ( rect.Contains( Input.MousePosition ) ) {
+						EditorGUIUtility.AddCursorRect( rect, MouseCursor.ResizeUpLeft );
+
+						if ( Input.ButtonPressed( EMouseButton.Left ) ) {
+							windowToResize = window;
+						}
+					}
+
+					if ( Input.ButtonReleased( EMouseButton.Left ) ) {
+						windowToResize = null;
+					}
+				}
+
+				if ( window.Settings.AllowRepositioning ) {
+					var rect = new Rect( window.WindowRect.position, new Vector2( window.WindowRect.width, 16.5f ) );
+					if ( rect.Contains( Input.MousePosition ) ) {
+						if ( Input.ButtonPressed( EMouseButton.Left ) ) {
+							windowToDrag = window;
+						}
+					}
+
+					if ( Input.ButtonReleased( EMouseButton.Left ) ) {
+						windowToDrag = null;
+					}
+				}
+			}
+
+			if ( CurrentEvent.type == EventType.MouseDrag ) {
+				if ( windowToResize != null ) {
+					windowToResize.Size += Input.MouseDelta;
+				}
+
+				if ( windowToDrag != null ) {
+					windowToDrag.Position += Input.MouseDelta;
+				}
+			}
+		}
+		#endregion
 
 		#region Window
 		public virtual void AddWindow( ExtendedWindow window ) {
