@@ -203,9 +203,14 @@ namespace TNRD.Editor.Core {
 						y = (float)item.Value;
 						break;
 					case ExtendedGUIOption.EType.Position:
-						var v = (Vector2)item.Value;
-						x = v.x;
-						y = v.y;
+						var position = (Vector2)item.Value;
+						x = position.x;
+						y = position.y;
+						break;
+					case ExtendedGUIOption.EType.Size:
+						var size = (Vector2)item.Value;
+						w = size.x;
+						h = size.y;
 						break;
 					case ExtendedGUIOption.EType.WindowSize:
 						windowSize = (Vector2)item.Value;
