@@ -9,15 +9,34 @@ namespace TNRD.Editor.Core {
 		private Dictionary<KeyCode, State<bool>> kStates = new Dictionary<KeyCode, State<bool>>();
 		private Dictionary<EMouseButton, State<bool>> mStates = new Dictionary<EMouseButton, State<bool>>();
 
+		/// <summary>
+		/// The current mouse position in the editor/window
+		/// </summary>
 		public Vector2 MousePosition { get; set; }
+		/// <summary>
+		/// The current mouse delta in the editor/window (including scrollwheel delta)
+		/// </summary>
 		public Vector2 MouseDelta { get; private set; }
 
 		private Vector2 scrollDelta;
+		/// <summary>
+		/// 
+		/// </summary>
 		public Vector2 ScrollDelta { get { return scrollDelta; } }
 
+		/// <summary>
+		/// Did a double click occur. Check which button with <see cref="Button"/>
+		/// </summary>
 		public bool IsDoubleClick { get; private set; }
+
+		/// <summary>
+		/// The current mousebutton that is down. To be used with <see cref="IsDoubleClick"/>
+		/// </summary>
 		public EMouseButton Button { get; private set; }
 
+		/// <summary>
+		/// The current event type
+		/// </summary>
 		public EventType Type { get; private set; }
 
 		private long lastClick = 0;
@@ -150,27 +169,55 @@ namespace TNRD.Editor.Core {
 			SetValue( KeyCode.RightAlt, value );
 		}
 
+		/// <summary>
+		/// Did the given mouse button get pressed this frame
+		/// </summary>
+		/// <param name="button">The mouse button to check</param>
 		public bool ButtonPressed( EMouseButton button ) {
 			if ( !mStates.ContainsKey( button ) ) return false;
 			return mStates[button].IsPressed();
 		}
+
+		/// <summary>
+		/// Did the given mouse button get released this frame
+		/// </summary>
+		/// <param name="button">The mouse button to check</param>
 		public bool ButtonReleased( EMouseButton button ) {
 			if ( !mStates.ContainsKey( button ) ) return false;
 			return mStates[button].IsReleased();
 		}
+
+		/// <summary>
+		/// Is the given mouse button down
+		/// </summary>
+		/// <param name="button">The mouse button to check</param>
 		public bool ButtonDown( EMouseButton button ) {
 			if ( !mStates.ContainsKey( button ) ) return false;
 			return mStates[button].IsDown();
 		}
+
+		/// <summary>
+		/// Is the given mouse button up
+		/// </summary>
+		/// <param name="button">The mouse button to check</param>
 		public bool ButtonUp( EMouseButton button ) {
 			if ( !mStates.ContainsKey( button ) ) return false;
 			return mStates[button].IsUp();
 		}
 
+		/// <summary>
+		/// Did the given key get pressed this frame
+		/// </summary>
+		/// <param name="key">The key to check</param>
 		public bool KeyPressed( KeyCode key ) {
 			if ( !kStates.ContainsKey( key ) ) return false;
 			return kStates[key].IsPressed();
 		}
+
+		/// <summary>
+		/// Did one of the given keys get pressed this frame
+		/// </summary>
+		/// <param name="keys">The keys to check</param>
 		public bool KeyPressed( params KeyCode[] keys ) {
 			foreach ( var key in keys ) {
 				if ( kStates.ContainsKey( key ) ) {
@@ -181,6 +228,11 @@ namespace TNRD.Editor.Core {
 			}
 			return false;
 		}
+
+		/// <summary>
+		/// Did all of the given keys get pressed this frame
+		/// </summary>
+		/// <param name="keys">The keys to check</param>
 		public bool KeysPressed( params KeyCode[] keys ) {
 			foreach ( var key in keys ) {
 				if ( !kStates.ContainsKey( key ) ) return false;
@@ -189,10 +241,19 @@ namespace TNRD.Editor.Core {
 			return true;
 		}
 
+		/// <summary>
+		/// Did the given key get released this frame
+		/// </summary>
+		/// <param name="key">The key to check</param>
 		public bool KeyReleased( KeyCode key ) {
 			if ( !kStates.ContainsKey( key ) ) return false;
 			return kStates[key].IsReleased();
 		}
+
+		/// <summary>
+		/// Did one of the given keys get released this frame
+		/// </summary>
+		/// <param name="keys">The keys to check</param>
 		public bool KeyReleased( params KeyCode[] keys ) {
 			foreach ( var key in keys ) {
 				if ( kStates.ContainsKey( key ) ) {
@@ -203,6 +264,11 @@ namespace TNRD.Editor.Core {
 			}
 			return false;
 		}
+
+		/// <summary>
+		/// Did all of the given keys get released this frame
+		/// </summary>
+		/// <param name="keys">The keys to check</param>
 		public bool KeysReleased( params KeyCode[] keys ) {
 			foreach ( var key in keys ) {
 				if ( !kStates.ContainsKey( key ) ) return false;
@@ -211,10 +277,19 @@ namespace TNRD.Editor.Core {
 			return true;
 		}
 
+		/// <summary>
+		/// Is the given key down
+		/// </summary>
+		/// <param name="key">The key to check</param>
 		public bool KeyDown( KeyCode key ) {
 			if ( !kStates.ContainsKey( key ) ) return false;
 			return kStates[key].IsDown();
 		}
+
+		/// <summary>
+		/// Is one of the given keys down
+		/// </summary>
+		/// <param name="keys">The keys to check</param>
 		public bool KeyDown( params KeyCode[] keys ) {
 			foreach ( var key in keys ) {
 				if ( kStates.ContainsKey( key ) ) {
@@ -225,6 +300,11 @@ namespace TNRD.Editor.Core {
 			}
 			return false;
 		}
+
+		/// <summary>
+		/// Are all of the given keys down
+		/// </summary>
+		/// <param name="keys">The keys to check</param>
 		public bool KeysDown( params KeyCode[] keys ) {
 			foreach ( var key in keys ) {
 				if ( !kStates.ContainsKey( key ) ) return false;
@@ -233,10 +313,19 @@ namespace TNRD.Editor.Core {
 			return true;
 		}
 
+		/// <summary>
+		/// Is the given key up
+		/// </summary>
+		/// <param name="key">The key to check</param>
 		public bool KeyUp( KeyCode key ) {
 			if ( !kStates.ContainsKey( key ) ) return false;
 			return kStates[key].IsUp(); ;
 		}
+
+		/// <summary>
+		/// Is one of the given keys up
+		/// </summary>
+		/// <param name="keys">The keys to check</param>
 		public bool KeyUp( params KeyCode[] keys ) {
 			foreach ( var key in keys ) {
 				if ( kStates.ContainsKey( key ) ) {
@@ -247,6 +336,11 @@ namespace TNRD.Editor.Core {
 			}
 			return false;
 		}
+
+		/// <summary>
+		/// Are all of the given keys up
+		/// </summary>
+		/// <param name="keys">The keys to check</param>
 		public bool KeysUp( params KeyCode[] keys ) {
 			foreach ( var key in keys ) {
 				if ( !kStates.ContainsKey( key ) ) return false;
@@ -255,15 +349,20 @@ namespace TNRD.Editor.Core {
 			return true;
 		}
 
+		/// <summary>
+		/// Resets all the key and mousebutton states
+		/// </summary>
 		public void Reset() {
 			var keyStates = new Dictionary<KeyCode, State<bool>>( kStates );
 			foreach ( var item in keyStates ) {
 				SetValue( item.Key, false );
+				item.Value.Update();
 			}
 
 			var mouseStates = new Dictionary<EMouseButton, State<bool>>( mStates );
 			foreach ( var item in mouseStates ) {
 				SetValue( item.Key, false );
+				item.Value.Update();
 			}
 		}
 	}

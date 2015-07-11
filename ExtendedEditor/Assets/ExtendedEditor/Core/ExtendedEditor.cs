@@ -7,19 +7,31 @@ using UnityEditor;
 using UnityEngine;
 
 namespace TNRD.Editor.Core {
+	/// <summary>
+	/// The base for an editor
+	/// </summary>
 	public class ExtendedEditor : EditorWindow {
 
+		/// <summary>
+		/// If true the editor will call Repaint every update
+		/// </summary>
 		[JsonProperty]
 		protected bool RepaintOnUpdate = false;
 
+		/// <summary>
+		/// The active shared objects in this editor
+		/// </summary>
 		[JsonProperty]
 		protected Dictionary<string, ExtendedSharedObject> SharedObjects = new Dictionary<string, ExtendedSharedObject>();
 
+		/// <summary>
+		/// The active windows in this editor
+		/// </summary>
 		[JsonProperty]
 		protected List<ExtendedWindow> Windows = new List<ExtendedWindow>();
 
 		[JsonIgnore]
-		protected List<ExtendedWindow> WindowsToProcess = new List<ExtendedWindow>();
+		private List<ExtendedWindow> windowsToProcess = new List<ExtendedWindow>();
 
 		private List<ExtendedWindow> windowsToRemove = new List<ExtendedWindow>();
 
@@ -41,6 +53,9 @@ namespace TNRD.Editor.Core {
 		[JsonIgnore]
 		public ExtendedInput Input { get; private set; }
 
+		/// <summary>
+		/// The current event being processed by the Input manager
+		/// </summary>
 		[JsonIgnore]
 		public Event CurrentEvent { get; private set; }
 
@@ -52,7 +67,7 @@ namespace TNRD.Editor.Core {
 			Input = new ExtendedInput();
 
 			Windows = new List<ExtendedWindow>();
-			WindowsToProcess = new List<ExtendedWindow>();
+			windowsToProcess = new List<ExtendedWindow>();
 			modalWindow = null;
 			modalWindowCallback = null;
 
@@ -149,7 +164,7 @@ namespace TNRD.Editor.Core {
 				}
 			}
 
-			WindowsToProcess = new List<ExtendedWindow>( Windows );
+			windowsToProcess = new List<ExtendedWindow>( Windows );
 
 			BeginWindows();
 			WindowsGUI();
@@ -160,8 +175,8 @@ namespace TNRD.Editor.Core {
 		}
 
 		private void WindowsGUI() {
-			for ( int i = WindowsToProcess.Count - 1; i >= 0; i-- ) {
-				var w = WindowsToProcess[i];
+			for ( int i = windowsToProcess.Count - 1; i >= 0; i-- ) {
+				var w = windowsToProcess[i];
 				w.WindowID = i;
 
 				if ( w.WindowStyle == null ) {
@@ -177,10 +192,10 @@ namespace TNRD.Editor.Core {
 		}
 		private void ModalWindowGUI() {
 			if ( modalWindow != null ) {
-				GUI.BringWindowToFront( WindowsToProcess.Count );
+				GUI.BringWindowToFront( windowsToProcess.Count );
 				var p1 = modalWindow.WindowRect;
-				modalWindow.WindowRect = GUI.Window( WindowsToProcess.Count, modalWindow.WindowRect, modalWindow.OnGUI, modalWindow.Title );
-				GUI.FocusWindow( WindowsToProcess.Count );
+				modalWindow.WindowRect = GUI.Window( windowsToProcess.Count, modalWindow.WindowRect, modalWindow.OnGUI, modalWindow.Title );
+				GUI.FocusWindow( windowsToProcess.Count );
 				if ( p1 != modalWindow.WindowRect ) {
 					Event.current.Use();
 				}
@@ -199,8 +214,8 @@ namespace TNRD.Editor.Core {
 			}
 		}
 		private void HandleWindowDragAndResize() {
-			for ( int i = 0; i < WindowsToProcess.Count; i++ ) {
-				var window = WindowsToProcess[i];
+			for ( int i = 0; i < windowsToProcess.Count; i++ ) {
+				var window = windowsToProcess[i];
 				if ( window.Settings.AllowResize ) {
 					var rect = new Rect( window.WindowRect.position + window.WindowRect.size - new Vector2( 16, 16 ), new Vector2( 24, 24 ) );
 					if ( rect.Contains( Input.MousePosition ) ) {
@@ -232,7 +247,11 @@ namespace TNRD.Editor.Core {
 
 			if ( CurrentEvent.type == EventType.MouseDrag ) {
 				if ( windowToResize != null ) {
-					windowToResize.Size += Input.MouseDelta;
+					var size = windowToResize.Size;
+					size += Input.MouseDelta;
+					size.x = Mathf.Max( size.x, 50 );
+					size.y = Mathf.Max( size.y, 50 );
+					windowToResize.Size = size;
 				}
 
 				if ( windowToDrag != null ) {
@@ -243,6 +262,10 @@ namespace TNRD.Editor.Core {
 		#endregion
 
 		#region Window
+		/// <summary>
+		/// Adds a window to the end of the list
+		/// </summary>
+		/// <param name="window">The window to add</param>
 		public virtual void AddWindow( ExtendedWindow window ) {
 			if ( Windows.Contains( window ) ) return;
 
@@ -260,13 +283,26 @@ namespace TNRD.Editor.Core {
 			windowsDict[type].Add( window );
 			Windows.Add( window );
 		}
+
+		/// <summary>
+		/// Removes the window from the list, destroying it's loaded assets and controls
+		/// </summary>
+		/// <param name="window">The window to remove</param>
 		public virtual void RemoveWindow( ExtendedWindow window ) {
 			windowsToRemove.Add( window );
 		}
+
+		/// <summary>
+		/// Removes all (active) windows from the editor, destroying all loaded assets and controls
+		/// </summary>
 		public virtual void ClearWindows() {
 			windowsToRemove.AddRange( Windows );
 		}
 
+		/// <summary>
+		/// Returns a list of windows of type T
+		/// </summary>
+		/// <typeparam name="T">The type of the window</typeparam>
 		public List<T> GetWindowsByType<T>() where T : ExtendedWindow {
 			var type = typeof(T);
 			if ( windowsDict.ContainsKey( type ) ) {
@@ -279,6 +315,11 @@ namespace TNRD.Editor.Core {
 				return new List<T>();
 			}
 		}
+
+		/// <summary>
+		/// Returns a list of windows of the given type
+		/// </summary>
+		/// <param name="type">The type of the window</param>
 		public List<ExtendedWindow> GetWindowsByType( Type type ) {
 			if ( windowsDict.ContainsKey( type ) ) {
 				return windowsDict[type];
@@ -286,6 +327,11 @@ namespace TNRD.Editor.Core {
 				return new List<ExtendedWindow>();
 			}
 		}
+
+		/// <summary>
+		/// Returns a list of windows of type T including windows that inherit from this type
+		/// </summary>
+		/// <typeparam name="T">The type of the window</typeparam>
 		public List<T> GetWindowsByBaseType<T>() where T : ExtendedWindow {
 			var type = typeof(T);
 			var list = new List<T>();
@@ -303,6 +349,11 @@ namespace TNRD.Editor.Core {
 
 			return list;
 		}
+
+		/// <summary>
+		/// Returns a list of windows of the given type including windows that inherit from this type
+		/// </summary>
+		/// <param name="type">The type of the window</param>
 		public List<ExtendedWindow> GetWindowsByBaseType( Type type ) {
 			var list = new List<ExtendedWindow>();
 
@@ -322,21 +373,43 @@ namespace TNRD.Editor.Core {
 		#endregion
 
 		#region Modal Window
+		/// <summary>
+		/// Adds a modal window to the screen
+		/// </summary>
+		/// <param name="window">The window to add</param>
+		public void ShowModalWindow( ExtendedModalWindow window ) {
+			ShowModalWindow( window, null );
+		}
+
+		/// <summary>
+		/// Adds a modal window to the screen and invokes the callback when the window is closed
+		/// </summary>
+		/// <param name="window">The window to add</param>
+		/// <param name="callback">The callback to invoke</param>
 		public void ShowModalWindow( ExtendedModalWindow window, Action<ExtendedModalWindowEventArgs> callback ) {
 			modalWindow = window;
 			modalWindow.Editor = this;
 
 			modalWindowCallback = callback;
 		}
-		public void ShowModalWindow( ExtendedModalWindow window ) {
-			ShowModalWindow( window, null );
-		}
 		#endregion
 
 		#region Shared Object
+		/// <summary>
+		/// Adds a shared object to the editor. If the key exists the object will be overwritten
+		/// </summary>
+		/// <param name="key">The key to store the object with</param>
+		/// <param name="value">The object to store</param>
 		public virtual void AddSharedObject( string key, ExtendedSharedObject value ) {
 			AddSharedObject( key, value, true );
 		}
+
+		/// <summary>
+		/// Adds a shared object to the editor
+		/// </summary>
+		/// <param name="key">The key to store the object with</param>
+		/// <param name="value">The object to store</param>
+		/// <param name="overwrite">Should the object be overwritten if the key already exists</param>
 		public virtual void AddSharedObject( string key, ExtendedSharedObject value, bool overwrite ) {
 			if ( SharedObjects.ContainsKey( key ) && !overwrite ) return;
 
@@ -346,26 +419,34 @@ namespace TNRD.Editor.Core {
 				SharedObjects.Add( key, value );
 			}
 		}
+
+		/// <summary>
+		/// Removes the shared object with the given key from the editor
+		/// </summary>
+		/// <param name="key">The key of the object to remove</param>
 		public virtual void RemoveSharedObject( string key ) {
 			if ( !SharedObjects.ContainsKey( key ) ) return;
 			SharedObjects.Remove( key );
 		}
+
+		/// <summary>
+		/// Removes all the shared objects from the editor
+		/// </summary>
 		public virtual void ClearSharedObjects() {
 			SharedObjects.Clear();
 		}
 
-		public ExtendedSharedObject GetSharedObject( string key ) {
-			if ( SharedObjects.ContainsKey( key ) ) {
-				return SharedObjects[key];
-			} else {
-				return null;
-			}
-		}
+		/// <summary>
+		/// Gets the shared object stored with the given key
+		/// </summary>
+		/// <typeparam name="T">The type of the shared object</typeparam>
+		/// <param name="key">The key the object is stored with</param>
+		/// <returns>T or null if the key doesn't exist</returns>
 		public T GetSharedObject<T>( string key ) where T : ExtendedSharedObject {
 			if ( SharedObjects.ContainsKey( key ) ) {
 				return SharedObjects[key] as T;
 			} else {
-				return default(T);
+				return null;
 			}
 		}
 		#endregion
@@ -394,6 +475,10 @@ namespace TNRD.Editor.Core {
 		#endregion
 
 		#region Serialization/Deserialization
+		/// <summary>
+		/// Serializes the editor as a whole
+		/// </summary>
+		/// <returns>A JSON string</returns>
 		public string Serialize() {
 			var settings = new JsonSerializerSettings();
 			settings.PreserveReferencesHandling = PreserveReferencesHandling.All;
@@ -409,78 +494,83 @@ namespace TNRD.Editor.Core {
 			}
 		}
 
+		/// <summary>
+		/// Saves a serialized state of the editor in the preferences
+		/// </summary>
+		/// <param name="key">The key to store the serialized editor with</param>
+		/// <returns>True on success, false on failure</returns>
 		public bool SaveToPreferences( string key ) {
+			if ( string.IsNullOrEmpty( key ) ) {
+				Debug.LogError( "Unable to save to preferences, key cannot be empty." );
+				return false;
+			}
+
 			var content = Serialize();
+
 			if ( string.IsNullOrEmpty( content ) ) {
-				Debug.LogError( "Unable to save to preferences, error while serializing." );
+				// No need to log this as this is done before
+				//Debug.LogError( "Unable to save to preferences, error while serializing." );
 				return false;
 			} else {
-				return SaveToPreferences( key, content );
-			}
-		}
-
-		public bool SaveToPreferences( string key, string content ) {
-			try {
-				if ( string.IsNullOrEmpty( key ) ) {
-					Debug.LogError( "Unable to save to preferences, key cannot be empty." );
-					return false;
-				} else if ( string.IsNullOrEmpty( content ) ) {
-					Debug.LogError( "Unable to save to preferences, content cannot be empty." );
+				try {
+					PlayerPrefs.SetString( key, content );
+					PlayerPrefs.Save();
+					return true;
+				} catch ( PlayerPrefsException) {
+					Debug.LogError( "Unabled to save to preferences, exceeding maximum size." );
 					return false;
 				}
-
-				PlayerPrefs.SetString( key, content );
-				PlayerPrefs.Save();
-				return true;
-			} catch ( PlayerPrefsException) {
-				Debug.LogError( "Unabled to save to preferences, exceeding maximum size." );
-				return false;
 			}
 		}
 
+		/// <summary>
+		/// Saves a serialized state of the editor to a file at the given path
+		/// </summary>
+		/// <param name="path">The path to the file to save</param>
+		/// <returns>True on success, false on failure</returns>
 		public bool SaveToFile( string path ) {
+			if ( string.IsNullOrEmpty( path ) ) {
+				Debug.LogError( "Unable to save to file, path cannot be empty." );
+				return false;
+			}
+
 			var content = Serialize();
+
 			if ( string.IsNullOrEmpty( content ) ) {
-				Debug.LogError( "Unable to save to file, error while serializing" );
+				// No need to log this as this is done before
+				//Debug.LogError( "Unable to save to file, error while serializing" );
 				return false;
 			} else {
-				return SaveToFile( path, content );
-			}
-		}
-
-		public bool SaveToFile( string path, string content ) {
-			try {
-				if ( string.IsNullOrEmpty( path ) ) {
-					Debug.LogError( "Unable to save to file, path cannot be empty." );
+				try {
+					File.WriteAllText( path, content );
+					return true;
+				} catch ( PathTooLongException) {
+					Debug.LogError( "Unable to save to file, path is too long." );
 					return false;
-				} else if ( string.IsNullOrEmpty( content ) ) {
-					Debug.LogError( "Unable to save to file, content cannot be empty." );
+				} catch ( NotSupportedException) {
+					Debug.LogError( "Unable to save to file, check your path format." );
+					return false;
+				} catch ( System.Security.SecurityException) {
+					Debug.LogError( "Unable to save to file, lacking permission to write the file." );
+					return false;
+				} catch ( UnauthorizedAccessException) {
+					Debug.LogError( "Unable to save to file, check your permissions, if the file is writable, and if you're on the right platform." );
+					return false;
+				} catch ( DirectoryNotFoundException) {
+					Debug.LogError( "Unable to save to file, no such directory." );
+					return false;
+				} catch ( IOException) {
+					Debug.LogError( "Unable to save to file, IO exception." );
 					return false;
 				}
-
-				File.WriteAllText( path, content );
-				return true;
-			} catch ( PathTooLongException) {
-				Debug.LogError( "Unable to save to file, path is too long." );
-				return false;
-			} catch ( NotSupportedException) {
-				Debug.LogError( "Unable to save to file, check your path format." );
-				return false;
-			} catch ( System.Security.SecurityException) {
-				Debug.LogError( "Unable to save to file, lacking permission to write the file." );
-				return false;
-			} catch ( UnauthorizedAccessException) {
-				Debug.LogError( "Unable to save to file, check your permissions, if the file is writable, and if you're on the right platform." );
-				return false;
-			} catch ( DirectoryNotFoundException) {
-				Debug.LogError( "Unable to save to file, no such directory." );
-				return false;
-			} catch ( IOException) {
-				Debug.LogError( "Unable to save to file, IO exception." );
-				return false;
 			}
 		}
 
+		/// <summary>
+		/// Deserializes a serialized editor
+		/// </summary>
+		/// <typeparam name="T">The type of the editor</typeparam>
+		/// <param name="value">A JSON string</param>
 		public void Deserialize<T>( string value ) where T : ExtendedEditor {
 			var settings = new JsonSerializerSettings();
 			settings.TypeNameHandling = TypeNameHandling.Auto;
@@ -499,11 +589,6 @@ namespace TNRD.Editor.Core {
 				SharedObjects = deserialized.SharedObjects;
 				Windows = deserialized.Windows;
 				windowsDict = deserialized.windowsDict;
-
-				// Backward-compat
-				if ( windowsDict == null ) {
-					windowsDict = new Dictionary<Type, List<ExtendedWindow>>();
-				}
 
 				for ( int i = Windows.Count - 1; i >= 0; i-- ) {
 					var w = Windows[i];
@@ -525,6 +610,12 @@ namespace TNRD.Editor.Core {
 			}
 		}
 
+		/// <summary>
+		/// Loads and deserializes the editor from the preferences
+		/// </summary>
+		/// <typeparam name="T">The type of the editor</typeparam>
+		/// <param name="key">The key that the editor is stored with</param>
+		/// <returns>True on success, false on failure</returns>
 		public bool LoadFromPreferences<T>( string key ) where T : ExtendedEditor {
 			if ( PlayerPrefs.HasKey( key ) ) {
 				try {
@@ -540,6 +631,12 @@ namespace TNRD.Editor.Core {
 			}
 		}
 
+		/// <summary>
+		/// Loads and deserializes the editor from a file
+		/// </summary>
+		/// <typeparam name="T">The type of the editor</typeparam>
+		/// <param name="path">The path to the file</param>
+		/// <returns>True on success, false on failure</returns>
 		public bool LoadFromFile<T>( string path ) where T : ExtendedEditor {
 			if ( string.IsNullOrEmpty( path ) ) {
 				Debug.LogError( "Path is empty, cancelling LoadFromFile." );
@@ -573,10 +670,19 @@ namespace TNRD.Editor.Core {
 		}
 		#endregion
 
+		/// <summary>
+		/// Destroys the given asset
+		/// </summary>
+		/// <param name="obj">The asset to destroy</param>
 		public void DestroyAsset( UnityEngine.Object obj ) {
 			DestroyImmediate( obj );
 		}
 
+		/// <summary>
+		/// Destroys the given asset
+		/// </summary>
+		/// <param name="obj">The asset to destroy</param>
+		/// <param name="allowDestroyingAssets">True means allowing an asset to be deleted from disk</param>
 		public void DestroyAsset( UnityEngine.Object obj, bool allowDestroyingAssets ) {
 			DestroyImmediate( obj, allowDestroyingAssets );
 		}

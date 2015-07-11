@@ -1,6 +1,9 @@
 ﻿#if UNITY_EDITOR
 
 namespace TNRD.Editor.Core {
+	/// <summary>
+	/// Settings that apply to a single window
+	/// </summary>
 	public class ExtendedWindowSettings {
 
 		/// <summary>

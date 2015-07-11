@@ -4,17 +4,23 @@ using UnityEditor;
 using UnityEngine;
 
 namespace TNRD.Editor.Core {
+	/// <summary>
+	/// Base for controls that can be added to ExtendedWindows
+	/// </summary>
 	public class ExtendedControl {
 
 		[JsonIgnore]
 		public ExtendedWindow Window;
+
 		[JsonIgnore]
 		public ExtendedInput Input { get { return Window.Input; } }
 
 		public bool IsInitialized;
 
 		public Vector2 Position;
+
 		public Vector2 Size;
+
 		[JsonIgnore]
 		public Rect Rectangle {
 			get {
@@ -32,6 +38,9 @@ namespace TNRD.Editor.Core {
 
 		public ExtendedControl() { }
 
+		/// <summary>
+		/// Called when the control is added to a window
+		/// </summary>
 		public virtual void OnInitialize() {
 			IsInitialized = true;
 
@@ -39,10 +48,13 @@ namespace TNRD.Editor.Core {
 			controlHint = t.Name.GetHashCode();
 		}
 
+		/// <summary>
+		/// Called the first time OnGUI is called on this control
+		/// </summary>
 		public virtual void OnInitializeGUI() {
 			initializedGUI = true;
 		}
-
+		
 		public virtual void OnDeserialized() {
 			if ( controlHint == -1 ) {
 				var t = GetType();
@@ -50,18 +62,29 @@ namespace TNRD.Editor.Core {
 			}
 		}
 
+		/// <summary>
+		/// Called when the Window gets closed
+		/// </summary>
 		public virtual void OnDestroy() {
 			IsInitialized = false;
 		}
 
-		public virtual void Update( bool hasFocus ) { }
+		/// <summary>
+		/// Called 100 times per second
+		/// </summary>
+		public virtual void Update( bool windowHasFocus ) { }
+
 		public virtual void OnGUI() {
 			if ( !initializedGUI ) {
 				OnInitializeGUI();
 			}
 		}
+
 		public virtual void OnSceneGUI( SceneView view ) { }
 
+		/// <summary>
+		/// Get a unique ID for a control
+		/// </summary>
 		public int GetControlID( FocusType focus ) {
 			return GUIUtility.GetControlID( controlHint, focus );
 		}

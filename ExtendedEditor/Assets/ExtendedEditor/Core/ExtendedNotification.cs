@@ -2,6 +2,10 @@
 using UnityEngine;
 
 namespace TNRD.Editor.Core {
+
+	/// <summary>
+	/// A notification popup that can be shown in a window at the bottom right corner
+	/// </summary>
 	public class ExtendedNotification {
 		public GUIContent Text;
 		public Color @Color;

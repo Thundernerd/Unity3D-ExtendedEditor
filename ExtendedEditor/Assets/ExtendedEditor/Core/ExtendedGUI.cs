@@ -15,6 +15,7 @@ namespace TNRD.Editor.Core {
 			stretchWidth = true,
 			margin = new RectOffset( 0, 0, 5, 5 )
 		};
+
 		private static Color horizontalLineColor = new Color( 0.349f, 0.349f, 0.349f );
 
 		public static void HorizontalLine( float thickness = 1 ) {
@@ -22,6 +23,21 @@ namespace TNRD.Editor.Core {
 		}
 
 		public static void HorizontalLine( Color color, float thickness = 1 ) {
+			Rect position = GUILayoutUtility.GetRect( GUIContent.none, horizontalLineStyle, GUILayout.Height( thickness ) );
+
+			if ( Event.current.type == EventType.Repaint ) {
+				var guiColor = GUI.color;
+				GUI.color = color;
+				horizontalLineStyle.Draw( position, false, false, false, false );
+				GUI.color = guiColor;
+			}
+		}
+
+		public static void IndentedHorizontalLine( float thickness = 1 ) {
+			IndentedHorizontalLine( horizontalLineColor, thickness );
+		}
+
+		public static void IndentedHorizontalLine( Color color, float thickness = 1 ) {
 			Rect position = EditorGUI.IndentedRect( GUILayoutUtility.GetRect( GUIContent.none, horizontalLineStyle, GUILayout.Height( thickness ) ) );
 
 			if ( Event.current.type == EventType.Repaint ) {
@@ -105,6 +121,7 @@ namespace TNRD.Editor.Core {
 		public static void BeginToolbar() {
 			GUILayout.BeginHorizontal( toolbarStyle );
 		}
+
 		public static void EndToolbar() {
 			GUILayout.FlexibleSpace();
 			GUILayout.EndHorizontal();
@@ -113,6 +130,7 @@ namespace TNRD.Editor.Core {
 		public static bool ToolbarButton( string content ) {
 			return GUILayout.Button( content, toolbarButtonStyle );
 		}
+
 		public static bool ToolbarButton( GUIContent content ) {
 			return GUILayout.Button( content, toolbarButtonStyle );
 		}
@@ -122,6 +140,7 @@ namespace TNRD.Editor.Core {
 			GUILayout.Button( content, toolbarButtonStyle );
 			EditorGUI.EndDisabledGroup();
 		}
+
 		public static void ToolbarButtonDisabled( GUIContent content ) {
 			EditorGUI.BeginDisabledGroup( true );
 			GUILayout.Button( content, toolbarButtonStyle );
@@ -131,6 +150,7 @@ namespace TNRD.Editor.Core {
 		public static bool ToolbarDropDown( string content ) {
 			return GUILayout.Button( content, toolbarDropDownStyle );
 		}
+
 		public static bool ToolbarDropDown( GUIContent content ) {
 			return GUILayout.Button( content, toolbarDropDownStyle );
 		}
@@ -150,6 +170,7 @@ namespace TNRD.Editor.Core {
 			}
 			return InternalDropdownList( GUILayoutUtility.GetRect( contents[0], EditorStyles.toolbarPopup ), current, contents, toolbarPopupStyle );
 		}
+
 		public static int ToolbarPopup( int current, GUIContent[] items ) {
 			return InternalDropdownList( GUILayoutUtility.GetRect( items[0], EditorStyles.toolbarPopup ), current, items, toolbarPopupStyle );
 		}
@@ -163,6 +184,7 @@ namespace TNRD.Editor.Core {
 			var rect = GUILayoutUtility.GetRect( gContent, toolbarSearchStyle, GUILayout.Width( width ) );
 			return ToolbarSearchField( rect, content );
 		}
+
 		public static string ToolbarSearchField( Rect rect, string content ) {
 			rect.width -= 15;
 			var text = GUI.TextField( rect, content, toolbarSearchStyle );
@@ -174,6 +196,7 @@ namespace TNRD.Editor.Core {
 			}
 			return text;
 		}
+
 		public static string ToolbarSearchFieldWithBackground( Rect rect, string content ) {
 			rect.height = toolbarStyle.fixedHeight;
 			GUI.Box( rect, "", toolbarStyle );
@@ -227,16 +250,19 @@ namespace TNRD.Editor.Core {
 
 			GUILayout.BeginArea( new Rect( x, y, w, h ) );
 		}
+
 		public static void EndArea() {
 			GUILayout.EndArea();
 		}
-		
+
 		public static Rect GetControlRect( params GUILayoutOption[] options ) {
 			return GUILayoutUtility.GetRect( GUIContent.none, EditorStyles.layerMaskField, options );
 		}
+
 		public static Rect GetControlRect( GUIContent content, params GUILayoutOption[] options ) {
 			return GUILayoutUtility.GetRect( content, EditorStyles.layerMaskField, options );
 		}
+
 		public static Rect GetControlRect( GUIContent content, GUIStyle style, params GUILayoutOption[] options ) {
 			return GUILayoutUtility.GetRect( content, style, options );
 		}
@@ -255,11 +281,15 @@ namespace TNRD.Editor.Core {
 
 		private class DropdownCallbackInfo {
 			private const string kMaskMenuChangedMessage = "MaskMenuChanged";
+
 			public static DropdownCallbackInfo instance;
+
 			private readonly int controlID;
+
 			private int selectedIndex;
 
 			private object view;
+
 			private MethodInfo method;
 
 			public DropdownCallbackInfo( int controlID ) {
@@ -316,6 +346,7 @@ namespace TNRD.Editor.Core {
 			}
 			return new Vector2( width * 1.1f, height );
 		}
+
 		private static Vector2 GetDropdownSize( GUIContent[] items, GUIStyle style ) {
 			float width = 0;
 			float height = 0;
@@ -337,6 +368,7 @@ namespace TNRD.Editor.Core {
 			EditorGUI.LabelField( labelRect, "Platform material" );
 			return DropdownList( dropdownRect, current, items );
 		}
+
 		public static int DropdownList( string label, int current, GUIContent[] items ) {
 			var rect = EditorGUILayout.GetControlRect();
 			var rwidth = 150;
@@ -345,6 +377,7 @@ namespace TNRD.Editor.Core {
 			EditorGUI.LabelField( labelRect, "Platform material" );
 			return DropdownList( dropdownRect, current, items );
 		}
+
 		public static int DropdownList( int current, string[] items ) {
 			var rect = GetControlRect();
 			GUIContent[] contents = new GUIContent[items.Length];
@@ -353,10 +386,12 @@ namespace TNRD.Editor.Core {
 			}
 			return InternalDropdownList( rect, current, contents, dropdownPopupStyle );
 		}
+
 		public static int DropdownList( int current, GUIContent[] items ) {
 			var rect = GetControlRect();
 			return InternalDropdownList( rect, current, items, dropdownPopupStyle );
 		}
+
 		public static int DropdownList( Rect position, int current, string[] items ) {
 			GUIContent[] contents = new GUIContent[items.Length];
 			for ( int i = 0; i < items.Length; i++ ) {
@@ -364,6 +399,7 @@ namespace TNRD.Editor.Core {
 			}
 			return InternalDropdownList( position, current, contents, dropdownPopupStyle );
 		}
+
 		public static int DropdownList( Rect position, int current, GUIContent[] items ) {
 			return InternalDropdownList( position, current, items, dropdownPopupStyle );
 		}
