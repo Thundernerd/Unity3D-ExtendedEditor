@@ -70,8 +70,6 @@ namespace TNRD.Editor.Core {
 			windowsToProcess = new List<ExtendedWindow>();
 			modalWindow = null;
 			modalWindowCallback = null;
-
-			wantsMouseMove = false;
 		}
 
 		protected virtual void OnDestroy() {
