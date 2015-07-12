@@ -1,18 +1,18 @@
-﻿using UnityEngine;
-using System.Collections;
-using TNRD.Editor.Core;
+﻿using TNRD.Editor.Core;
+using UnityEngine;
 
 public class MultiWindow : ExtendedWindow {
 
-	public MultiWindow( string name, bool loose )
+	public MultiWindow( string name, bool allowMovement, bool drawButtons )
 		: base() {
 		Title = name;
 
 		Settings.IsBlocking = false;
 		Settings.IsFullscreen = false;
 
-		Settings.DrawTitleBarButtons = loose;
-		Settings.AllowRepositioning = Settings.AllowResize = loose;
+
+		Settings.DrawTitleBarButtons = drawButtons;
+		Settings.AllowRepositioning = Settings.AllowResize = allowMovement;
     }
 
 	public override void OnInitialize() {

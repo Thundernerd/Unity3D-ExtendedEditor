@@ -1,7 +1,6 @@
-﻿using UnityEngine;
-using System.Collections;
-using TNRD.Editor.Core;
+﻿using TNRD.Editor.Core;
 using UnityEditor;
+using UnityEngine;
 
 public class MultiWindowEditor : ExtendedEditor {
 
@@ -17,9 +16,9 @@ public class MultiWindowEditor : ExtendedEditor {
 
 		RepaintOnUpdate = true;
 
-		var w1 = new MultiWindow( "#1", false );
-		var w2 = new MultiWindow( "#2", true );
-		var w3 = new MultiWindow( "#3", true );
+		var w1 = new MultiWindow( "#1", false, false );
+		var w2 = new MultiWindow( "#2", true, false );
+		var w3 = new MultiWindow( "#3", true, true );
 
 		AddWindow( w1 );
 		AddWindow( w2 );
