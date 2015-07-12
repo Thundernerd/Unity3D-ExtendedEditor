@@ -136,16 +136,28 @@ namespace TNRD.Editor.Controls {
 
 		protected void AddInternal( ReorderableList list ) {
 			try {
-				list.list.Add( Activator.CreateInstance<T>() );
+				var item = Activator.CreateInstance<T>();
+				list.list.Add( item );
+
+				if ( OnAddedItem != null ) {
+					OnAddedItem.Invoke( this, new ReorderableListEventArgs( list, item ) );
+				}
 			} catch ( MissingMethodException) {
 				list.list.Add( default(T) );
 			}
 		}
 
 		private void RemoveInternal( ReorderableList list ) {
-			GUIUtility.hotControl = GUIUtility.keyboardControl = 0;
+			var item = (T)list.list[list.index];
+
 			list.list.RemoveAt( list.index );
-			list.index = -1;
+			list.index = Mathf.Min( list.index, list.count - 1 );
+
+			GUIUtility.hotControl = GUIUtility.keyboardControl = 0;
+
+			if ( OnRemovedItem != null ) {
+				OnRemovedItem.Invoke( this, new ReorderableListEventArgs( list, item ) );
+			}
 		}
 
 		private void DrawHeaderInternal( Rect rect ) {

@@ -33,8 +33,6 @@ public class NoteControl : ExtendedControl {
 	private Vector2 textSize = new Vector2();
 	private GUIStyle textStyle;
 	private GUIStyle textAreaStyle;
-	private GUIStyle dropStyle;
-	private GUIStyle dropTextStyle;
 
 	private Texture2D cross;
 	private Texture2D downArrow;
@@ -70,12 +68,6 @@ public class NoteControl : ExtendedControl {
 		textStyle = new GUIStyle( GUI.skin.label );
 		textAreaStyle = new GUIStyle( GUI.skin.textArea );
 		textAreaStyle.fontSize = textStyle.fontSize = textAreaStyle.fontSize = 20;
-
-		dropStyle = new GUIStyle( "NotificationBackground" );
-		dropTextStyle = new GUIStyle( "NotificationText" );
-		dropTextStyle.padding = new RectOffset( 20, 20, 20, 20 );
-		dropTextStyle.alignment = TextAnchor.MiddleCenter;
-		dropTextStyle.fontSize = 17;
 	}
 
 	public override void OnGUI() {
