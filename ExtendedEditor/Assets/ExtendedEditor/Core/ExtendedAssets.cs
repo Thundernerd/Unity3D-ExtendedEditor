@@ -13,10 +13,15 @@ namespace TNRD.Editor.Core {
 		[JsonIgnore]
 		private Dictionary<string, Texture2D> textures;
 		[JsonProperty]
-		private string path;
+		public string Path;
 
 		public ExtendedAssets() {
 			textures = new Dictionary<string, Texture2D>();
+		}
+
+		public ExtendedAssets( string path ) {
+			textures = new Dictionary<string, Texture2D>();
+			Path = path;
 		}
 
 		/// <summary>
@@ -31,10 +36,10 @@ namespace TNRD.Editor.Core {
 				if ( files.Length == 1 ) {
 					var f = files[0];
 					var fi = new FileInfo( f );
-					this.path = Path.Combine( fi.DirectoryName, "Assets/" );
+					this.Path = System.IO.Path.Combine( fi.DirectoryName, "Assets/" );
 				}
 			} else {
-				this.path = path.ToLower().StartsWith( "assets" ) ? path : string.Format( "Assets/{0}", path );
+				this.Path = path.ToLower().StartsWith( "assets" ) ? path : string.Format( "Assets/{0}", path );
 			}
 
 			textures = new Dictionary<string, Texture2D>();
@@ -59,7 +64,7 @@ namespace TNRD.Editor.Core {
 		/// <param name="key">The name of the texture file without the extension</param>
 		/// <returns>Texture2D or null if the texture file does not exist</returns>
 		public Texture2D Load( string key ) {
-			return Load( key, path );
+			return Load( key, Path );
 		}
 
 		/// <summary>
@@ -76,7 +81,7 @@ namespace TNRD.Editor.Core {
 				return textures[key];
 			}
 
-			var path = Path.Combine( location, key + ".png" );
+			var path = System.IO.Path.Combine( location, key + ".png" );
 			if ( !File.Exists( path ) ) return null;
 
 			var tex = new Texture2D( 1, 1 );
