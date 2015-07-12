@@ -11,11 +11,11 @@ namespace TNRD.Editor.Core {
 		/// </summary>
 		public string AssetPath = "";
 
-		public bool AllowResize = true;
+		public bool AllowResize = false;
 
-		public bool AllowRepositioning = true;
+		public bool AllowRepositioning = false;
 
-		public bool DrawTitleBarButtons = true;
+		public bool DrawTitleBarButtons = false;
 
 		public bool DrawToolbar = false;
 
