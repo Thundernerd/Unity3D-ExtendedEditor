@@ -85,8 +85,6 @@ namespace TNRD.Editor.Core {
 
 		private Dictionary<Type, List<ExtendedControl>> controlsDict = new Dictionary<Type, List<ExtendedControl>>();
 
-		private Vector2 previousEditorSize;
-
 		private Rect nonFullScreenRect;
 
 		private bool initializedGUI = false;
@@ -212,8 +210,6 @@ namespace TNRD.Editor.Core {
 				if ( WindowRect.position.x != 0 && WindowRect.position.y != 0 ) {
 					WindowRect.position = new Vector2( 0, 0 );
 				}
-
-				previousEditorSize = currentEditorSize;
 			} else {
 				nonFullScreenRect = WindowRect;
 			}
