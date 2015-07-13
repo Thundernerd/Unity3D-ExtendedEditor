@@ -19,7 +19,7 @@ namespace TNRD.Editor.Controls {
 				Item = item;
 			}
 		}
-
+		
 		private enum EListType {
 			Int,
 			Float,

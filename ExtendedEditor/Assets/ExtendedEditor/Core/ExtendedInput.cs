@@ -4,49 +4,44 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace TNRD.Editor.Core {
+
+	[DocsDescription("The input manager for every editor")]
 	public class ExtendedInput {
 
 		private Dictionary<KeyCode, State<bool>> kStates = new Dictionary<KeyCode, State<bool>>();
 		private Dictionary<EMouseButton, State<bool>> mStates = new Dictionary<EMouseButton, State<bool>>();
 
-		/// <summary>
-		/// The current mouse position in the editor/window
-		/// </summary>
+
+		[DocsDescription("The current mouse position in the editor/window")]
 		public Vector2 MousePosition { get; set; }
-		/// <summary>
-		/// The current mouse delta in the editor/window (including scrollwheel delta)
-		/// </summary>
+
+		[DocsDescription("The current mouse delta in the editor/window (including scrollwheel delta)")]
 		public Vector2 MouseDelta { get; private set; }
 
 		private Vector2 scrollDelta;
-		/// <summary>
-		/// 
-		/// </summary>
+
+		[DocsDescription("The current scrollwheel delta")]
 		public Vector2 ScrollDelta { get { return scrollDelta; } }
 
-		/// <summary>
-		/// Did a double click occur. Check which button with <see cref="Button"/>
-		/// </summary>
+		[DocsDescription("Did a double click occur. Check which button with \"Button\"")]
 		public bool IsDoubleClick { get; private set; }
 
-		/// <summary>
-		/// The current mousebutton that is down. To be used with <see cref="IsDoubleClick"/>
-		/// </summary>
+		[DocsDescription("The mouse button that invoked a double click")]
 		public EMouseButton Button { get; private set; }
 
-		/// <summary>
-		/// The current event type
-		/// </summary>
+		[DocsDescription("The current event that is being processed")]
 		public EventType Type { get; private set; }
 
 		private long lastClick = 0;
 		private int lastButton = -1;
 
+		[DocsIgnore]
 		public ExtendedInput() {
 			MousePosition = new Vector2();
 			MouseDelta = new Vector2();
 		}
 
+		[DocsDescription("Called 100 times per second")]
 		public void Update() {
 			var kCopy = new Dictionary<KeyCode, State<bool>>( kStates );
 			foreach ( var item in kCopy ) {
@@ -65,6 +60,7 @@ namespace TNRD.Editor.Core {
 			IsDoubleClick = false;
 		}
 
+		[DocsDescription("Handles the input events")]
 		public void OnGUI( Event e ) {
 			if ( e == null ) return;
 
@@ -168,56 +164,44 @@ namespace TNRD.Editor.Core {
 			SetValue( KeyCode.LeftAlt, value );
 			SetValue( KeyCode.RightAlt, value );
 		}
-
-		/// <summary>
-		/// Did the given mouse button get pressed this frame
-		/// </summary>
-		/// <param name="button">The mouse button to check</param>
+		
+		[DocsDescription("Did the given mouse button get pressed this frame")]
+		[DocsParameter("button", "the mouse button to check")]
 		public bool ButtonPressed( EMouseButton button ) {
 			if ( !mStates.ContainsKey( button ) ) return false;
 			return mStates[button].IsPressed();
 		}
-
-		/// <summary>
-		/// Did the given mouse button get released this frame
-		/// </summary>
-		/// <param name="button">The mouse button to check</param>
+		
+		[DocsDescription("Did the given mouse button get released this frame")]
+		[DocsParameter("button", "the mouse button to check")]
 		public bool ButtonReleased( EMouseButton button ) {
 			if ( !mStates.ContainsKey( button ) ) return false;
 			return mStates[button].IsReleased();
 		}
-
-		/// <summary>
-		/// Is the given mouse button down
-		/// </summary>
-		/// <param name="button">The mouse button to check</param>
+		
+		[DocsDescription("Is the given mouse button down")]
+		[DocsParameter("button", "the mouse button to check")]
 		public bool ButtonDown( EMouseButton button ) {
 			if ( !mStates.ContainsKey( button ) ) return false;
 			return mStates[button].IsDown();
 		}
-
-		/// <summary>
-		/// Is the given mouse button up
-		/// </summary>
-		/// <param name="button">The mouse button to check</param>
+		
+		[DocsDescription("Is the given mouse button up")]
+		[DocsParameter("button", "the mouse button to check")]
 		public bool ButtonUp( EMouseButton button ) {
 			if ( !mStates.ContainsKey( button ) ) return false;
 			return mStates[button].IsUp();
 		}
-
-		/// <summary>
-		/// Did the given key get pressed this frame
-		/// </summary>
-		/// <param name="key">The key to check</param>
+		
+		[DocsDescription("Did the given key get pressed this frame")]
+		[DocsParameter("key", "the key to check")]
 		public bool KeyPressed( KeyCode key ) {
 			if ( !kStates.ContainsKey( key ) ) return false;
 			return kStates[key].IsPressed();
 		}
-
-		/// <summary>
-		/// Did one of the given keys get pressed this frame
-		/// </summary>
-		/// <param name="keys">The keys to check</param>
+		
+		[DocsDescription("Did one of the given keys get pressed this frame")]
+		[DocsParameter("keys", "the keys to check")]
 		public bool KeyPressed( params KeyCode[] keys ) {
 			foreach ( var key in keys ) {
 				if ( kStates.ContainsKey( key ) ) {
@@ -228,11 +212,9 @@ namespace TNRD.Editor.Core {
 			}
 			return false;
 		}
-
-		/// <summary>
-		/// Did all of the given keys get pressed this frame
-		/// </summary>
-		/// <param name="keys">The keys to check</param>
+		
+		[DocsDescription("Did all of the given keys get pressed this frame")]
+		[DocsParameter("keys", "the keys to check")]
 		public bool KeysPressed( params KeyCode[] keys ) {
 			foreach ( var key in keys ) {
 				if ( !kStates.ContainsKey( key ) ) return false;
@@ -240,20 +222,16 @@ namespace TNRD.Editor.Core {
 			}
 			return true;
 		}
-
-		/// <summary>
-		/// Did the given key get released this frame
-		/// </summary>
-		/// <param name="key">The key to check</param>
+		
+		[DocsDescription("Did the given key get released this frame")]
+		[DocsParameter("key", "the key to check")]
 		public bool KeyReleased( KeyCode key ) {
 			if ( !kStates.ContainsKey( key ) ) return false;
 			return kStates[key].IsReleased();
 		}
-
-		/// <summary>
-		/// Did one of the given keys get released this frame
-		/// </summary>
-		/// <param name="keys">The keys to check</param>
+		
+		[DocsDescription("Did one of the given keys get released this frame")]
+		[DocsParameter("keys", "the keys to check")]
 		public bool KeyReleased( params KeyCode[] keys ) {
 			foreach ( var key in keys ) {
 				if ( kStates.ContainsKey( key ) ) {
@@ -264,11 +242,9 @@ namespace TNRD.Editor.Core {
 			}
 			return false;
 		}
-
-		/// <summary>
-		/// Did all of the given keys get released this frame
-		/// </summary>
-		/// <param name="keys">The keys to check</param>
+		
+		[DocsDescription("Did all of the given keys get released this frame")]
+		[DocsParameter("keys", "the keys to check")]
 		public bool KeysReleased( params KeyCode[] keys ) {
 			foreach ( var key in keys ) {
 				if ( !kStates.ContainsKey( key ) ) return false;
@@ -276,20 +252,16 @@ namespace TNRD.Editor.Core {
 			}
 			return true;
 		}
-
-		/// <summary>
-		/// Is the given key down
-		/// </summary>
-		/// <param name="key">The key to check</param>
+		
+		[DocsDescription("Is the given key down")]
+		[DocsParameter("key", "the key to check")]
 		public bool KeyDown( KeyCode key ) {
 			if ( !kStates.ContainsKey( key ) ) return false;
 			return kStates[key].IsDown();
 		}
-
-		/// <summary>
-		/// Is one of the given keys down
-		/// </summary>
-		/// <param name="keys">The keys to check</param>
+		
+		[DocsDescription("Is one of the given keys down")]
+		[DocsParameter("keys", "the keys to check")]
 		public bool KeyDown( params KeyCode[] keys ) {
 			foreach ( var key in keys ) {
 				if ( kStates.ContainsKey( key ) ) {
@@ -300,11 +272,9 @@ namespace TNRD.Editor.Core {
 			}
 			return false;
 		}
-
-		/// <summary>
-		/// Are all of the given keys down
-		/// </summary>
-		/// <param name="keys">The keys to check</param>
+		
+		[DocsDescription("Are all of the given keys down")]
+		[DocsParameter("keys", "the keys to check")]
 		public bool KeysDown( params KeyCode[] keys ) {
 			foreach ( var key in keys ) {
 				if ( !kStates.ContainsKey( key ) ) return false;
@@ -312,20 +282,16 @@ namespace TNRD.Editor.Core {
 			}
 			return true;
 		}
-
-		/// <summary>
-		/// Is the given key up
-		/// </summary>
-		/// <param name="key">The key to check</param>
+		
+		[DocsDescription("Is the given key up")]
+		[DocsParameter("key", "the key to check")]
 		public bool KeyUp( KeyCode key ) {
 			if ( !kStates.ContainsKey( key ) ) return false;
 			return kStates[key].IsUp(); ;
 		}
-
-		/// <summary>
-		/// Is one of the given keys up
-		/// </summary>
-		/// <param name="keys">The keys to check</param>
+		
+		[DocsDescription("Is one of the given keys up")]
+		[DocsParameter("keys", "the keys to check")]
 		public bool KeyUp( params KeyCode[] keys ) {
 			foreach ( var key in keys ) {
 				if ( kStates.ContainsKey( key ) ) {
@@ -336,11 +302,9 @@ namespace TNRD.Editor.Core {
 			}
 			return false;
 		}
-
-		/// <summary>
-		/// Are all of the given keys up
-		/// </summary>
-		/// <param name="keys">The keys to check</param>
+		
+		[DocsDescription("Are all of the given keys up")]
+		[DocsParameter("keys", "the keys to check")]
 		public bool KeysUp( params KeyCode[] keys ) {
 			foreach ( var key in keys ) {
 				if ( !kStates.ContainsKey( key ) ) return false;
@@ -349,9 +313,7 @@ namespace TNRD.Editor.Core {
 			return true;
 		}
 
-		/// <summary>
-		/// Resets all the key and mousebutton states
-		/// </summary>
+		[DocsDescription("Resets all the key and mousebutton states")]
 		public void Reset() {
 			var keyStates = new Dictionary<KeyCode, State<bool>>( kStates );
 			foreach ( var item in keyStates ) {

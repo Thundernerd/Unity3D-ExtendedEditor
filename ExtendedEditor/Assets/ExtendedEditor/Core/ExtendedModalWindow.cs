@@ -2,61 +2,69 @@
 using UnityEngine;
 
 namespace TNRD.Editor.Core {
+	[DocsDescription("Base class for modal windows that can be added to ExtendedWindows")]
 	public class ExtendedModalWindow {
 
+		[DocsDescription("The editor this modal window is shown in")]
 		public ExtendedEditor Editor;
 
+		[DocsDescription("The result of a closed modal window")]
 		public EExtendedModalWindowResult Result { get; private set; }
 
+		[DocsDescription("Is the modal window ready to close")]
 		public bool IsDone { get; private set; }
 
+		[DocsDescription("Can the modal window be dragged around")]
 		public bool IsDraggable { get; protected set; }
 
+		[DocsDescription("The title of the modal window")]
 		public string Title = "";
 
+		[DocsDescription("The rectangle used to draw the modal window")]
 		public Rect WindowRect = new Rect();
 
+		[DocsDescription("The input manager")]
 		public ExtendedInput Input { get { return Editor.Input; } }
-
-		/// <summary>
-		/// Should the modal window be aligned to the center of the editor
-		/// </summary>
-		protected bool alignToCenter = true;
 		
+		[DocsDescription("Should the modal window be aligned to the center of the editor")]
+        protected bool alignToCenter = true;
+		
+		[DocsDescription("Should the modal window show the OK/Accept button")]
 		protected bool showOKButton = false;
 
+		[DocsDescription("Should the modal window show the Cancel/Close button")]
 		protected bool showCancelButton = false;
 		
+		[DocsDescription("The text to show on the OK/Accept button")]
 		protected string textOKButton = "OK";
 		
+		[DocsDescription("The text to show on the Cancel/Close button")]
 		protected string textCancelButton = "Cancel";
 
 		private bool isInitialized = false;
 
+		[DocsDescription("Creates an instance of ExtendedModalWindow")]
 		public ExtendedModalWindow() { }
-
-		/// <summary>
-		/// Called the first time OnGUI is called on this modal window
-		/// </summary>
-		protected virtual void Initialize() {
+		
+		[DocsDescription("Called the first time OnGUI is called on this modal window")]
+		protected virtual void OnInitialize() {
 			isInitialized = true;
 		}
-
-		/// <summary>
-		/// Called when the modal window gets closed
-		/// </summary>
-		protected virtual void Destroy() {
+		
+		[DocsDescription("Called when the modal window gets closed")]
+		protected virtual void OnDestroy() {
 			isInitialized = false;
 		}
-
-		/// <summary>
-		/// Called 100 times per second
-		/// </summary>
+		
+		[DocsDescription("Called 100 times per second")]
+		[DocsParameter("windowHasFocus", "Does this window have focus")]
 		public virtual void Update( bool windowHasFocus ) { }
-
+		
+		[DocsDescription("Write your own GUI logic here")]
+		[DocsParameter("id", "-")]
 		public virtual void OnGUI( int id ) {
 			if ( !isInitialized ) {
-				Initialize();
+				OnInitialize();
 
 				if ( alignToCenter ) {
 					AlignToCenter();
@@ -110,28 +118,22 @@ namespace TNRD.Editor.Core {
 				}
 			}
 		}
-
-		/// <summary>
-		/// Closes the modal window with the OK result
-		/// </summary>
+		
+		[DocsDescription("Closes the modal window with the OK result")]
 		public void OK() {
 			Result = EExtendedModalWindowResult.OK;
 			IsDone = true;
 			Event.current.Use();
 		}
-
-		/// <summary>
-		/// Closes the modal window with the Cancel result
-		/// </summary>
+		
+		[DocsDescription("Closes the modal window with the Cancel result")]
 		public void Cancel() {
 			Result = EExtendedModalWindowResult.Cancel;
 			IsDone = true;
 			Event.current.Use();
 		}
-
-		/// <summary>
-		/// Aligns the modal window to the center of the editor
-		/// </summary>
+		
+		[DocsDescription("Aligns the modal window to the center of the editor")]
 		public void AlignToCenter() {
 			var esize = Editor.position.size / 2;
 			var csize = WindowRect.size / 2;
@@ -139,9 +141,13 @@ namespace TNRD.Editor.Core {
 		}
 
 		#region Events
+		[DocsDescription("Invoked when a ContextClick event occurs")]
 		public virtual void OnContextClick( Vector2 position ) { }
+		[DocsDescription("Invoked when a DragExited event occurs")]
 		public virtual void OnDragExited() { }
+		[DocsDescription("Invoked when a DragPerform event occurs")]
 		public virtual void OnDragPerform( string[] paths, Vector2 position ) { }
+		[DocsDescription("Invoked when a DragUpdate event occurs")]
 		public virtual void OnDragUpdate( string[] paths, Vector2 position ) { }
 		#endregion
 	}
