@@ -235,22 +235,23 @@ public class DocsGenerator : MonoBehaviour {
 				fields.RemoveAt( i );
 			}
 		}
-		var builder = new StringBuilder();
 
-		builder.Append( SubsectionStart( "Fields" ) );
-		foreach ( var field in fields ) {
-			if ( field.IsPrivate ) continue;
-			//builder.Append( SubsectionSegment( string.Format( "{2}.{0}-{1}.html", item.Name, variable.Name, item.Namespace ), variable.Name ) );
-			builder.Append( SubsectionSegment( "#", field.Name, GetDescription( field ) ) );
+		if ( fields.Count > 0 ) {
+			var builder = new StringBuilder();
+
+			builder.Append( SubsectionStart( "Fields" ) );
+			foreach ( var field in fields ) {
+				if ( field.IsPrivate ) continue;
+				//builder.Append( SubsectionSegment( string.Format( "{2}.{0}-{1}.html", item.Name, variable.Name, item.Namespace ), variable.Name ) );
+				builder.Append( SubsectionSegment( "#", field.Name, GetDescription( field ) ) );
+			}
+
+			builder.Append( SubsectionEnd() );
+
+			return builder.ToString();
 		}
 
-		if ( fields.Count == 0 ) {
-			builder.Append( SubsectionSegment( "#", "No fields visible", "-" ) );
-		}
-
-		builder.Append( SubsectionEnd() );
-
-		return builder.ToString();
+		return "";
 	}
 
 	private static string GenerateItemProperties( Type item ) {
@@ -262,23 +263,23 @@ public class DocsGenerator : MonoBehaviour {
 			}
 		}
 
-		var builder = new StringBuilder();
+		if ( properties.Count > 0 ) {
+			var builder = new StringBuilder();
 
-		builder.Append( SubsectionStart( "Properties" ) );
-		foreach ( var property in properties ) {
-			if ( !property.CanRead && !property.CanWrite ) continue;
+			builder.Append( SubsectionStart( "Properties" ) );
+			foreach ( var property in properties ) {
+				if ( !property.CanRead && !property.CanWrite ) continue;
 
-			//builder.Append( SubsectionSegment( string.Format( "{2}.{0}-{1}.html", item.Name, property.Name, item.Namespace ), property.Name ) );
-			builder.Append( SubsectionSegment( "#", property.Name, GetDescription( property ) ) );
+				//builder.Append( SubsectionSegment( string.Format( "{2}.{0}-{1}.html", item.Name, property.Name, item.Namespace ), property.Name ) );
+				builder.Append( SubsectionSegment( "#", property.Name, GetDescription( property ) ) );
+			}
+
+			builder.Append( SubsectionEnd() );
+
+			return builder.ToString();
 		}
 
-		if ( properties.Count == 0 ) {
-			builder.Append( SubsectionSegment( "#", "No properties visible", "-" ) );
-		}
-
-		builder.Append( SubsectionEnd() );
-
-		return builder.ToString();
+		return "";
 	}
 
 	private static string GenerateItemConstructors( Type item ) {
@@ -289,28 +290,28 @@ public class DocsGenerator : MonoBehaviour {
 			}
 		}
 
-		var builder = new StringBuilder();
+		if ( constructors.Count > 0 ) {
+			var builder = new StringBuilder();
 
-		builder.Append( SubsectionStart( "Constructors" ) );
-		for ( int i = 0; i < constructors.Count; i++ ) {
-			if ( constructors[i].IsPrivate ) continue;
-			builder.Append( SubsectionSegment(
-				string.Format( "{2}.{3}{0}-{0}.html",
-				item.Name,
-				constructors[i].Name,
-				item.Namespace,
-				item.ReflectedType == null ? "" : item.ReflectedType.Name + "." ), item.Name, GetDescription( constructors[i] ) ) );
-			// breaking after the first, we only want one
-			break;
+			builder.Append( SubsectionStart( "Constructors" ) );
+			for ( int i = 0; i < constructors.Count; i++ ) {
+				if ( constructors[i].IsPrivate ) continue;
+				builder.Append( SubsectionSegment(
+					string.Format( "{2}.{3}{0}-{0}.html",
+					item.Name,
+					constructors[i].Name,
+					item.Namespace,
+					item.ReflectedType == null ? "" : item.ReflectedType.Name + "." ), item.Name, GetDescription( constructors[i] ) ) );
+				// breaking after the first, we only want one
+				break;
+			}
+
+			builder.Append( SubsectionEnd() );
+
+			return builder.ToString();
 		}
 
-		if ( constructors.Count == 0 ) {
-			builder.Append( SubsectionSegment( "#", "No constructors visible", "-" ) );
-		}
-
-		builder.Append( SubsectionEnd() );
-
-		return builder.ToString();
+		return "";
 	}
 
 	private static string GenerateItemPublicFunctions( Type item ) {
@@ -326,31 +327,43 @@ public class DocsGenerator : MonoBehaviour {
 
 			if ( methods[i].GetCustomAttributes( typeof(DocsIgnoreAttribute), false ).Length > 0 ) {
 				methods.RemoveAt( i );
+				continue;
 			}
+
+			if ( methods[i].IsPrivate ) {
+				methods.RemoveAt( i );
+				continue;
+			}
+
+			if ( methods[i].Name.StartsWith( "get_" ) || 
+					methods[i].Name.StartsWith( "set_" ) || 
+					methods[i].Name.StartsWith( "add_" ) || 
+					methods[i].Name.StartsWith( "remove_" ) ) {
+
+				methods.RemoveAt( i );
+				continue;
+			}
+        }
+
+		if ( methods.Count > 0 ) {
+			var builder = new StringBuilder();
+
+			builder.Append( SubsectionStart( "Public Methods" ) );
+			foreach ( var method in methods ) {
+				builder.Append( SubsectionSegment(
+					string.Format( "{2}.{3}{0}-{1}.html",
+					item.Name,
+					method.Name,
+					item.Namespace,
+					item.ReflectedType == null ? "" : item.ReflectedType.Name + "." ), method.Name, GetDescription( method ) ) );
+			}
+
+			builder.Append( SubsectionEnd() );
+
+			return builder.ToString();
 		}
 
-		var builder = new StringBuilder();
-
-		builder.Append( SubsectionStart( "Public Methods" ) );
-		foreach ( var method in methods ) {
-			if ( method.IsPrivate ) continue;
-			if ( method.Name.StartsWith( "get_" ) || method.Name.StartsWith( "set_" ) ) continue;
-
-			builder.Append( SubsectionSegment(
-				string.Format( "{2}.{3}{0}-{1}.html",
-				item.Name,
-				method.Name,
-				item.Namespace,
-				item.ReflectedType == null ? "" : item.ReflectedType.Name + "." ), method.Name, GetDescription( method ) ) );
-		}
-
-		if ( methods.Count == 0 ) {
-			builder.Append( SubsectionSegment( "#", "No methods visible", "-" ) );
-		}
-
-		builder.Append( SubsectionEnd() );
-
-		return builder.ToString();
+		return "";
 	}
 
 	private static string GenerateItemStaticFunctions( Type item ) {
@@ -368,25 +381,26 @@ public class DocsGenerator : MonoBehaviour {
 				methods.RemoveAt( i );
 			}
 		}
-		var builder = new StringBuilder();
 
-		builder.Append( SubsectionStart( "Static Methods" ) );
-		foreach ( var method in methods ) {
-			builder.Append( SubsectionSegment(
-				string.Format( "{2}.{3}{0}-{1}.html",
-				item.Name,
-				method.Name,
-				item.Namespace,
-				item.ReflectedType == null ? "" : item.ReflectedType.Name + "." ), method.Name, GetDescription( method ) ) );
+		if ( methods.Count > 0 ) {
+			var builder = new StringBuilder();
+
+			builder.Append( SubsectionStart( "Static Methods" ) );
+			foreach ( var method in methods ) {
+				builder.Append( SubsectionSegment(
+					string.Format( "{2}.{3}{0}-{1}.html",
+					item.Name,
+					method.Name,
+					item.Namespace,
+					item.ReflectedType == null ? "" : item.ReflectedType.Name + "." ), method.Name, GetDescription( method ) ) );
+			}
+
+			builder.Append( SubsectionEnd() );
+
+			return builder.ToString();
 		}
 
-		if ( methods.Count == 0 ) {
-			builder.Append( SubsectionSegment( "#", "No static methods visible", "-" ) );
-		}
-
-		builder.Append( SubsectionEnd() );
-
-		return builder.ToString();
+		return "";
 	}
 
 	private static string SubsectionStart( string name ) {
@@ -430,6 +444,18 @@ public class DocsGenerator : MonoBehaviour {
 				GenerateMemberConstructors( item );
 			}
 		}
+	}
+
+	private static string SectionStart( string url, string value, string name ) {
+		return string.Format(
+			@"<div class=""section"">
+				<div class=""mb20 clear"" id="""">
+					<h1 class=""heading inherit"">
+					<a href=""{0}"">{1}</a>.{2}</h1>
+					<div class=""clear""></div>
+					<div class=""clear""></div>
+					<div class=""clear""></div>
+				</div>", url, value, name );
 	}
 
 	private static void GenerateMemberFields( Type parent ) {
@@ -543,6 +569,31 @@ public class DocsGenerator : MonoBehaviour {
 		}
 	}
 
+	private static string MethodReturnValue( MethodInfo item ) {
+		var returnType = item.ReturnType;
+		var returnAttributes = item.GetCustomAttributes( typeof(DocsReturnValueAttribute), false );
+
+		return string.Format(
+					@"<div class=""subsection"">
+						<h2>Returns</h2>
+						<p><strong>{0}</strong> {1}</p>
+					</div>",
+					GetType( returnType ),
+					returnAttributes.Length == 1 ? ( returnAttributes[0] as DocsReturnValueAttribute ).Description : "-" );
+	}
+
+	private static string MethodDescription( MethodInfo item ) {
+		var descriptionAttributes = item.GetCustomAttributes( typeof(DocsDescriptionAttribute), false );
+
+		return string.Format(
+			@"<div class=""subsection"">
+						<h2>Description</h2>
+						<p>{0}</p>
+					</div>",
+			descriptionAttributes.Length == 1 ?
+				( descriptionAttributes[0] as DocsDescriptionAttribute ).Description : "-" );
+	}
+
 	private static void GenerateMemberMethods( Type parent ) {
 		var typeMethods = parent.GetMethods( BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.DeclaredOnly );
 		var methodInfos = new Dictionary<string, List<MethodInfo>>();
@@ -550,6 +601,7 @@ public class DocsGenerator : MonoBehaviour {
 		foreach ( var item in typeMethods ) {
 			if ( item.IsPrivate ) continue;
 			if ( item.Name.StartsWith( "get_" ) || item.Name.StartsWith( "set_" ) ) continue;
+			if ( item.Name.StartsWith( "add_" ) || item.Name.StartsWith( "remove_" ) ) continue;
 			if ( item.GetCustomAttributes( typeof(DocsIgnoreAttribute), false ).Length > 0 ) continue;
 
 			if ( methodInfos.ContainsKey( item.Name ) ) {
@@ -560,78 +612,178 @@ public class DocsGenerator : MonoBehaviour {
 			}
 		}
 
-		foreach ( var item in methodInfos ) {
-			var value = item.Value[0];
+		foreach ( var methodInfo in methodInfos ) {
+			var value = methodInfo.Value[0];
 			var path = string.Format( "{0}-{1}.html",
 				parent.ToString(), value.Name )
 				.Replace( "+", "." )
 				.Replace( "[T]", "" )
 				.Replace( "`1", "" );
 
-			if ( path.Contains( "+" ) ) {
-				Debug.Log( value.Name + "contains+" );
-			}
-
 			var builder = new StringBuilder();
 
 			builder.Append( DocumentStart() );
+			builder.Append( SectionStart( path.Replace( "-", "" ).Replace( value.Name, "" ), parent.Name, value.Name ) );
 
-			builder.AppendFormat(
-@"<div class=""section"">
-	<div class=""mb20 clear"" id="""">
-		<h1 class=""heading inherit"">
-			<a href=""{0}"">{1}</a>.{2}</h1>
-		<div class=""clear""></div>
-		<div class=""clear""></div>
-		<div class=""clear""></div>
-	</div>
-	<div class=""subsection"">
-		<div class=""signature"">", path.Replace( "-", "" ).Replace( value.Name, "" ), parent.Name, value.Name );
+			var parameterCollection = new List<string>();
+			var parameterDescriptionCollection = new List<DocsParameterAttribute>();
 
-			var parameterNames = new List<string>();
+			#region All Methods
+			builder.Append(
+				@"<div class=""subsection"">
+					<div class=""signature"">" );
 
-			foreach ( var method in item.Value ) {
+			foreach ( var method in methodInfo.Value ) {
 				var parameterInfos = method.GetParameters();
-				string parameters = "";
-				foreach ( var parameter in parameterInfos ) {
-					parameters += string.Format( " {0} <span class=\"sig-kw\">{1}</span>,", GetType( parameter.ParameterType ), parameter.Name );
+				var parameters = "";
 
-					if ( !parameterNames.Contains( parameter.Name ) ) {
-						parameterNames.Add( parameter.Name );
+				foreach ( var parameter in parameterInfos ) {
+					parameters += string.Format(
+						" {0} <span class=\"sig-kw\">{1}</span>,", GetType( parameter.ParameterType ), parameter.Name );
+
+					if ( !parameterCollection.Contains( parameter.Name ) ) {
+						parameterCollection.Add( parameter.Name );
+
+						var found = false;
+						var parameterDescriptions = method.GetCustomAttributes( typeof(DocsParameterAttribute), false );
+						foreach ( var item in parameterDescriptions ) {
+							var desc = (DocsParameterAttribute)item;
+
+							if ( desc.Parameter == parameter.Name ) {
+								parameterDescriptionCollection.Add( desc );
+								found = true;
+								break;
+							}
+						}
+
+						if ( !found ) {
+							parameterDescriptionCollection.Add( null );
+						}
 					}
 				}
-				parameters = parameters.TrimEnd( ',' );
+
 				parameters += " ";
-				parameters = parameters.Trim();
+				parameters = parameters.Trim( ',', ' ' );
 
 				builder.AppendFormat(
-@"<div class=""signature-CS sig-block"">
-	{0}{4} {1} <span class=""sig-kw"">{2}</span>({3});
-</div>", method.IsFamily ? "protected" : "public", GetType( method.ReturnType ), method.Name, parameters, method.IsStatic ? " static" : "" );
+					@"<div class=""signature-CS sig-block"">
+						{0}{1} {2} <span class=""sig-kw"">{3}</span>({4});
+					</div>",
+					method.IsFamily ? "protected" : "public",
+					method.IsStatic ? " static" : "",
+					GetType( method.ReturnType ),
+					method.Name,
+					parameters );
+			}
+
+			builder.AppendFormat(
+				@"	</div>
+				</div>" );
+			#endregion
+
+			#region All Parameters
+			builder.AppendFormat(
+				@"<div class=""subsection"">
+					<h2>Parameters</h2>
+					<table class=""list"">
+						<tbody>" );
+
+			for ( int j = 0; j < parameterCollection.Count; j++ ) {
+				string name = parameterCollection[j];
+				string description = parameterDescriptionCollection[j] == null ? "-" : parameterDescriptionCollection[j].Description;
+
+				builder.AppendFormat(
+					@"<tr>
+							<td class=""name lbl"">{0}</td>
+							<td class=""desc"">{1}</td>
+						</tr>",
+					name,
+					description );
 			}
 
 			builder.Append(
-@"	</div>
-</div>" );
+				@"		</tbody>
+						</table>
+					</div>" );
+			#endregion
 
-			builder.Append( @"<div class=""subsection"">
-	<h2>Parameters</h2>
-	<table class=""list"">
-		<tbody>" );
-			foreach ( var parameter in parameterNames ) {
-				builder.AppendFormat( @"<tr>
-	<td class=""name lbl"">{0}</td>
-	<td class=""desc"">...</td>", parameter );
+			#region Return Value
+			builder.Append( MethodReturnValue( methodInfo.Value[methodInfo.Value.Count - 1] ) );
+			#endregion
+
+			builder.AppendLine( 
+				@"<hr class=""section"">" );
+
+			for ( int i = 0; i < methodInfo.Value.Count; i++ ) {
+				var method = methodInfo.Value[i];
+
+				var parameterInfos = method.GetParameters();
+				var parameterString = "";
+
+				foreach ( var parameter in parameterInfos ) {
+					parameterString += string.Format(
+						" {0} <span class=\"sig-kw\">{1}</span>,", GetType( parameter.ParameterType ), parameter.Name );
+				}
+
+				parameterString += " ";
+				parameterString = parameterString.Trim( ',', ' ' );
+
+				builder.AppendFormat(
+					@"<div class=""subsection"">
+						<div class=""signature"">
+							<div class=""signature-CS sig-block"" style=""display: block;"">
+								{0}{1} {2} <span class=""sig-kw"">{3}</span>({4});
+							</div>
+						</div>
+					</div>",
+					method.IsFamily ? "protected" : "public",
+					method.IsStatic ? " static" : "",
+					GetType( method.ReturnType ),
+					method.Name,
+					parameterString );
+
+				builder.AppendFormat(
+					@"<div class=""subsection"">
+						<h2>Parameters</h2>
+						<table class=""list"">
+							<tbody>" );
+
+				var parameterDescriptions = method.GetCustomAttributes( typeof(DocsParameterAttribute), false );
+				var parameters = method.GetParameters();
+
+				for ( int j = 0; j < parameters.Length; j++ ) {
+					string name = parameters[j].Name;
+					string description = "";
+
+					foreach ( var item in parameterDescriptions ) {
+						var param = ( item as DocsParameterAttribute );
+						if ( param.Parameter == name ) {
+							description = param.Description;
+							break;
+						}
+					}
+
+					builder.AppendFormat(
+						@"<tr>
+							<td class=""name lbl"">{0}</td>
+							<td class=""desc"">{1}</td>
+						</tr>",
+						name,
+						description );
+				}
+
+				builder.Append(
+					@"		</tbody>
+						</table>
+					</div>" );
+
+				builder.Append( MethodReturnValue( method ) );
+				builder.Append( MethodDescription( method ) );
+
+				if ( i < methodInfo.Value.Count - 1 ) {
+					builder.AppendLine( "<hr class=\"section\">" );
+				}
 			}
-
-			builder.Append( @" </tbody>
-	</table>
-</div>" );
-
-			builder.AppendFormat( @"<div class=""subsection"">
-	<h2>Description</h2>
-	<p>{0}</p>
-</div>", GetDescription( value ) );
 
 			builder.Append( DocumentEnd() );
 
@@ -824,8 +976,12 @@ public class DocsGenerator : MonoBehaviour {
 				return "bool";
 			case "Single":
 				return "float";
+			case "Single[]":
+				return "float[]";
 			case "String":
 				return "string";
+			case "String[]":
+				return "string[]";
 			case "Dictionary`2":
 				args = item.GetGenericArguments();
 				return string.Format( "Dictionary&lt;{0}, {1}&gt;", GetType( args[0] ), GetType( args[1] ) );
