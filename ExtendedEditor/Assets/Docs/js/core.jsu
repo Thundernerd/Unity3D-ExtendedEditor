@@ -1,7 +1,7 @@
 /* ====================================================
  * Company: Unity Technologies
  * Author:  Rickard Andersson, rickard@unity3d.com
- * 
+ *
    TABLE OF CONTENTS
    1. Plugins
    2. Global variables
@@ -239,7 +239,7 @@ $(document).ready(function(){
   });
 
   // Submit suggestion
-  $('#suggest_submit').on('click',function(){     
+  $('#suggest_submit').on('click',function(){
 
     var errors = 0,
         $name = $('#suggest_name'),
@@ -250,7 +250,7 @@ $(document).ready(function(){
         $success = $('.suggest-success'),
         $failed = $('.suggest-failed'),
         rege = /[a-z0-9!#$%&'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
-    
+
     $email.removeClass('error');
     $body.removeClass('error');
 
@@ -264,10 +264,10 @@ $(document).ready(function(){
     }
 
     if(errors > 0) return false;
-    
+
     $loading.removeClass('hide');
     $form.addClass('hidden');
-    
+
     var json = JSON.stringify({
       name: $name.val(),
       email: $email.val(),
@@ -284,7 +284,7 @@ $(document).ready(function(){
         $loading.addClass('hide');
         $success.removeClass('hide');
       },
-      error: function(res) {      
+      error: function(res) {
         $loading.addClass('hide');
         $failed.removeClass('hide');
       }
@@ -297,7 +297,7 @@ $(document).ready(function(){
 /****************************************
   ==== 7. GLOBAL FUNCTIONS
 ****************************************/
-  
+
   function columnHeight(){
     var sidebarHeight = getHeight() - 160;
     var tocHeight = getHeight() - 141;
@@ -308,7 +308,7 @@ $(document).ready(function(){
   function centerElement(parent,child,nested){if(nested){var el = parent.find(child);el.css('width', el.width());el.css('left', (parent.outerWidth(true) - el.outerWidth(true)/2 - parent.outerWidth(true)/2) - 3);}}
 
   function checkScriptLanguage(lang){
-  
+
     if(lang != false){
       storeValue('scriptlang',lang);
     }
@@ -318,29 +318,31 @@ $(document).ready(function(){
     else {
       scriptlang = getStoredValue('scriptlang');
     }
-  
+    // TNRD: Only show CS
+    scriptlang = "CS";
+
     // Make sure language is valid, otherwise set cookie with default language
     if($.inArray(getStoredValue('scriptlang'), scriptLanguages) == -1){
       storeValue('scriptlang',defaultScriptLanguage);
     }
-  
+
     // Dialog state
     if(getStoredValue('scriptlangdialog') == null){
       $('#script-lang-dialog').removeClass('hide');
     }
-  
+
     // Select correct tab
     $('.script-lang li').removeClass('selected');
     $('.script-lang li[data-lang='+ scriptlang +']').addClass('selected');
-  
+
     // Show prefered language elements
     $('.signature-JS, .signature-CS, .signature-Boo').hide();
     $('.signature-' + scriptlang).show();
     $('.codeExampleJS, .codeExampleCS, .codeExampleBoo').hide();
     $('.codeExample' + scriptlang).show();
-  
+
   }
-  
+
   function localstorageSupport(){
     var isIE11 = !!navigator.userAgent.match(/Trident.*rv[ :]*11\./);
     if(!isIE11){
@@ -373,7 +375,7 @@ $(document).ready(function(){
       return $.cookie(name);
     }
   }
-  
+
   function GetQueryParameters(){
   var parameters = new Object();
   var l = window.location.search.substr(1).replace(/\+/g,' ').split(/[&;]/);
@@ -383,7 +385,7 @@ $(document).ready(function(){
   }
   return parameters;
 }
-  
+
 function GetPageTitle(i) {
     return pages[info[i][1]][1];
 }
@@ -427,14 +429,14 @@ function GetSearchResults(terms, query) {
   }
   var results = new Array();
   for (var page in score) {
-    
+
           var title = GetPageTitle(page);
           var summary = GetPageSummary(page);
           var url = GetPageURL(page);
     // ignore partial matches
     if(score[page] >= min_score) {
       results.push(page);
-      
+
       var placement;
       // Adjust scores for better matches
       for (var i = 0; i < terms.length; i++){
@@ -445,10 +447,10 @@ function GetSearchResults(terms, query) {
             score[page] += 500;
           if(placement+term.length==title.length || title[placement+term.length]=='.')
             score[page] += 500;
-        } 
+        }
         else if( (placement=summary.toLowerCase().indexOf(term)) > -1)
           score[page] += ((placement<10)?(20-placement):10);
-      }       
+      }
 
       if (title.toLowerCase() == query )
         score[page] += 10000;
@@ -458,7 +460,7 @@ function GetSearchResults(terms, query) {
         score[page] += ((placement<25)?(50-placement):25);
     }
   }
-  
+
   results=results.sort(function (a,b) {
     if (score[b]==score[a]) { // sort alphabetically by title if score is the same
       var x = GetPageTitle(a).toLowerCase();
@@ -466,7 +468,7 @@ function GetSearchResults(terms, query) {
       return ((x < y) ? -1 : ((x > y) ? 1 : 0));
     }
     else { // else by score descending
-      return score[b]-score[a] 
+      return score[b]-score[a]
     }
   });
 
@@ -503,7 +505,7 @@ function PerformSearch() {
         return a;
     };
     results = unique (results);
-  
+
   if (results.length > 0) {
     if (p.redirect && ( results.length == 1 || p.redirect <= score[results[0]]-score[results[1]] )) {
       document.location=GetPageURL(results[0])+".html";
@@ -524,5 +526,3 @@ function PerformSearch() {
     $('.search-results').append('Your search for "<b>'+ p.q +'</b>" did not result in any matches. Please try again with a wider search');
   }
 }
-
-  
