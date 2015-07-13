@@ -5,7 +5,7 @@ public class MultiWindow : ExtendedWindow {
 
 	public MultiWindow( string name, bool allowMovement, bool drawButtons )
 		: base() {
-		Title = name;
+		WindowContent = new GUIContent( name );
 
 		Settings.IsBlocking = false;
 		Settings.IsFullscreen = false;
