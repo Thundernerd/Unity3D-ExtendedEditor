@@ -59,6 +59,12 @@ namespace TNRD.Editor.Controls {
 			set { rList.list[index] = value; }
 		}
 
+		public List<T> Items {
+			get {
+				return (List<T>)rList.list;
+			}
+		}
+
 		public float ElementHeight {
 			get {
 				return rList.elementHeight;
@@ -128,13 +134,7 @@ namespace TNRD.Editor.Controls {
 			rList.list.Clear();
 		}
 
-		public List<T> Items {
-			get {
-				return (List<T>)rList.list;
-			}
-		}
-
-		protected void AddInternal( ReorderableList list ) {
+		private void AddInternal( ReorderableList list ) {
 			try {
 				var item = Activator.CreateInstance<T>();
 				list.list.Add( item );
