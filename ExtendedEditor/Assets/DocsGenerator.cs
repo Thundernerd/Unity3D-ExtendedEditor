@@ -8,8 +8,57 @@ using UnityEditor;
 using UnityEngine;
 using System.Linq;
 
-public class DocsGenerator : MonoBehaviour {
+[AttributeUsage(AttributeTargets.All, Inherited = false, AllowMultiple = false)]
+sealed class DocsIgnoreAttribute : Attribute {
+	public DocsIgnoreAttribute() { }
+}
 
+[AttributeUsage(AttributeTargets.All, Inherited = false, AllowMultiple = false)]
+sealed class DocsDescriptionAttribute : Attribute {
+	readonly string description;
+
+	public DocsDescriptionAttribute( string description ) {
+		this.description = description;
+	}
+
+	public string Description {
+		get { return description; }
+	}
+}
+
+[AttributeUsage(AttributeTargets.Constructor | AttributeTargets.Method, Inherited = false, AllowMultiple = true)]
+sealed class DocsParameterAttribute : Attribute {
+	readonly string parameter;
+	readonly string description;
+
+	public DocsParameterAttribute( string parameter, string description ) {
+		this.parameter = parameter;
+		this.description = description;
+	}
+
+	public string Parameter {
+		get { return parameter; }
+	}
+
+	public string Description {
+		get { return description; }
+	}
+}
+
+[AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
+sealed class DocsReturnValueAttribute : Attribute {
+	readonly string description;
+
+	public DocsReturnValueAttribute( string description ) {
+		this.description = description;
+	}
+
+	public string Description {
+		get { return description; }
+	}
+}
+
+public class DocsGenerator : MonoBehaviour {
 
 	private class FieldInfoComparer : IComparer<FieldInfo> {
 		public int Compare( FieldInfo f1, FieldInfo f2 ) {
@@ -49,7 +98,9 @@ public class DocsGenerator : MonoBehaviour {
 		var types = ext.Assembly.GetTypes();
 		foreach ( var item in types ) {
 			if ( item.Namespace == null ) continue;
+			if ( !item.IsPublic ) continue;
 			if ( item.Namespace.StartsWith( "TNRD" ) ) {
+				if ( item.GetCustomAttributes( typeof(DocsIgnoreAttribute), false ).Length > 0 ) continue;
 				if ( item.Namespace != null ) {
 					if ( item.ReflectedType == null ) {
 						var key = item.Namespace.Replace( "`1", "" );
@@ -127,7 +178,9 @@ public class DocsGenerator : MonoBehaviour {
 		var types = t.Assembly.GetTypes();
 		foreach ( var item in types ) {
 			if ( item.Namespace == null ) continue;
+			if ( !item.IsPublic ) continue;
 			if ( item.Namespace.StartsWith( "TNRD" ) ) {
+				if ( item.GetCustomAttributes( typeof(DocsIgnoreAttribute), false ).Length > 0 ) continue;
 
 				var builder = new StringBuilder();
 
@@ -151,17 +204,20 @@ public class DocsGenerator : MonoBehaviour {
 	}
 
 	private static string ItemStart( Type item ) {
+		var attr = item.GetCustomAttributes( typeof(DocsDescriptionAttribute), false );
+
+
 		return string.Format( @"<div class=""section"">
 	<div class=""mb20 clear"" id="""">
 		<h1 class=""heading inherit"">{0}</h1>
 		<div class=""clear""></div>
-		<p class=""cl mb0 left mr10"">class in {1} </p>
+		<p class=""cl mb0 left mr10"">class in {1}</p>
         <div class=""clear""></div>
 	</div>
 	<div class=""subsection"">
 		<h2>Description</h2>
-		<p></p>
-	</div>", item.Name, item.Namespace );
+		<p>{2}</p>
+	</div>", item.Name, item.Namespace, GetDescription( item ) );
 	}
 
 	private static string GenerateItemFields( Type item ) {
@@ -174,69 +230,87 @@ public class DocsGenerator : MonoBehaviour {
 					fields.RemoveAt( i + 1 );
 				}
 			}
-		}
 
-		if ( fields.Count > 0 ) {
-			var builder = new StringBuilder();
-
-			builder.Append( SubsectionStart( "Variables" ) );
-			foreach ( var variable in fields ) {
-				if ( variable.IsPrivate ) continue;
-				//builder.Append( SubsectionSegment( string.Format( "{2}.{0}-{1}.html", item.Name, variable.Name, item.Namespace ), variable.Name ) );
-				builder.Append( SubsectionSegment( "#", variable.Name ) );
+			if ( fields[i].GetCustomAttributes( typeof(DocsIgnoreAttribute), false ).Length > 0 ) {
+				fields.RemoveAt( i );
 			}
-			builder.Append( SubsectionEnd() );
+		}
+		var builder = new StringBuilder();
 
-			return builder.ToString();
+		builder.Append( SubsectionStart( "Fields" ) );
+		foreach ( var field in fields ) {
+			if ( field.IsPrivate ) continue;
+			//builder.Append( SubsectionSegment( string.Format( "{2}.{0}-{1}.html", item.Name, variable.Name, item.Namespace ), variable.Name ) );
+			builder.Append( SubsectionSegment( "#", field.Name, GetDescription( field ) ) );
 		}
 
-		return "";
+		if ( fields.Count == 0 ) {
+			builder.Append( SubsectionSegment( "#", "No fields visible", "-" ) );
+		}
+
+		builder.Append( SubsectionEnd() );
+
+		return builder.ToString();
 	}
 
 	private static string GenerateItemProperties( Type item ) {
 		var properties = item.GetProperties( BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly ).ToList();
 		properties.Sort( new PropertyInfoComparer() );
-
-		if ( properties.Count > 0 ) {
-			var builder = new StringBuilder();
-
-			builder.Append( SubsectionStart( "Properties" ) );
-			foreach ( var property in properties ) {
-				if ( !property.CanRead && !property.CanWrite ) continue;
-				//builder.Append( SubsectionSegment( string.Format( "{2}.{0}-{1}.html", item.Name, property.Name, item.Namespace ), property.Name ) );
-				builder.Append( SubsectionSegment( "#", property.Name ) );
+		for ( int i = properties.Count - 1; i >= 0; i-- ) {
+			if ( properties[i].GetCustomAttributes( typeof(DocsIgnoreAttribute), false ).Length > 0 ) {
+				properties.RemoveAt( i );
 			}
-			builder.Append( SubsectionEnd() );
-
-			return builder.ToString();
 		}
 
-		return "";
+		var builder = new StringBuilder();
+
+		builder.Append( SubsectionStart( "Properties" ) );
+		foreach ( var property in properties ) {
+			if ( !property.CanRead && !property.CanWrite ) continue;
+
+			//builder.Append( SubsectionSegment( string.Format( "{2}.{0}-{1}.html", item.Name, property.Name, item.Namespace ), property.Name ) );
+			builder.Append( SubsectionSegment( "#", property.Name, GetDescription( property ) ) );
+		}
+
+		if ( properties.Count == 0 ) {
+			builder.Append( SubsectionSegment( "#", "No properties visible", "-" ) );
+		}
+
+		builder.Append( SubsectionEnd() );
+
+		return builder.ToString();
 	}
 
 	private static string GenerateItemConstructors( Type item ) {
-		var constructors = item.GetConstructors( BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly );
-		if ( constructors.Length > 0 ) {
-			var builder = new StringBuilder();
-
-			builder.Append( SubsectionStart( "Constructors" ) );
-			for ( int i = 0; i < constructors.Length; i++ ) {
-				if ( constructors[i].IsPrivate ) continue;
-				builder.Append( SubsectionSegment(
-					string.Format( "{2}.{3}{0}-{0}.html",
-					item.Name,
-					constructors[i].Name,
-					item.Namespace,
-					item.ReflectedType == null ? "" : item.ReflectedType.Name + "." ), item.Name ) );
-				// breaking after the first, we only want one
-				break;
+		var constructors = item.GetConstructors( BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly ).ToList();
+		for ( int i = constructors.Count - 1; i >= 0; i-- ) {
+			if ( constructors[i].GetCustomAttributes( typeof(DocsIgnoreAttribute), false ).Length > 0 ) {
+				constructors.RemoveAt( i );
 			}
-			builder.Append( SubsectionEnd() );
-
-			return builder.ToString();
 		}
 
-		return "";
+		var builder = new StringBuilder();
+
+		builder.Append( SubsectionStart( "Constructors" ) );
+		for ( int i = 0; i < constructors.Count; i++ ) {
+			if ( constructors[i].IsPrivate ) continue;
+			builder.Append( SubsectionSegment(
+				string.Format( "{2}.{3}{0}-{0}.html",
+				item.Name,
+				constructors[i].Name,
+				item.Namespace,
+				item.ReflectedType == null ? "" : item.ReflectedType.Name + "." ), item.Name, GetDescription( constructors[i] ) ) );
+			// breaking after the first, we only want one
+			break;
+		}
+
+		if ( constructors.Count == 0 ) {
+			builder.Append( SubsectionSegment( "#", "No constructors visible", "-" ) );
+		}
+
+		builder.Append( SubsectionEnd() );
+
+		return builder.ToString();
 	}
 
 	private static string GenerateItemPublicFunctions( Type item ) {
@@ -249,28 +323,34 @@ public class DocsGenerator : MonoBehaviour {
 					methods.RemoveAt( i + 1 );
 				}
 			}
-		}
 
-		if ( methods.Count > 0 ) {
-			var builder = new StringBuilder();
-
-			builder.Append( SubsectionStart( "Public Functions" ) );
-			foreach ( var function in methods ) {
-				if ( function.IsPrivate ) continue;
-				if ( function.Name.StartsWith( "get_" ) || function.Name.StartsWith( "set_" ) ) continue;
-				builder.Append( SubsectionSegment(
-					string.Format( "{2}.{3}{0}-{1}.html",
-					item.Name,
-					function.Name,
-					item.Namespace,
-					item.ReflectedType == null ? "" : item.ReflectedType.Name + "." ), function.Name ) );
+			if ( methods[i].GetCustomAttributes( typeof(DocsIgnoreAttribute), false ).Length > 0 ) {
+				methods.RemoveAt( i );
 			}
-			builder.Append( SubsectionEnd() );
-
-			return builder.ToString();
 		}
 
-		return "";
+		var builder = new StringBuilder();
+
+		builder.Append( SubsectionStart( "Public Methods" ) );
+		foreach ( var method in methods ) {
+			if ( method.IsPrivate ) continue;
+			if ( method.Name.StartsWith( "get_" ) || method.Name.StartsWith( "set_" ) ) continue;
+
+			builder.Append( SubsectionSegment(
+				string.Format( "{2}.{3}{0}-{1}.html",
+				item.Name,
+				method.Name,
+				item.Namespace,
+				item.ReflectedType == null ? "" : item.ReflectedType.Name + "." ), method.Name, GetDescription( method ) ) );
+		}
+
+		if ( methods.Count == 0 ) {
+			builder.Append( SubsectionSegment( "#", "No methods visible", "-" ) );
+		}
+
+		builder.Append( SubsectionEnd() );
+
+		return builder.ToString();
 	}
 
 	private static string GenerateItemStaticFunctions( Type item ) {
@@ -283,27 +363,30 @@ public class DocsGenerator : MonoBehaviour {
 					methods.RemoveAt( i + 1 );
 				}
 			}
-		}
 
-		if ( methods.Count > 0 ) {
-			var builder = new StringBuilder();
-
-			builder.Append( SubsectionStart( "Static Functions" ) );
-			foreach ( var function in methods ) {
-				builder.Append( SubsectionSegment(
-					string.Format( "{2}.{3}{0}-{1}.html",
-					item.Name,
-					function.Name,
-					item.Namespace,
-					item.ReflectedType == null ? "" : item.ReflectedType.Name + "." ), function.Name ) );
+			if ( methods[i].GetCustomAttributes( typeof(DocsIgnoreAttribute), false ).Length > 0 ) {
+				methods.RemoveAt( i );
 			}
-			builder.Append( SubsectionEnd() );
+		}
+		var builder = new StringBuilder();
 
-
-			return builder.ToString();
+		builder.Append( SubsectionStart( "Static Methods" ) );
+		foreach ( var method in methods ) {
+			builder.Append( SubsectionSegment(
+				string.Format( "{2}.{3}{0}-{1}.html",
+				item.Name,
+				method.Name,
+				item.Namespace,
+				item.ReflectedType == null ? "" : item.ReflectedType.Name + "." ), method.Name, GetDescription( method ) ) );
 		}
 
-		return "";
+		if ( methods.Count == 0 ) {
+			builder.Append( SubsectionSegment( "#", "No static methods visible", "-" ) );
+		}
+
+		builder.Append( SubsectionEnd() );
+
+		return builder.ToString();
 	}
 
 	private static string SubsectionStart( string name ) {
@@ -313,13 +396,13 @@ public class DocsGenerator : MonoBehaviour {
 		<tbody>", name );
 	}
 
-	private static string SubsectionSegment( string link, string name ) {
+	private static string SubsectionSegment( string link, string name, string description ) {
 		return string.Format( @"<tr>
 	<td class=""lbl"">
 		<a href=""{0}"">{1}</a>
 	</td>
-	<td class=""desc"">...</td>
-</tr>", link, name );
+	<td class=""desc"">{2}</td>
+</tr>", link, name, string.IsNullOrEmpty( description ) ? "..." : description );
 	}
 
 	private static string SubsectionEnd() {
@@ -336,6 +419,8 @@ public class DocsGenerator : MonoBehaviour {
 		var types = t.Assembly.GetTypes();
 		foreach ( var item in types ) {
 			if ( item.Namespace == null ) continue;
+			if ( item.GetCustomAttributes( typeof(DocsIgnoreAttribute), false ).Length > 0 ) continue;
+
 			if ( item.Namespace.StartsWith( "TNRD" ) ) {
 
 				// Not doing pages for fields or properties
@@ -352,6 +437,8 @@ public class DocsGenerator : MonoBehaviour {
 
 		foreach ( var field in fields ) {
 			if ( field.IsPrivate ) continue;
+			if ( field.GetCustomAttributes( typeof(DocsIgnoreAttribute), false ).Length > 0 ) continue;
+
 			var builder = new StringBuilder();
 
 			builder.Append( DocumentStart() );
@@ -397,6 +484,7 @@ public class DocsGenerator : MonoBehaviour {
 			var setm = property.GetGetMethod();
 
 			if ( !( getm == null || getm.IsFamily || getm.IsPublic ) && ( setm == null || !setm.IsFamily || setm.IsPublic ) ) continue;
+			if ( property.GetCustomAttributes( typeof(DocsIgnoreAttribute), false ).Length > 0 ) continue;
 
 			var builder = new StringBuilder();
 
@@ -456,12 +544,13 @@ public class DocsGenerator : MonoBehaviour {
 	}
 
 	private static void GenerateMemberMethods( Type parent ) {
-		var typeMethods = parent.GetMethods( BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly );
+		var typeMethods = parent.GetMethods( BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.DeclaredOnly );
 		var methodInfos = new Dictionary<string, List<MethodInfo>>();
 
 		foreach ( var item in typeMethods ) {
 			if ( item.IsPrivate ) continue;
 			if ( item.Name.StartsWith( "get_" ) || item.Name.StartsWith( "set_" ) ) continue;
+			if ( item.GetCustomAttributes( typeof(DocsIgnoreAttribute), false ).Length > 0 ) continue;
 
 			if ( methodInfos.ContainsKey( item.Name ) ) {
 				methodInfos[item.Name].Add( item );
@@ -513,12 +602,12 @@ public class DocsGenerator : MonoBehaviour {
 				}
 				parameters = parameters.TrimEnd( ',' );
 				parameters += " ";
-				parameters.Trim();
+				parameters = parameters.Trim();
 
 				builder.AppendFormat(
 @"<div class=""signature-CS sig-block"">
-	{0} {1} <span class=""sig-kw"">{2}</span>({3});
-</div>", method.IsFamily ? "protected" : "public", GetType( method.ReturnType ), method.Name, parameters );
+	{0}{4} {1} <span class=""sig-kw"">{2}</span>({3});
+</div>", method.IsFamily ? "protected" : "public", GetType( method.ReturnType ), method.Name, parameters, method.IsStatic ? " static" : "" );
 			}
 
 			builder.Append(
@@ -539,10 +628,10 @@ public class DocsGenerator : MonoBehaviour {
 	</table>
 </div>" );
 
-			builder.Append( @"<div class=""subsection"">
+			builder.AppendFormat( @"<div class=""subsection"">
 	<h2>Description</h2>
-	<p>...</p>
-</div>" );
+	<p>{0}</p>
+</div>", GetDescription( value ) );
 
 			builder.Append( DocumentEnd() );
 
@@ -568,7 +657,7 @@ public class DocsGenerator : MonoBehaviour {
 
 		foreach ( var item in methodInfos ) {
 			var name = parent.Name.Replace( "[T]", "" ).Replace( "`1", "" );
-            var value = item.Value[0];
+			var value = item.Value[0];
 			var path = string.Format( "{0}-{1}.html",
 				parent.ToString(), parent.Name )
 				.Replace( "+", "." )
@@ -605,7 +694,7 @@ public class DocsGenerator : MonoBehaviour {
 				}
 				parameters = parameters.TrimEnd( ',' );
 				parameters += " ";
-				parameters.Trim();
+				parameters = parameters.Trim();
 
 				builder.AppendFormat(
 @"<div class=""signature-CS sig-block"">
@@ -639,28 +728,6 @@ public class DocsGenerator : MonoBehaviour {
 			builder.Append( DocumentEnd() );
 
 			File.WriteAllText( path, builder.ToString() );
-		}
-	}
-
-	private static string GetType( Type item ) {
-		Type[] args;
-		switch ( item.Name ) {
-			case "Void":
-				return "void";
-			case "Int32":
-				return "int";
-			case "Boolean":
-				return "bool";
-			case "Single":
-				return "float";
-			case "Dictionary`2":
-				args = item.GetGenericArguments();
-				return string.Format( "Dictionary&lt;{0}, {1}&gt;", GetType( args[0] ), GetType( args[1] ) );
-			case "List`1":
-				args = item.GetGenericArguments();
-				return string.Format( "List&lt;{0}&gt;", GetType( args[0] ) );
-			default:
-				return item.Name;
 		}
 	}
 
@@ -746,6 +813,30 @@ public class DocsGenerator : MonoBehaviour {
 	//}
 	#endregion
 
+	private static string GetType( Type item ) {
+		Type[] args;
+		switch ( item.Name ) {
+			case "Void":
+				return "void";
+			case "Int32":
+				return "int";
+			case "Boolean":
+				return "bool";
+			case "Single":
+				return "float";
+			case "String":
+				return "string";
+			case "Dictionary`2":
+				args = item.GetGenericArguments();
+				return string.Format( "Dictionary&lt;{0}, {1}&gt;", GetType( args[0] ), GetType( args[1] ) );
+			case "List`1":
+				args = item.GetGenericArguments();
+				return string.Format( "List&lt;{0}&gt;", GetType( args[0] ) );
+			default:
+				return item.Name;
+		}
+	}
+
 	private static string DocumentStart() {
 		return @"<!DOCTYPE html>
 <html lang=""en"" class=""no-js"">
@@ -802,5 +893,23 @@ public class DocsGenerator : MonoBehaviour {
 </div>
 </body>
 </html>";
+	}
+
+	private static string GetDescription( MemberInfo item ) {
+		var attr = item.GetCustomAttributes( typeof(DocsDescriptionAttribute), false );
+		if ( attr.Length > 0 ) {
+			return ( attr[0] as DocsDescriptionAttribute ).Description;
+		} else {
+			return "";
+		}
+	}
+
+	private static string GetDescription( ParameterInfo item ) {
+		var attr = item.GetCustomAttributes( typeof(DocsDescriptionAttribute), false );
+		if ( attr.Length > 0 ) {
+			return ( attr[0] as DocsDescriptionAttribute ).Description;
+		} else {
+			return "";
+		}
 	}
 }
