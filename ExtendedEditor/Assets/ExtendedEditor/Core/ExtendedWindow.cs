@@ -521,13 +521,17 @@ namespace TNRD.Editor.Core {
 			var list = new List<T>();
 
 			foreach ( var item in Controls ) {
-				var baseType = item.GetType().BaseType;
-				while ( baseType != null ) {
-					if ( baseType == type ) {
-						list.Add( item as T );
-						break;
+				if ( item.GetType() == type ) {
+					list.Add( item as T );
+				} else {
+					var baseType = item.GetType().BaseType;
+					while ( baseType != null ) {
+						if ( baseType == type ) {
+							list.Add( item as T );
+							break;
+						}
+						baseType = baseType.BaseType;
 					}
-					baseType = baseType.BaseType;
 				}
 			}
 
@@ -540,13 +544,17 @@ namespace TNRD.Editor.Core {
 			var list = new List<ExtendedControl>();
 
 			foreach ( var item in Controls ) {
-				var baseType = item.GetType().BaseType;
-				while ( baseType != null ) {
-					if ( baseType == type ) {
-						list.Add( item );
-						break;
+				if ( item.GetType() == type ) {
+					list.Add( item );
+				} else {
+					var baseType = item.GetType().BaseType;
+					while ( baseType != null ) {
+						if ( baseType == type ) {
+							list.Add( item );
+							break;
+						}
+						baseType = baseType.BaseType;
 					}
-					baseType = baseType.BaseType;
 				}
 			}
 
