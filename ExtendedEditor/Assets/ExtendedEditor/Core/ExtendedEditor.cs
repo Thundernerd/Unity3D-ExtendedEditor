@@ -342,13 +342,17 @@ namespace TNRD.Editor.Core {
 			var list = new List<T>();
 
 			foreach ( var item in Windows ) {
-				var baseType = item.GetType().BaseType;
-				while ( baseType != null ) {
-					if ( baseType == type ) {
-						list.Add( item as T );
-						break;
+				if ( item.GetType() == type ) {
+					list.Add( item as T );
+				} else {
+					var baseType = item.GetType().BaseType;
+					while ( baseType != null ) {
+						if ( baseType == type ) {
+							list.Add( item as T );
+							break;
+						}
+						baseType = baseType.BaseType;
 					}
-					baseType = baseType.BaseType;
 				}
 			}
 
@@ -361,13 +365,17 @@ namespace TNRD.Editor.Core {
 			var list = new List<ExtendedWindow>();
 
 			foreach ( var item in Windows ) {
-				var baseType = item.GetType().BaseType;
-				while ( baseType != null ) {
-					if ( baseType == type ) {
-						list.Add( item );
-						break;
+				if ( item.GetType() == type ) {
+					list.Add( item );
+				} else {
+					var baseType = item.GetType().BaseType;
+					while ( baseType != null ) {
+						if ( baseType == type ) {
+							list.Add( item );
+							break;
+						}
+						baseType = baseType.BaseType;
 					}
-					baseType = baseType.BaseType;
 				}
 			}
 
@@ -474,89 +482,103 @@ namespace TNRD.Editor.Core {
 
 		[DocsDescription("Serializes the editor as a whole in JSON")]
 		public string Serialize() {
+			return Serialize( this );
+		}
+
+		public string Serialize( object item ) {
 			var settings = new JsonSerializerSettings();
 			settings.PreserveReferencesHandling = PreserveReferencesHandling.All;
 			settings.ReferenceLoopHandling = ReferenceLoopHandling.Serialize;
 			settings.TypeNameHandling = TypeNameHandling.Auto;
 
 			try {
-				var serialized = JsonConvert.SerializeObject( this, Formatting.None, settings );
+				var serialized = JsonConvert.SerializeObject( item, Formatting.Indented, settings );
 				return serialized;
 			} catch ( JsonSerializationException ex ) {
 				Debug.LogErrorFormat( "Error serializing: {0}", ex.Message );
 				return "";
 			}
 		}
-		
+
 		[DocsDescription("Saves a serialized state of the editor in the preferences")]
 		[DocsParameter("key", "The key to store the serialized editor with")]
 		public bool SaveToPreferences( string key ) {
-			if ( string.IsNullOrEmpty( key ) ) {
-				Debug.LogError( "Unable to save to preferences, key cannot be empty." );
-				return false;
-			}
-
 			var content = Serialize();
-
 			if ( string.IsNullOrEmpty( content ) ) {
-				// No need to log this as this is done before
-				//Debug.LogError( "Unable to save to preferences, error while serializing." );
+				Debug.LogError( "Unable to save to preferences, error while serializing." );
 				return false;
 			} else {
-				try {
-					PlayerPrefs.SetString( key, content );
-					PlayerPrefs.Save();
-					return true;
-				} catch ( PlayerPrefsException) {
-					Debug.LogError( "Unabled to save to preferences, exceeding maximum size." );
-					return false;
-				}
+				return SaveToPreferences( key, content );
 			}
 		}
-		
+
+		public bool SaveToPreferences( string key, string content ) {
+			try {
+				if ( string.IsNullOrEmpty( key ) ) {
+					Debug.LogError( "Unable to save to preferences, key cannot be empty." );
+					return false;
+				} else if ( string.IsNullOrEmpty( content ) ) {
+					Debug.LogError( "Unable to save to preferences, content cannot be empty." );
+					return false;
+				}
+
+				PlayerPrefs.SetString( key, content );
+				PlayerPrefs.Save();
+				return true;
+			} catch ( PlayerPrefsException) {
+				Debug.LogError( "Unabled to save to preferences, exceeding maximum size." );
+				return false;
+			}
+		}
+
 		[DocsDescription("Saves a serialized state of the editor to a file")]
 		[DocsParameter("path", ">The path to the file to save")]
 		public bool SaveToFile( string path ) {
-			if ( string.IsNullOrEmpty( path ) ) {
-				Debug.LogError( "Unable to save to file, path cannot be empty." );
-				return false;
-			}
-
 			var content = Serialize();
-
 			if ( string.IsNullOrEmpty( content ) ) {
-				// No need to log this as this is done before
-				//Debug.LogError( "Unable to save to file, error while serializing" );
+				Debug.LogError( "Unable to save to file, error while serializing" );
 				return false;
 			} else {
-				try {
-					File.WriteAllText( path, content );
-					return true;
-				} catch ( PathTooLongException) {
-					Debug.LogError( "Unable to save to file, path is too long." );
-					return false;
-				} catch ( NotSupportedException) {
-					Debug.LogError( "Unable to save to file, check your path format." );
-					return false;
-				} catch ( System.Security.SecurityException) {
-					Debug.LogError( "Unable to save to file, lacking permission to write the file." );
-					return false;
-				} catch ( UnauthorizedAccessException) {
-					Debug.LogError( "Unable to save to file, check your permissions, if the file is writable, and if you're on the right platform." );
-					return false;
-				} catch ( DirectoryNotFoundException) {
-					Debug.LogError( "Unable to save to file, no such directory." );
-					return false;
-				} catch ( IOException) {
-					Debug.LogError( "Unable to save to file, IO exception." );
-					return false;
-				}
+				return SaveToFile( path, content );
 			}
 		}
-		
+
+		public bool SaveToFile( string path, string content ) {
+			try {
+				if ( string.IsNullOrEmpty( path ) ) {
+					Debug.LogError( "Unable to save to file, path cannot be empty." );
+					return false;
+				} else if ( string.IsNullOrEmpty( content ) ) {
+					Debug.LogError( "Unable to save to file, content cannot be empty." );
+					return false;
+				}
+
+				File.WriteAllText( path, content );
+				return true;
+			} catch ( PathTooLongException) {
+				Debug.LogError( "Unable to save to file, path is too long." );
+				return false;
+			} catch ( NotSupportedException) {
+				Debug.LogError( "Unable to save to file, check your path format." );
+				return false;
+			} catch ( System.Security.SecurityException) {
+				Debug.LogError( "Unable to save to file, lacking permission to write the file." );
+				return false;
+			} catch ( UnauthorizedAccessException) {
+				Debug.LogError( "Unable to save to file, check your permissions, if the file is writable, and if you're on the right platform." );
+				return false;
+			} catch ( DirectoryNotFoundException) {
+				Debug.LogError( "Unable to save to file, no such directory." );
+				return false;
+			} catch ( IOException) {
+				Debug.LogError( "Unable to save to file, IO exception." );
+				return false;
+			}
+		}
+
 		[DocsDescription("Deserializes a JSON string into an editor")]
 		[DocsParameter("value", "A JSON string representing an ExtendedEditor")]
-		public void Deserialize<T>( string value ) where T : ExtendedEditor {
+		public void DeserializeEditor<T>( string value ) where T : ExtendedEditor {
 			var settings = new JsonSerializerSettings();
 			settings.TypeNameHandling = TypeNameHandling.Auto;
 
@@ -594,55 +616,65 @@ namespace TNRD.Editor.Core {
 				}
 			}
 		}
-		
+
+		public T Deserialize<T>( string value ) {
+			var settings = new JsonSerializerSettings();
+			settings.TypeNameHandling = TypeNameHandling.Auto;
+
+			try {
+				return JsonConvert.DeserializeObject<T>( value, settings );
+			} catch ( JsonReaderException ex ) {
+				Debug.LogErrorFormat( "Error deserializing: {0}", ex.Message );
+				return default(T);
+			}
+		}
+
 		[DocsDescription("Loads a serialized editor from the preferences")]
 		[DocsParameter("key", "The key that the editor is stored with")]
-		public bool LoadFromPreferences<T>( string key ) where T : ExtendedEditor {
+		public T LoadFromPreferences<T>( string key ) {
 			if ( PlayerPrefs.HasKey( key ) ) {
 				try {
-					Deserialize<T>( PlayerPrefs.GetString( key ) );
-					return true;
+					return Deserialize<T>( PlayerPrefs.GetString( key ) );
 				} catch ( Exception) {
 					Debug.LogError( "Unabled to deserialize content." );
-					return false;
+					return default(T);
 				}
 			} else {
 				Debug.LogError( "Unabled to deserialize content, key does not exist" );
-				return false;
+				return default(T);
 			}
 		}
-		
+
 		[DocsDescription("Loads a serialized editor from a file")]
 		[DocsParameter("path", "The path to the file")]
-		public bool LoadFromFile<T>( string path ) where T : ExtendedEditor {
+		public T LoadFromFile<T>( string path ) {
 			if ( string.IsNullOrEmpty( path ) ) {
 				Debug.LogError( "Path is empty, cancelling LoadFromFile." );
-				return false;
+				return default(T);
 			}
 
 			try {
 				var content = File.ReadAllText( path );
-				Deserialize<T>( content );
-				return true;
+				return Deserialize<T>( content );
 			} catch ( FileNotFoundException) {
 				Debug.LogError( "Unable to deserialize content, no such file." );
-				return false;
+				return default(T);
 			} catch ( NotSupportedException) {
 				Debug.LogError( "Unable to deserialize content, check your path format." );
-				return false;
+				return default(T);
 			} catch ( System.Security.SecurityException) {
 				Debug.LogError( "Unable to deserialize content, lacking permission to read the file." );
-				return false;
+				return default(T);
 			} catch ( DirectoryNotFoundException) {
 				Debug.LogError( "Unable to deserialize content, no such directory." );
-				return false;
+				return default(T);
 			} catch ( IOException) {
 				Debug.LogError( "Unable to deserialize content, IO exception." );
-				return false;
+				return default(T);
 			} catch ( Exception ex ) {
 				Debug.LogError( ex );
 				Debug.LogError( "Unabled to deserialize content." );
-				return false;
+				return default(T);
 			}
 		}
 		#endregion
