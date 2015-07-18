@@ -29,7 +29,7 @@ namespace TNRD.Editor.Core {
 		/// An asset manager that can be accessed from every window
 		/// </summary>
 		[JsonProperty]
-		public ExtendedAssets SharedAssets = new ExtendedAssets();
+		public ExtendedAssets SharedAssets;
 
 		/// <summary>
 		/// The active windows in this editor
@@ -80,6 +80,7 @@ namespace TNRD.Editor.Core {
 		protected virtual void OnInitialize() {
 			initializer = new object();
 
+			SharedAssets = new ExtendedAssets( this );
 			Input = new ExtendedInput();
 
 			Windows = new List<ExtendedWindow>();

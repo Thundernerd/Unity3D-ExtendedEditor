@@ -54,7 +54,7 @@ namespace TNRD.Editor.Windows {
         protected override void OnInitialize() {
 			base.OnInitialize();
 
-			alignToCenter = true;
+			shouldAlignToCenter = true;
 			IsDraggable = true;
 			showOKButton = true;
 

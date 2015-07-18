@@ -46,7 +46,7 @@ namespace TNRD.Editor.Core {
 		/// <summary>
 		/// Should the modal window be aligned to the center of the editor
 		/// </summary>
-        protected bool alignToCenter = true;
+        protected bool shouldAlignToCenter = true;
 		
 		/// <summary>
 		/// Should the modal window show the OK/Accept button
@@ -102,7 +102,7 @@ namespace TNRD.Editor.Core {
 			if ( !isInitialized ) {
 				OnInitialize();
 
-				if ( alignToCenter ) {
+				if ( shouldAlignToCenter ) {
 					AlignToCenter();
 				}
 			}
@@ -110,7 +110,7 @@ namespace TNRD.Editor.Core {
 			if ( IsDraggable ) {
 				GUI.DragWindow( new Rect( 0, 0, WindowRect.width, 17.5f ) );
 			} else {
-				if ( alignToCenter ) {
+				if ( shouldAlignToCenter ) {
 					AlignToCenter();
 				}
 			}

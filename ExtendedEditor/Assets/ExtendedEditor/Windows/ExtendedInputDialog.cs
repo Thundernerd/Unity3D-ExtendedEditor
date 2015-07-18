@@ -48,7 +48,7 @@ namespace TNRD.Editor.Windows {
 			showCancelButton = true;
 
 			IsDraggable = true;
-			alignToCenter = true;
+			shouldAlignToCenter = true;
 
 			WindowRect = new Rect( 0, 0, 350, 120 );
 		}

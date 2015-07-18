@@ -35,6 +35,17 @@ namespace TNRD.Editor.Core {
 			textures = new Dictionary<string, Texture2D>();
 			Path = path;
 		}
+		
+		public ExtendedAssets( ExtendedEditor editor ) {
+			textures = new Dictionary<string, Texture2D>();
+			var type = editor.GetType();
+			var files = Directory.GetFiles( Application.dataPath, string.Format( "*{0}.cs", type.Name ), SearchOption.AllDirectories );
+			if ( files.Length == 1 ) {
+				var f = files[0];
+				var fi = new FileInfo( f );
+				Path = System.IO.Path.Combine( fi.DirectoryName, "Assets/" );
+			}
+		}
 
 		/// <summary>
 		/// Creates a new instance of ExtendedAssets
@@ -56,7 +67,7 @@ namespace TNRD.Editor.Core {
 
 			textures = new Dictionary<string, Texture2D>();
 		}
-		
+
 		public Texture2D this[string key] {
 			get {
 				if ( textures.ContainsKey( key ) ) {

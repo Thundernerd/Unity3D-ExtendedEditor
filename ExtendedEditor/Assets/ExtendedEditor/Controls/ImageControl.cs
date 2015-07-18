@@ -2,6 +2,7 @@
 using TNRD.Editor.Core;
 
 namespace TNRD.Editor.Controls {
+
 	public class ImageControl : ExtendedControl {
 
 		private Texture2D image;

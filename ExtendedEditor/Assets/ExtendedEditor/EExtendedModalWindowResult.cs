@@ -2,7 +2,9 @@
 
 namespace TNRD.Editor.Core {
 
-
+	/// <summary>
+	/// The result of a modal window
+	/// </summary>
 	public enum EExtendedModalWindowResult {
 		/// <summary>
 		/// -
