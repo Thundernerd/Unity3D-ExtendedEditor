@@ -4,7 +4,9 @@ using UnityEngine;
 
 namespace TNRD.Editor.Windows {
 
-	[DocsDescription("A simple dialog box")]
+	/// <summary>
+	/// A simple dialog box
+	/// </summary>
 	public class ExtendedDialogBox : ExtendedModalWindow {
 
 		private string message = "";
@@ -12,36 +14,43 @@ namespace TNRD.Editor.Windows {
 		private Rect messageRect = new Rect();
 		private GUIStyle messageStyle;
 
-		[DocsDescription("Creates a new instance of ExtendedDialogBox")]
+		/// <summary>
+		/// Creates a new instance of ExtendedDialogBox
+		/// </summary>
 		public ExtendedDialogBox() : base() { }
 
-		[DocsDescription("Creates a new instance of ExtendedDialogBox")]
-		[DocsParameter("title","The title of the window")]
-		[DocsParameter("message","The message to show on the ExtendedDialogBox")]
+		/// <summary>
+		/// Creates a new instance of ExtendedDialogBox
+		/// </summary>
+		/// <param name="title">The title of the window</param>
+		/// <param name="message">The message to show on the ExtendedDialogBox</param>
 		public ExtendedDialogBox( string title, string message ) : this() {
 			this.Title = title;
 			this.message = message;
 		}
 
-		[DocsDescription("Creates a new instance of ExtendedDialogBox")]
-		[DocsParameter("title", "The title of the window")]
-		[DocsParameter("message", "The message to show on the ExtendedDialogBox")]
-		[DocsParameter("okButton", "The text for the OK Button")]
+		/// <summary>
+		/// Creates a new instance of ExtendedDialogBox
+		/// </summary>
+		/// <param name="title">The title of the window</param>
+		/// <param name="message">The message to show on the ExtendedDialogBox</param>
+		/// <param name="okButton">The text for the OK Button</param>
 		public ExtendedDialogBox( string title, string message, string okButton ) : this( title, message ) {
 			textOKButton = okButton;
 		}
 
-		[DocsDescription("Creates a new instance of ExtendedDialogBox")]
-		[DocsParameter("title", "The title of the window")]
-		[DocsParameter("message", "The message to show on the ExtendedDialogBox")]
-		[DocsParameter("okButton", "The text for the OK Button")]
-		[DocsParameter("cancelButton", "The text for the Cancel Button")]
+		/// <summary>
+		/// Creates a new instance of ExtendedDialogBox
+		/// </summary>
+		/// <param name="title">The title of the window</param>
+		/// <param name="message">The message to show on the ExtendedDialogBox</param>
+		/// <param name="okButton">The text for the OK Button</param>
+		/// <param name="cancelButton">The text for the Cancel Button</param>
 		public ExtendedDialogBox( string title, string message, string okButton, string cancelButton ) : this( title, message, okButton ) {
 			textCancelButton = cancelButton;
 			showCancelButton = true;
 		}
-
-		[DocsIgnore]
+		
         protected override void OnInitialize() {
 			base.OnInitialize();
 
@@ -68,8 +77,7 @@ namespace TNRD.Editor.Windows {
 				messageSize.x, messageSize.y );
 			}
 		}
-
-		[DocsIgnore]
+		
 		public override void OnGUI( int id ) {
 			base.OnGUI( id );
 			GUI.Label( messageRect, message, messageStyle );

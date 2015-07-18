@@ -4,16 +4,19 @@ using TNRD.Editor.Core;
 
 namespace TNRD.Editor.Blocks {
 
-	[DocsDescription("")]
+	/// <summary>
+	/// 
+	/// </summary>
 	public class AreaBlock : IDisposable {
 
-		[DocsDescription("Creates a new instance of AreaBlock")]
-		[DocsParameter("options", "The options to apply to the area")]
+		/// <summary>
+		/// Creates a new instance of AreaBlock
+		/// </summary>
+		/// <param name="options">The options to apply to the area</param>
 		public AreaBlock( params ExtendedGUIOption[] options ) {
 			ExtendedGUI.BeginArea( options );
 		}
 
-		[DocsIgnore]
 		public void Dispose() {
 			ExtendedGUI.EndArea();
 		}

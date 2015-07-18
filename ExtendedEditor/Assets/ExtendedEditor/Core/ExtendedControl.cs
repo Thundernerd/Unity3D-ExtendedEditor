@@ -5,28 +5,42 @@ using UnityEngine;
 
 namespace TNRD.Editor.Core {
 
-	[DocsDescription("Base class for controls that can be added to ExtendedWindows")]
+	/// <summary>
+	/// Base class for controls that can be added to ExtendedWindows
+	/// </summary>
 	public class ExtendedControl {
 
+		/// <summary>
+		/// The window this control is added to
+		/// </summary>
 		[JsonIgnore]
-		[DocsDescription("The window this control is added to")]
 		public ExtendedWindow Window;
 
+		/// <summary>
+		/// The input handler belonging to this control's window
+		/// </summary>
 		[JsonIgnore]
-		[DocsDescription("The input handler belonging to this control's window")]
 		public ExtendedInput Input { get { return Window.Input; } }
 
-		[DocsDescription("Is the control initialized")]
+		/// <summary>
+		/// Is the control initialized
+		/// </summary>
 		public bool IsInitialized;
 
-		[DocsDescription("The position of the control in the window")]
+		/// <summary>
+		/// The position of the control in the window
+		/// </summary>
 		public Vector2 Position;
 
-		[DocsDescription("The size of the control")]
+		/// <summary>
+		/// The size of the control
+		/// </summary>
 		public Vector2 Size;
 
+		/// <summary>
+		/// The rectangle used for drawing in OnGUI
+		/// </summary>
 		[JsonIgnore]
-		[DocsDescription("The rectangle used for drawing in OnGUI")]
 		public Rect Rectangle {
 			get {
 				var scaledPosition = Window.ScaleMatrix.MultiplyVector( Position + (Vector2)Window.Camera );
@@ -41,10 +55,14 @@ namespace TNRD.Editor.Core {
 		[JsonIgnore]
 		private bool initializedGUI = false;
 
-		[DocsDescription("Creates a new instance of ExtendedControl")]
+		/// <summary>
+		/// Creates a new instance of ExtendedControl
+		/// </summary>
 		public ExtendedControl() { }
 
-		[DocsDescription("Called when the control is added to a window")]
+		/// <summary>
+		/// Called when the control is added to a window
+		/// </summary>
 		public virtual void OnInitialize() {
 			IsInitialized = true;
 
@@ -52,12 +70,16 @@ namespace TNRD.Editor.Core {
 			controlHint = t.Name.GetHashCode();
 		}
 
-		[DocsDescription("Called the first time OnGUI is called on this control")]
+		/// <summary>
+		/// Called the first time OnGUI is called on this control
+		/// </summary>
 		public virtual void OnInitializeGUI() {
 			initializedGUI = true;
 		}
-		
-		[DocsDescription("Called when a window gets deserialized")]
+
+		/// <summary>
+		/// Called when a window gets deserialized
+		/// </summary>
 		public virtual void OnDeserialized() {
 			if ( controlHint == -1 ) {
 				var t = GetType();
@@ -65,48 +87,68 @@ namespace TNRD.Editor.Core {
 			}
 		}
 
-		[DocsDescription("Called when the Window this control is located in gets closed")]
+		/// <summary>
+		/// Called when the Window this control is located in gets closed
+		/// </summary>
 		public virtual void OnDestroy() {
 			IsInitialized = false;
 		}
 
-		[DocsDescription("Called 100 times per second")]
-		[DocsParameter("windowHasFocus", "Does this window have focus")]
+		/// <summary>
+		/// Called 100 times per second
+		/// </summary>
+		/// <param name="windowHasFocus">Does the window this control is in have focus</param>
 		public virtual void Update( bool windowHasFocus ) { }
 
-		[DocsDescription("Implement your own GUI logic here")]
+		/// <summary>
+		/// Implement your own GUI logic here
+		/// </summary>
 		public virtual void OnGUI() {
 			if ( !initializedGUI ) {
 				OnInitializeGUI();
 			}
 		}
 
-		[DocsDescription("Implement your own SceneGUI logic here")]
-		[DocsParameter("view", "The current SceneView")]
+		/// <summary>
+		/// Implement your own SceneGUI logic here
+		/// </summary>
+		/// <param name="view">The current SceneView</param>
 		public virtual void OnSceneGUI( SceneView view ) { }
 
-		[DocsDescription("Gets a unique ID for a control")]
+		/// <summary>
+		/// Gets a unique ID for a control
+		/// </summary>
+		/// <param name="focus">-</param>
+		/// <returns>-</returns>
 		public int GetControlID( FocusType focus ) {
 			return GUIUtility.GetControlID( controlHint, focus );
 		}
 
 		#region Events
-		[DocsDescription("Invoked when a ContextClick event occurs")]
-		[DocsParameter("position", "The location of the right-mouse click")]
-		[DocsParameter("used", "-")]
+		/// <summary>
+		/// Invoked when a ContextClick event occurs
+		/// </summary>
+		/// <param name="position">The location of the right-mouse click</param>
+		/// <param name="used">-</param>
 		public virtual void OnContextClick( Vector2 position, ref bool used ) { }
 
-		[DocsDescription("Invoked when a DragExited event occurs")]
+		/// <summary>
+		/// Invoked when a DragExited event occurs
+		/// </summary>
 		public virtual void OnDragExited() { }
 
-		[DocsDescription("Invoked when a DragPerform event occurs")]
-		[DocsParameter("paths", "Path(s) of the file(s) being dragged onto the editor")]
-		[DocsParameter("position", "The mouse position")]
+		/// <summary>
+		/// Invoked when a DragPerform event occurs
+		/// </summary>
+		/// <param name="paths">Path(s) of the file(s) being dragged onto the edito</param>
+		/// <param name="position">The mouse position</param>
 		public virtual void OnDragPerform( string[] paths, Vector2 position ) { }
 
-		[DocsDescription("Invoked when a DragUpdate event occurs")]
-		[DocsParameter("paths", "Path(s) of the file(s) being dragged onto the editor")]
-		[DocsParameter("position", "The mouse position")]
+		/// <summary>
+		/// Invoked when a DragUpdate event occurs
+		/// </summary>
+		/// <param name="paths">Path(s) of the file(s) being dragged onto the editor</param>
+		/// <param name="position">The mouse position</param>
 		public virtual void OnDragUpdate( string[] paths, Vector2 position ) { }
 		#endregion
 	}

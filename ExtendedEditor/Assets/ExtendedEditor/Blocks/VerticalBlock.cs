@@ -7,23 +7,29 @@ using UnityEngine;
 
 namespace TNRD.Editor.Blocks {
 
-	[DocsDescription("")]
+	/// <summary>
+	/// 
+	/// </summary>
 	public class VerticalBlock : IDisposable {
 
-		[DocsDescription("Creats a new instance of VerticalBlock")]
-		[DocsParameter("options", "The options to apply to the Vertical")]
+
+		/// <summary>
+		/// Creates a new instance of VerticalBlock
+		/// </summary>
+		/// <param name="options"The options to apply to the Vertical></param>
 		public VerticalBlock( params GUILayoutOption[] options ) {
 			EditorGUILayout.BeginVertical( options );
 		}
 
-		[DocsDescription("Creats a new instance of VerticalBlock")]
-		[DocsParameter("style", "The style to apply to the Vertical")]
-		[DocsParameter("options", "The options to apply to the Vertical")]
+		/// <summary>
+		/// Creates a new instance of VerticalBlock
+		/// </summary>
+		/// <param name="style">The style to apply to the Vertical</param>
+		/// <param name="options"The options to apply to the Vertical></param>
 		public VerticalBlock( GUIStyle style, params GUILayoutOption[] options ) {
 			EditorGUILayout.BeginVertical( style, options );
 		}
-
-		[DocsIgnore]
+		
 		public void Dispose() {
 			EditorGUILayout.EndVertical();
 		}

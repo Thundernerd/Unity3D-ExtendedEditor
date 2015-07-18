@@ -7,68 +7,89 @@ using UnityEngine;
 
 namespace TNRD.Editor.Utilities {
 
-	[DocsDescription("Functionality that could be considered useful")]
+	/// <summary>
+	/// Functionality that could be considered useful
+	/// </summary>
 	public class Utils {
 		
-		[DocsDescription("Returns the InspectorWindow type to use as GetWindow's desiredDockNextTo parameter")]
+		/// <summary>
+		/// Returns the InspectorWindow type to use as GetWindow's desiredDockNextTo parameter
+		/// </summary>
         public static Type InspectorWindow {
 			get {
 				return Assembly.Load( "UnityEditor" ).GetType( "UnityEditor.InspectorWindow" );
 			}
 		}
-		[DocsDescription("Returns the SceneView type to use as GetWindow's desiredDockNextTo parameter")]
+
+		/// <summary>
+		/// Returns the SceneView type to use as GetWindow's desiredDockNextTo parameter
+		/// </summary>
         public static Type SceneView {
 			get {
 				return typeof(SceneView);
 			}
 		}
 
-		[DocsDescription("Returns the GameView type to use as GetWindow's desiredDockNextTo parameter")]
+		/// <summary>
+		/// Returns the GameView type to use as GetWindow's desiredDockNextTo parameter
+		/// </summary>
         public static Type GameView {
 			get {
 				return Assembly.Load( "UnityEditor" ).GetType( "UnityEditor.GameView" );
 			}
 		}
 
-		[DocsDescription("Returns the HierarchyWindow type to use as GetWindow's desiredDockNextTo parameter")]
+		/// <summary>
+		/// Returns the HierarchyWindow type to use as GetWindow's desiredDockNextTo parameter
+		/// </summary>
         public static Type HierarchyWindow {
 			get {
 				return Assembly.Load( "UnityEditor" ).GetType( "UnityEditor.SceneHierarchyWindow" );
 			}
 		}
 
-		[DocsDescription("Returns the ProjectBrowser type to use as GetWindow's desiredDockNextTo parameter")]
+		/// <summary>
+		/// Returns the ProjectBrowser type to use as GetWindow's desiredDockNextTo parameter
+		/// </summary>
 		public static Type ProjectBrowser {
 			get {
 				return Assembly.Load( "UnityEditor" ).GetType( "UnityEditor.ProjectBrowser" );
 			}
 		}
 
-		[DocsDescription("Returns the AnimationWindow type to use as GetWindow's desiredDockNextTo parameter")]
+		/// <summary>
+		/// Returns the AnimationWindow type to use as GetWindow's desiredDockNextTo parameter
+		/// </summary>
 		public static Type AnimationWindow {
 			get {
 				return Assembly.Load( "UnityEditor" ).GetType( "UnityEditor.AnimationWindow" );
 			}
 		}
 
-		[DocsDescription("Returns the ProfilerWindow type to use as GetWindow's desiredDockNextTo parameter")]
+		/// <summary>
+		/// Returns the ProfilerWindow type to use as GetWindow's desiredDockNextTo parameter
+		/// </summary>
 		public static Type ProfilerWindow {
 			get {
 				return Assembly.Load( "UnityEditor" ).GetType( "UnityEditor.ProfilerWindow" );
 			}
 		}
 
-		[DocsDescription("Returns the AudioMixerWindow type to use as GetWindow's desiredDockNextTo parameter")]
+		/// <summary>
+		/// Returns the AudioMixerWindow type to use as GetWindow's desiredDockNextTo parameter
+		/// </summary>
 		public static Type AudioMixerWindow {
 			get {
 				return Assembly.Load( "UnityEditor" ).GetType( "UnityEditor.AudioMixerWindow" );
 			}
 		}
 
-		[DocsDescription("Returns an array of file names that are formatted for ExtendedGUI.DropdownList")]
-		[DocsParameter("directory", "The directory to search for files")]
-		[DocsParameter("searchPattern", "The search string")]
-		[DocsParameter("searchOption", ">One of the enumeration values that specifies whether the search operation should include only the current directory or all subdirectories")]
+		/// <summary>
+		/// Returns an array of file names that are formatted for ExtendedGUI.DropdownList
+		/// </summary>
+		/// <param name="directory">The directory to search for files</param>
+		/// <param name="searchPattern">The search string</param>
+		/// <param name="searchOption">One of the enumeration values that specifies whether the search operation should include only the current directory or all subdirectories</param>
 		public static string[] GetFiles( string directory, string searchPattern = "*", SearchOption searchOption = SearchOption.TopDirectoryOnly ) {
 			directory = directory.Trim( '/', '\\' );
 			directory += "/";
@@ -86,10 +107,12 @@ namespace TNRD.Editor.Utilities {
 			return values;
 		}
 
-		[DocsDescription("Returns an array of directory names that are formatted for ExtendedGUI.DropdownList")]
-		[DocsParameter("directory", "The directory to search for files")]
-		[DocsParameter("searchPattern", "The search string")]
-		[DocsParameter("searchOption", ">One of the enumeration values that specifies whether the search operation should include only the current directory or all subdirectories")]
+		/// <summary>
+		/// Returns an array of directory names that are formatted for ExtendedGUI.DropdownList
+		/// </summary>
+		/// <param name="directory">The directory to search for files</param>
+		/// <param name="searchPattern">The search string</param>
+		/// <param name="searchOption">One of the enumeration values that specifies whether the search operation should include only the current directory or all subdirectories</param>
 		public static string[] GetDirectories( string directory, string searchPattern = "*", SearchOption searchOption = SearchOption.TopDirectoryOnly ) {
 			directory = directory.Trim( '/', '\\' );
 			directory += "/";

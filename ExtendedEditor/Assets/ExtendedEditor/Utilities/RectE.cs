@@ -1,8 +1,7 @@
 ﻿using UnityEngine;
 
 namespace TNRD {
-
-	[DocsIgnore]
+	
 	public static class _RectE {
 
 		public static Vector2 TopLeft( this Rect rect ) {

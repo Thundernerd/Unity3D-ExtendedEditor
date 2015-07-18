@@ -2,66 +2,102 @@
 using UnityEngine;
 
 namespace TNRD.Editor.Core {
-	[DocsDescription("Base class for modal windows that can be added to ExtendedWindows")]
+
+	/// <summary>
+	/// Base class for modal windows that can be added to ExtendedWindows
+	/// </summary>
 	public class ExtendedModalWindow {
 
-		[DocsDescription("The editor this modal window is shown in")]
+		/// <summary>
+		/// The editor this modal window is shown in
+		/// </summary>
 		public ExtendedEditor Editor;
 
-		[DocsDescription("The result of a closed modal window")]
+		/// <summary>
+		/// The result of a closed modal window
+		/// </summary>
 		public EExtendedModalWindowResult Result { get; private set; }
 
-		[DocsDescription("Is the modal window ready to close")]
+		/// <summary>
+		/// Is the modal window ready to close
+		/// </summary>
 		public bool IsDone { get; private set; }
 
-		[DocsDescription("Can the modal window be dragged around")]
+		/// <summary>
+		/// Can the modal window be dragged around
+		/// </summary>
 		public bool IsDraggable { get; protected set; }
 
-		[DocsDescription("The title of the modal window")]
+		/// <summary>
+		/// The title of the modal window
+		/// </summary>
 		public string Title = "";
 
-		[DocsDescription("The rectangle used to draw the modal window")]
+		/// <summary>
+		/// The rectangle used to draw the modal window
+		/// </summary>
 		public Rect WindowRect = new Rect();
 
-		[DocsDescription("The input manager")]
+		/// <summary>
+		/// The input manager
+		/// </summary>
 		public ExtendedInput Input { get { return Editor.Input; } }
 		
-		[DocsDescription("Should the modal window be aligned to the center of the editor")]
+		/// <summary>
+		/// Should the modal window be aligned to the center of the editor
+		/// </summary>
         protected bool alignToCenter = true;
 		
-		[DocsDescription("Should the modal window show the OK/Accept button")]
+		/// <summary>
+		/// Should the modal window show the OK/Accept button
+		/// </summary>
 		protected bool showOKButton = false;
 
-		[DocsDescription("Should the modal window show the Cancel/Close button")]
+		/// <summary>
+		/// Should the modal window show the Cancel/Close button
+		/// </summary>
 		protected bool showCancelButton = false;
 		
-		[DocsDescription("The text to show on the OK/Accept button")]
+		/// <summary>
+		/// The text to show on the OK/Accept button
+		/// </summary>
 		protected string textOKButton = "OK";
 		
-		[DocsDescription("The text to show on the Cancel/Close button")]
+		/// <summary>
+		/// The text to show on the Cancel/Close button
+		/// </summary>
 		protected string textCancelButton = "Cancel";
 
 		private bool isInitialized = false;
 
-		[DocsDescription("Creates an instance of ExtendedModalWindow")]
+		/// <summary>
+		/// Creates an instance of ExtendedModalWindow
+		/// </summary>
 		public ExtendedModalWindow() { }
 		
-		[DocsDescription("Called the first time OnGUI is called on this modal window")]
+		/// <summary>
+		/// Called the first time OnGUI is called on this modal window
+		/// </summary>
 		protected virtual void OnInitialize() {
 			isInitialized = true;
 		}
 		
-		[DocsDescription("Called when the modal window gets closed")]
+		/// <summary>
+		/// Called when the modal window gets closed
+		/// </summary>
 		protected virtual void OnDestroy() {
 			isInitialized = false;
 		}
-		
-		[DocsDescription("Called 100 times per second")]
-		[DocsParameter("windowHasFocus", "Does this window have focus")]
+
+		/// <summary>
+		/// Called 100 times per second
+		/// </summary>
+		/// <param name="windowHasFocus">Does the window this control is in have focus</param>
 		public virtual void Update( bool windowHasFocus ) { }
-		
-		[DocsDescription("Write your own GUI logic here")]
-		[DocsParameter("id", "-")]
+
+		/// <summary>
+		/// Implement your own GUI logic here
+		/// </summary>
 		public virtual void OnGUI( int id ) {
 			if ( !isInitialized ) {
 				OnInitialize();
@@ -119,21 +155,27 @@ namespace TNRD.Editor.Core {
 			}
 		}
 		
-		[DocsDescription("Closes the modal window with the OK result")]
+		/// <summary>
+		/// Closes the modal window with the OK result
+		/// </summary>
 		public void OK() {
 			Result = EExtendedModalWindowResult.OK;
 			IsDone = true;
 			Event.current.Use();
 		}
 		
-		[DocsDescription("Closes the modal window with the Cancel result")]
+		/// <summary>
+		/// Closes the modal window with the Cancel result
+		/// </summary>
 		public void Cancel() {
 			Result = EExtendedModalWindowResult.Cancel;
 			IsDone = true;
 			Event.current.Use();
 		}
 		
-		[DocsDescription("Aligns the modal window to the center of the editor")]
+		/// <summary>
+		/// Aligns the modal window to the center of the editor
+		/// </summary>
 		public void AlignToCenter() {
 			var esize = Editor.position.size / 2;
 			var csize = WindowRect.size / 2;
@@ -141,13 +183,30 @@ namespace TNRD.Editor.Core {
 		}
 
 		#region Events
-		[DocsDescription("Invoked when a ContextClick event occurs")]
+
+		/// <summary>
+		/// Invoked when a ContextClick event occurs
+		/// </summary>
+		/// <param name="position">The location of the right-mouse click</param>
 		public virtual void OnContextClick( Vector2 position ) { }
-		[DocsDescription("Invoked when a DragExited event occurs")]
+
+		/// <summary>
+		/// Invoked when a DragExited event occurs
+		/// </summary>
 		public virtual void OnDragExited() { }
-		[DocsDescription("Invoked when a DragPerform event occurs")]
+
+		/// <summary>
+		/// Invoked when a DragPerform event occurs
+		/// </summary>
+		/// <param name="paths">Path(s) of the file(s) being dragged onto the edito</param>
+		/// <param name="position">The mouse position</param>
 		public virtual void OnDragPerform( string[] paths, Vector2 position ) { }
-		[DocsDescription("Invoked when a DragUpdate event occurs")]
+
+		/// <summary>
+		/// Invoked when a DragUpdate event occurs
+		/// </summary>
+		/// <param name="paths">Path(s) of the file(s) being dragged onto the editor</param>
+		/// <param name="position">The mouse position</param>
 		public virtual void OnDragUpdate( string[] paths, Vector2 position ) { }
 		#endregion
 	}

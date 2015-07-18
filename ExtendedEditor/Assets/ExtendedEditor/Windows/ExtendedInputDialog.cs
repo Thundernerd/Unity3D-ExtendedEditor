@@ -4,34 +4,43 @@ using UnityEngine;
 
 namespace TNRD.Editor.Windows {
 
-	[DocsDescription("A simple input dialog")]
+	/// <summary>
+	/// A simple input dialog
+	/// </summary>
 	public class ExtendedInputDialog : ExtendedModalWindow {
 
-		[DocsDescription("The input text in this dialog")]
+		/// <summary>
+		/// The input text in this dialog
+		/// </summary>
 		public string InputText = "";
 
 		private string message = "";
-		
-		[DocsDescription("Creates a new instance of ExtendedInputDialog")]
+
+		/// <summary>
+		/// Creates a new instance of ExtendedInputDialog
+		/// </summary>
 		public ExtendedInputDialog() : base() { }
 
-		[DocsDescription("Creates a new instance of ExtendedInputDialog")]
-		[DocsParameter("title", "The title of the window")]
-		[DocsParameter("message", "The message to show on the ExtendedDialogBox")]
+		/// <summary>
+		/// Creates a new instance of ExtendedInputDialog
+		/// </summary>
+		/// <param name="title">The title of the window</param>
+		/// <param name="message">The message to show on the ExtendedDialogBox</param>
 		public ExtendedInputDialog( string title, string message ) : this() {
 			this.Title = title;
 			this.message = message;
 		}
 
-		[DocsDescription("Creates a new instance of ExtendedInputDialog")]
-		[DocsParameter("title", "The title of the window")]
-		[DocsParameter("message", "The message to show on the ExtendedDialogBox")]
-		[DocsParameter("input", "The input to already show in the inputbox")]
+		/// <summary>
+		/// Creates a new instance of ExtendedInputDialog
+		/// </summary>
+		/// <param name="title">The title of the window</param>
+		/// <param name="message">The message to show on the ExtendedDialogBox</param>
+		/// <param name="input">The input to already show in the inputbox</param>
 		public ExtendedInputDialog( string title, string message, string input ) : this( title, message ) {
 			this.InputText = input;
 		}
-
-		[DocsIgnore]
+		
 		protected override void OnInitialize() {
 			base.OnInitialize();
 
@@ -43,8 +52,7 @@ namespace TNRD.Editor.Windows {
 
 			WindowRect = new Rect( 0, 0, 350, 120 );
 		}
-
-		[DocsIgnore]
+		
 		public override void OnGUI( int id ) {
 			base.OnGUI( id );
 

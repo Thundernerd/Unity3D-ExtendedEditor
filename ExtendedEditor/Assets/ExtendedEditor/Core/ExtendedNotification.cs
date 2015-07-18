@@ -3,27 +3,40 @@ using UnityEngine;
 
 namespace TNRD.Editor.Core {
 
-	[DocsDescription("A notification popup that can be shown in a window at the bottom right corner")]
+	/// <summary>
+	/// A notification popup that can be shown in a window at the bottom right corner
+	/// </summary>
 	public class ExtendedNotification {
 
-		[DocsDescription("The text to display on the notification")]
+		/// <summary>
+		/// The text to display on the notification
+		/// </summary>
 		public GUIContent Text;
 
-		[DocsDescription("The color to draw the text with")]
+		/// <summary>
+		/// The color to draw the text with
+		/// </summary>
 		public Color @Color;
 
-		[DocsDescription("The duration of the notification")]
+		/// <summary>
+		/// The duration of the notification
+		/// </summary>
 		public float Duration;
 
-		[DocsDescription("The size of the notification (read-only)")]
+		/// <summary>
+		/// The size of the notification (read-only)
+		/// </summary>
 		public readonly Vector2 Size;
-		
-		[DocsDescription("Creates an instance of ExtendedNotification")]
-		[DocsParameter("text", "The text to display on the notification")]
-		[DocsParameter("color", "The color of the notification")]
-		[DocsParameter("duration", "The duration of the notification")]
-		[DocsParameter("style", "The style of the notification")]
-		public ExtendedNotification( string text, Color color, float duration, GUIStyle style ) {
+
+
+		/// <summary>
+		/// Creates an instance of ExtendedNotification
+		/// </summary>
+		/// <param name="text">The text to display on the notification</param>
+		/// <param name="color">The color of the notification</param>
+		/// <param name="duration">The duration of the notification</param>
+		/// <param name="style">The style of the notification</param>
+        public ExtendedNotification( string text, Color color, float duration, GUIStyle style ) {
 			Text = new GUIContent( text );
 			Color = color;
 			Duration = duration;

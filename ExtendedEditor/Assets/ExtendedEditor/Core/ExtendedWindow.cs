@@ -7,43 +7,63 @@ using UnityEngine;
 
 namespace TNRD.Editor.Core {
 
-	[DocsDescription("Base class for windows that can be added to ExtendedEditor")]
+	/// <summary>
+	/// Base class for windows that can be added to ExtendedEditor
+	/// </summary>
 	public class ExtendedWindow {
 
+		/// <summary>
+		/// The asset manager for this window
+		/// </summary>
 		[JsonProperty]
-		[DocsDescription("The asset manager for this window")]
 		public ExtendedAssets Assets;
 
+		/// <summary>
+		/// The editor this window is added to
+		/// </summary>
 		[JsonIgnore]
-		[DocsDescription("The editor this window is added to")]
 		public ExtendedEditor Editor;
 
+		/// <summary>
+		/// The settings that apply to this window
+		/// </summary>
 		[JsonProperty]
-		[DocsDescription("The settings that apply to this window")]
 		public ExtendedWindowSettings Settings;
 
+		/// <summary>
+		/// Is the window initialized
+		/// </summary>
 		[JsonProperty]
-		[DocsDescription("Is the window initialized")]
 		public bool IsInitialized = false;
 
+		/// <summary>
+		/// The content to draw on the top of the window
+		/// </summary>
 		[JsonProperty]
-		[DocsDescription("The content to draw on the top of the window")]
 		public GUIContent WindowContent = new GUIContent();
 
+		/// <summary>
+		/// The window ID
+		/// </summary>
 		[JsonProperty]
-		[DocsDescription("The window ID")]
 		public int WindowID = -1;
 
+		/// <summary>
+		/// The rectangle used for drawing the window
+		/// </summary>
 		[JsonProperty]
-		[DocsDescription("The rectangle used for drawing the window")]
 		public Rect WindowRect = new Rect();
 
+		/// <summary>
+		/// The GUIStyle for the window
+		/// </summary>
 		[JsonProperty]
-		[DocsDescription("The GUIStyle for the window")]
 		public GUIStyle WindowStyle = null;
 
+		/// <summary>
+		/// The position of the window inside the editor
+		/// </summary>
 		[JsonIgnore]
-		[DocsDescription("The position of the window inside the editor")]
 		public Vector2 Position {
 			get {
 				return WindowRect.position;
@@ -54,8 +74,10 @@ namespace TNRD.Editor.Core {
 			}
 		}
 
+		/// <summary>
+		/// The size of the window
+		/// </summary>
 		[JsonIgnore]
-		[DocsDescription("The size of the window")]
 		public Vector2 Size {
 			get {
 				return WindowRect.size;
@@ -66,20 +88,28 @@ namespace TNRD.Editor.Core {
 			}
 		}
 
+		/// <summary>
+		/// The camera that is used for panning in the window
+		/// </summary>
 		[JsonIgnore]
-		[DocsDescription("The camera that is used for panning in the window")]
 		public Vector3 Camera = new Vector3( 0, 0, 1 );
 
+		/// <summary>
+		/// The matrix that is used for scaling the contents of this window
+		/// </summary>
 		[JsonIgnore]
-		[DocsDescription("The matrix that is used for scaling the contents of this window")]
 		public Matrix4x4 ScaleMatrix = Matrix4x4.identity;
 
+		/// <summary>
+		/// The input manager for this window
+		/// </summary>
 		[JsonIgnore]
-		[DocsDescription("The input manager for this window")]
 		public ExtendedInput Input = new ExtendedInput();
 
+		/// <summary>
+		/// The active controls in this window
+		/// </summary>
 		[JsonProperty]
-		[DocsDescription("The active controls in this window")]
 		protected List<ExtendedControl> Controls = new List<ExtendedControl>();
 
 		private List<ExtendedControl> controlsToProcess = new List<ExtendedControl>();
@@ -104,17 +134,24 @@ namespace TNRD.Editor.Core {
 
 		private GUIStyle maximizeButtonStyle;
 
-		[DocsDescription("...")]
+		/// <summary>
+		/// Creates a new instance of ExtendedWindow with default settings
+		/// </summary>
 		public ExtendedWindow() : this( new ExtendedWindowSettings() ) { }
-
-		[DocsDescription("...")]
+		
+		/// <summary>
+		/// Creates a new instance of ExtendedWindow with the given settings
+		/// </summary>
+		/// <param name="settings">The settings to apply to this window</param>
 		public ExtendedWindow( ExtendedWindowSettings settings ) {
 			Settings = settings;
 		}
 
 		#region Initialization
 
-		[DocsDescription("Called when the window is added to an editor")]
+		/// <summary>
+		/// Called when the window is added to an editor
+		/// </summary>
 		public virtual void OnInitialize() {
 			Assets = new ExtendedAssets( Settings.AssetPath, this );
 
@@ -126,7 +163,9 @@ namespace TNRD.Editor.Core {
 			IsInitialized = true;
 		}
 
-		[DocsDescription("Called the first time OnGUI is called on this window")]
+		/// <summary>
+		/// Called the first time OnGUI is called on this window
+		/// </summary>
 		protected virtual void OnInitializeGUI() {
 			notificationBackgroundStyle = new GUIStyle( "NotificationBackground" );
 			notificationTextStyle = new GUIStyle( "NotificationText" );
@@ -150,7 +189,9 @@ namespace TNRD.Editor.Core {
 			initializedGUI = true;
 		}
 
-		[DocsDescription("Called when this window gets deserialized")]
+		/// <summary>
+		/// Called when this window gets deserialized
+		/// </summary>
 		public virtual void OnDeserialized() {
 			Assets = new ExtendedAssets( Settings.AssetPath, this );
 
@@ -186,7 +227,9 @@ namespace TNRD.Editor.Core {
 			}
 		}
 
-		[DocsDescription("Called when this window or the editor gets closed")]
+		/// <summary>
+		/// Called when this window or the editor gets closed
+		/// </summary>
 		public virtual void OnDestroy() {
 			for ( int i = Controls.Count - 1; i >= 0; i-- ) {
 				Controls[i].OnDestroy();
@@ -204,14 +247,20 @@ namespace TNRD.Editor.Core {
 		}
 		#endregion
 
-		[DocsDescription("Called when this window gets focus")]
+		/// <summary>
+		/// Called when this window gets focus
+		/// </summary>
 		public virtual void OnFocus() { }
 
-		[DocsDescription("Called when this window loses focus")]
+		/// <summary>
+		/// Called when this window loses focus
+		/// </summary>
 		public virtual void OnLostFocus() { }
 
-		[DocsDescription("Called 100 times per second")]
-		[DocsParameter("windowHasFocus", "Does this window have focus")]
+		/// <summary>
+		/// Called 100 times per second
+		/// </summary>
+		/// <param name="windowHasFocus">Does this window have focus</param>
 		public virtual void Update( bool windowHasFocus ) {
 			controlsToProcess = new List<ExtendedControl>( Controls );
 
@@ -295,7 +344,6 @@ namespace TNRD.Editor.Core {
 		}
 
 		#region SceneGUI
-		[DocsIgnore]
 		public void InternalSceneGUI( SceneView view ) {
 			Handles.BeginGUI();
 			OnSceneGUI( view );
@@ -303,12 +351,9 @@ namespace TNRD.Editor.Core {
 		}
 
 		/// <summary>
-		/// See <see cref="ExtendedWindowSettings.UseOnSceneGUI"/> to enable this feature
+		/// Write your own SceneGUI logic here
 		/// </summary>
-		/// <param name="view"></param>
-		/// 
-		[DocsDescription("Write your own SceneGUI logic here")]
-		[DocsParameter("view", "The current SceneView")]
+		/// <param name="view">The current SceneView</param>
 		public virtual void OnSceneGUI( SceneView view ) {
 			foreach ( var item in Controls ) {
 				item.OnSceneGUI( view );
@@ -317,7 +362,6 @@ namespace TNRD.Editor.Core {
 		#endregion
 
 		#region GUI
-		[DocsIgnore]
 		public void InternalGUI( int id ) {
 			if ( !initializedGUI ) {
 				OnInitializeGUI();
@@ -350,8 +394,7 @@ namespace TNRD.Editor.Core {
 			OnGUI();
 			EndGUI();
 		}
-
-		[DocsIgnore]
+		
 		public void BeginGUI() {
 			if ( Settings.UseCamera ) {
 				var translation = Matrix4x4.TRS( WindowRect.TopLeft(), Quaternion.identity, Vector3.one );
@@ -395,13 +438,16 @@ namespace TNRD.Editor.Core {
 			}
 		}
 
-		[DocsDescription("Write your own toolbar logic here")]
+		/// <summary>
+		/// Write your own toolbar logic here
+		/// </summary>
 		public virtual void OnToolbarGUI() { }
 
-		[DocsDescription("Write your own GUI logic here")]
+		/// <summary>
+		/// Write your own GUI logic here
+		/// </summary>
 		public virtual void OnGUI() { }
-
-		[DocsIgnore]
+		
 		public void EndGUI() {
 			if ( Settings.DrawToolbar ) {
 				var pos = Input.MousePosition;
@@ -460,8 +506,10 @@ namespace TNRD.Editor.Core {
 		#endregion
 
 		#region Controls
-		[DocsDescription("Adds a control to the window")]
-		[DocsParameter("control", "The control to add")]
+		/// <summary>
+		/// Adds a control to the window
+		/// </summary>
+		/// <param name="control">The control to add</param>
 		public virtual void AddControl( ExtendedControl control ) {
 			if ( Controls.Contains( control ) ) return;
 
@@ -479,19 +527,26 @@ namespace TNRD.Editor.Core {
 			controlsDict[type].Add( control );
 			Controls.Add( control );
 		}
-		
-		[DocsDescription("Removes a control from the window")]
-		[DocsParameter("control", "The control to remove")]
+
+		/// <summary>
+		/// Removes a control from the window
+		/// </summary>
+		/// <param name="control">The control to remove</param>
 		public virtual void RemoveControl( ExtendedControl control ) {
 			controlsToRemove.Add( control );
 		}
 
-		[DocsDescription("Removes all controls from the window")]
+		/// <summary>
+		/// Removes all controls from the window
+		/// </summary>
 		public virtual void ClearControls() {
 			controlsToRemove.AddRange( Controls );
 		}
-		
-		[DocsDescription("Returns a list of controls of the given type")]
+
+		/// <summary>
+		/// Returns a list of controls of the given type, including controls that inherit from this type
+		/// </summary>
+		/// <returns>List of T</returns>
 		public List<T> GetControlsByType<T>() where T : ExtendedControl {
 			var type = typeof(T);
 			if ( controlsDict.ContainsKey( type ) ) {
@@ -504,9 +559,12 @@ namespace TNRD.Editor.Core {
 				return new List<T>();
 			}
 		}
-		
-		[DocsDescription("Returns a list of controls of the given type")]
-		[DocsParameter("type", "The type of the control to return")]
+
+		/// <summary>
+		/// Returns a list of controls of the given type
+		/// </summary>
+		/// <param name="type">The type of the control to return</param>
+		/// <returns>List of ExtendedControl</returns>
 		public List<ExtendedControl> GetControlsByType( Type type ) {
 			if ( controlsDict.ContainsKey( type ) ) {
 				return controlsDict[type];
@@ -515,7 +573,10 @@ namespace TNRD.Editor.Core {
 			}
 		}
 
-		[DocsDescription("Returns a list of controls of the given type, including controls that inherit from this type")]
+		/// <summary>
+		/// Returns a list of controls of the given type, including controls that inherit from this type
+		/// </summary>
+		/// <returns>List of T</returns>
 		public List<T> GetControlsByBaseType<T>() where T : ExtendedControl {
 			var type = typeof(T);
 			var list = new List<T>();
@@ -537,9 +598,12 @@ namespace TNRD.Editor.Core {
 
 			return list;
 		}
-		
-		[DocsDescription("Returns a list of controls of the given type, including controls that inherit from this type")]
-		[DocsParameter("type", "The type of the control to return")]
+
+		/// <summary>
+		/// Returns a list of controls of the given type, including controls that inherit from this type
+		/// </summary>
+		/// <param name="type">The type of the control to return</param>
+		/// <returns>List of ExtendedControl</returns>
 		public List<ExtendedControl> GetControlsByBaseType( Type type ) {
 			var list = new List<ExtendedControl>();
 
@@ -563,16 +627,20 @@ namespace TNRD.Editor.Core {
 		#endregion
 
 		#region Events
-		[DocsDescription("Invoked when a ContextClick event occurs")]
-		[DocsParameter("position", "The location of the right-mouse click")]
+		/// <summary>
+		/// Invoked when a ContextClick event occurs
+		/// </summary>
+		/// <param name="position">The location of the right-mouse click</param>
 		public void OnContextClick( Vector2 position ) {
 			bool used = false;
 			OnContextClick( position, ref used );
 		}
 
-		[DocsDescription("Invoked when a ContextClick event occurs")]
-		[DocsParameter("position", "The location of the right-mouse click")]
-		[DocsParameter("used", "-")]
+		/// <summary>
+		/// Invoked when a ContextClick event occurs
+		/// </summary>
+		/// <param name="position">The location of the right-mouse click</param>
+		/// <param name="used">-</param>
 		public virtual void OnContextClick( Vector2 position, ref bool used ) {
 			if ( Settings.DrawToolbar ) {
 				position.y -= 17.5f;
@@ -583,25 +651,31 @@ namespace TNRD.Editor.Core {
 			}
 		}
 
-		[DocsDescription("Invoked when a DragExited event occurs")]
+		/// <summary>
+		/// Invoked when a DragExited event occurs
+		/// </summary>
 		public virtual void OnDragExited() {
 			for ( int i = controlsToProcess.Count - 1; i >= 0; i-- ) {
 				controlsToProcess[i].OnDragExited();
 			}
 		}
 
-		[DocsDescription("Invoked when a DragPerform event occurs")]
-		[DocsParameter("paths", "Path(s) of the file(s) being dragged onto the editor")]
-		[DocsParameter("position", "The mouse position")]
+		/// <summary>
+		/// Invoked when a DragPerform event occurs
+		/// </summary>
+		/// <param name="paths">Path(s) of the file(s) being dragged onto the edito</param>
+		/// <param name="position">The mouse position</param>
 		public virtual void OnDragPerform( string[] paths, Vector2 position ) {
 			for ( int i = controlsToProcess.Count - 1; i >= 0; i-- ) {
 				controlsToProcess[i].OnDragPerform( paths, position );
 			}
 		}
 
-		[DocsDescription("Invoked when a DragUpdate event occurs")]
-		[DocsParameter("paths", "Path(s) of the file(s) being dragged onto the editor")]
-		[DocsParameter("position", "The mouse position")]
+		/// <summary>
+		/// Invoked when a DragUpdate event occurs
+		/// </summary>
+		/// <param name="paths">Path(s) of the file(s) being dragged onto the editor</param>
+		/// <param name="position">The mouse position</param>
 		public virtual void OnDragUpdate( string[] paths, Vector2 position ) {
 			for ( int i = controlsToProcess.Count - 1; i >= 0; i-- ) {
 				controlsToProcess[i].OnDragUpdate( paths, position );
@@ -610,17 +684,20 @@ namespace TNRD.Editor.Core {
 		#endregion
 
 		#region Notifications
-		[DocsDescription("Shows a notification at the bottom-right corner of the window")]
-		[DocsParameter("text", "The text to display on the notification")]
+		/// <summary>
+		/// Shows a notification at the bottom-right corner of the window
+		/// </summary>
+		/// <param name="text">The text to display on the notification</param>
 		public void ShowNotification( string text ) {
 			ShowNotification( text, Color.white, 1.25f );
 		}
-		
-		[DocsDescription("Shows a notification at the bottom-right corner of the window")]
-		[DocsParameter("text", "The text to display on the notification")]
-		[DocsParameter("color", "The color of the notification")]
-		[DocsParameter("duration", "The duration of the notification")]
-		[DocsParameter("style", "The style of the notification")]
+
+		/// <summary>
+		/// Shows a notification at the bottom-right corner of the window
+		/// </summary>
+		/// <param name="text">The text to display on the notification</param>
+		/// <param name="color">The color of the notification</param>
+		/// <param name="duration">The duration of the notification</param>
 		public void ShowNotification( string text, Color color, float duration ) {
 			if ( string.IsNullOrEmpty( text ) ) return;
 			color.a = 0;

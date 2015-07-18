@@ -1,16 +1,26 @@
 ﻿#if UNITY_EDITOR
 
 namespace TNRD.Editor.Core {
-	
-	[DocsDescription("The mouse buttons that can be checked for with ExtendedInput")]
+
+	/// <summary>
+	/// The mouse buttons that can be checked for with ExtendedInput
+	/// </summary>
 	public enum EMouseButton {
-		[DocsDescription("-")]
+		/// <summary>
+		/// -
+		/// </summary>
 		None = -1,
-		[DocsDescription("-")]
+		/// <summary>
+		/// -
+		/// </summary>
 		Left = 0,
-		[DocsDescription("-")]
+		/// <summary>
+		/// -
+		/// </summary>
 		Right = 1,
-		[DocsDescription("-")]
+		/// <summary>
+		/// -
+		/// </summary>
 		Middle = 2
 	}
 }

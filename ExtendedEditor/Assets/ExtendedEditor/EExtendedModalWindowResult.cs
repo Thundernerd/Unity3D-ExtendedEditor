@@ -2,11 +2,15 @@
 
 namespace TNRD.Editor.Core {
 
-	[DocsDescription("The result of a modal window")]
+
 	public enum EExtendedModalWindowResult {
-		[DocsDescription("-")]
+		/// <summary>
+		/// -
+		/// </summary>
 		OK,
-		[DocsDescription("-")]
+		/// <summary>
+		/// -
+		/// </summary>
 		Cancel
 	}
 }

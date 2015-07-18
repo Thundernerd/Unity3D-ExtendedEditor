@@ -1,57 +1,72 @@
 ﻿namespace TNRD {
 
-	[DocsDescription("An object to easily save and query the current and previous value")]
+	/// <summary>
+	/// An object to easily save and query the current and previous value
+	/// </summary>
 	public class State<T> {
 
-		[DocsDescription("The current value")]
+		/// <summary>
+		/// The current value
+		/// </summary>
 		public T Current;
 
-		[DocsDescription("The previous value")]
+		/// <summary>
+		/// The previous value
+		/// </summary>
 		public T Previous;
 
-		[DocsDescription("Updates the values")]
-		[DocsParameter("state", "The new value for the current state")]
+		/// <summary>
+		/// Updates the values
+		/// </summary>
+		/// <param name="state">The new value for the current state</param>
 		public void Update( T state ) {
 			Previous = Current;
 			Current = state;
 		}
 
-		[DocsDescription("Updates the values")]
+		/// <summary>
+		/// Updates the values
+		/// </summary>
 		public void Update() {
 			Previous = Current;
 		}
-
-		[DocsIgnore]
+		
 		public static bool operator true( State<T> v ) {
 			return v.Current.Equals( true );
 		}
-
-		[DocsIgnore]
+		
 		public static bool operator false( State<T> v ) {
 			return v.Current.Equals( false );
 		}
-
-		[DocsIgnore]
+		
 		public static bool operator !( State<T> v ) {
 			return v.Current.Equals( false );
 		}
 
-		[DocsDescription("Is the current state equal to true and the previous state equal to false")]
+		/// <summary>
+		/// Is the current state equal to true and the previous state equal to false
+		/// </summary>
 		public bool IsPressed() {
 			return Current.Equals( true ) && Previous.Equals( false );
 		}
 
-		[DocsDescription("Is the current state equal to false and the previous state equal to true")]
+		/// <summary>
+		/// Is the current state equal to false and the previous state equal to true
+		/// </summary>
 		public bool IsReleased() {
 			return Current.Equals( false ) && Previous.Equals( true );
 		}
 
-		[DocsDescription("Is the current state equal to true")]
+		/// <summary>
+		/// Is the current state equal to true
+		/// </summary>
 		public bool IsDown() {
 			return Current.Equals( true );
 		}
 
-		[DocsDescription("Is the current state equal to false")]
+		/// <summary>
+		/// Is the current state equal to false
+		/// </summary>
 		public bool IsUp() {
 			return Current.Equals( false );
 		}

@@ -2,37 +2,60 @@
 
 namespace TNRD.Editor.Core {
 
-	[DocsDescription("Settings that apply to ExtendedWindow")]
+
+	/// <summary>
+	/// Settings that apply to ExtendedWindow
+	/// </summary>
 	public class ExtendedWindowSettings {
 
-		[DocsDescription("Creats an instance of ExtendedWindowSettings")]
+		/// <summary>
+		/// Creats an instance of ExtendedWindowSettings
+		/// </summary>
 		public ExtendedWindowSettings() { }
 
-		[DocsDescription("The path to the assets (Default is \"Assets/.../CurrentEditorFolder/Assets/\")")]
+		/// <summary>
+		/// The path to the assets (Default is \"Assets/.../CurrentEditorFolder/Assets/\")
+		/// </summary>
 		public string AssetPath = "";
 
-		[DocsDescription("Can the window be resized")]
+		/// <summary>
+		/// Can the window be resized
+		/// </summary>
 		public bool AllowResize = false;
 
-		[DocsDescription("Can the window be moved")]
+		/// <summary>
+		/// Can the window be moved
+		/// </summary>
 		public bool AllowRepositioning = false;
 
-		[DocsDescription("Draw the maximize and close buttons")]
+		/// <summary>
+		/// Draw the maximize and close buttons
+		/// </summary>
 		public bool DrawTitleBarButtons = false;
 
-		[DocsDescription("Draw the toolbar")]
+		/// <summary>
+		/// Draw the toolbar
+		/// </summary>
 		public bool DrawToolbar = false;
 
-		[DocsDescription("Blocks underlying windows from appearing")]
+		/// <summary>
+		/// Blocks underlying windows from appearing
+		/// </summary>
 		public bool IsBlocking = true;
 
-		[DocsDescription("Is fullscreen in the editor")]
+		/// <summary>
+		/// Is fullscreen in the editor
+		/// </summary>
 		public bool IsFullscreen = true;
 
-		[DocsDescription("Use a camera in the window")]
+		/// <summary>
+		/// Use a camera in the window
+		/// </summary>
 		public bool UseCamera = false;
 
-		[DocsDescription("Enable OnSceneGUI for the window")]
+		/// <summary>
+		/// Enable OnSceneGUI for the window
+		/// </summary>
 		public bool UseOnSceneGUI = false;
 	}
 }

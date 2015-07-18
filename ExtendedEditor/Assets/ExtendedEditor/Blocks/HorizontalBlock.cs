@@ -7,23 +7,28 @@ using UnityEditor;
 
 namespace TNRD.Editor.Blocks {
 
-	[DocsDescription("")]
+	/// <summary>
+	/// 
+	/// </summary>
 	public class HorizontalBlock : IDisposable {
 
-		[DocsDescription("Creates a new instance of a HorizontalBlock")]
-		[DocsParameter("options", "The options to apply to the Horizontal")]
+		/// <summary>
+		/// Creates a new instance of a HorizontalBlock
+		/// </summary>
+		/// <param name="options">The options to apply to the Horizontal</param>
 		public HorizontalBlock( params GUILayoutOption[] options ) {
 			EditorGUILayout.BeginHorizontal( options );
 		}
 
-		[DocsDescription("Creates a new instance of a HorizontalBlock")]
-		[DocsParameter("style", "The style to apply to the Horizontal")]
-		[DocsParameter("options", "The options to apply to the Horizontal")]
+		/// <summary>
+		/// Creates a new instance of a HorizontalBlock
+		/// </summary>
+		/// <param name="style">The style to apply to the Horizontal</param>
+		/// <param name="options">The options to apply to the Horizontal</param>
 		public HorizontalBlock( GUIStyle style, params GUILayoutOption[] options ) {
 			EditorGUILayout.BeginHorizontal( style, options );
 		}
 
-		[DocsIgnore]
 		public void Dispose() {
 			EditorGUILayout.EndHorizontal();
 		}

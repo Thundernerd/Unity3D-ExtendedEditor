@@ -2,14 +2,20 @@
 
 namespace TNRD.Editor.Core {
 
-	[DocsDescription("Base for shared objects that can be added to editors")]
+	/// <summary>
+	/// Base for shared objects that can be added to editors
+	/// </summary>
 	public class ExtendedSharedObject {
 
-		[DocsDescription("Creates an instance of ExtendedSharedObject")]
+		/// <summary>
+		/// Creates an instance of ExtendedSharedObject
+		/// </summary>
 		public ExtendedSharedObject() { }
 
-		[DocsDescription("Called 100 times per second")]
-		[DocsParameter("windowHasFocus", "Does this window have focus")]
+		/// <summary>
+		/// Called 100 times per second
+		/// </summary>
+		/// <param name="windowHasFocus">Does this window have focus</param>
 		public virtual void Update( bool windowHasFocus ) { }
 	}
 }

@@ -3,21 +3,31 @@ using System;
 
 namespace TNRD.Editor.Core {
 
-	[DocsDescription("The result arguments when a modal window gets closed")]
+	/// <summary>
+	/// The result arguments when a modal window gets closed
+	/// </summary>
 	public class ExtendedModalWindowEventArgs : EventArgs {
 
-		[DocsDescription("The window that got closed")]
+		/// <summary>
+		/// The window that got closed
+		/// </summary>
 		public ExtendedModalWindow Window { get; private set; }
 
-		[DocsDescription("The result of the window")]
+		/// <summary>
+		/// The result of the window
+		/// </summary>
 		public EExtendedModalWindowResult Result { get; private set; }
 
-		[DocsDescription("Creates a new instance of ExtendedModalWindowEventArgs")]
+		/// <summary>
+		/// Creates a new instance of ExtendedModalWindowEventArgs
+		/// </summary>
 		public ExtendedModalWindowEventArgs() : base() { }
 
-		[DocsDescription("Creates a new instance of ExtendedModalWindowEventArgs")]
-		[DocsParameter("window", "The modal window")]
-		[DocsParameter("result", "The result of the modal window")]
+		/// <summary>
+		/// Creates a new instance of ExtendedModalWindowEventArgs
+		/// </summary>
+		/// <param name="window">The modal window</param>
+		/// <param name="result">The result of the modal window</param>
 		public ExtendedModalWindowEventArgs( ExtendedModalWindow window, EExtendedModalWindowResult result ) : this() {
 			Window = window;
 			Result = result;
