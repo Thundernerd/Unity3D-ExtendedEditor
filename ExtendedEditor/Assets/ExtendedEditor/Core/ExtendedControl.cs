@@ -37,6 +37,26 @@ namespace TNRD.Editor.Core {
 		/// </summary>
 		public Vector2 Size;
 
+        /// <summary>
+        /// Gets or sets the edges of the window to which a control is bound and determines how a control is resized with its parent.
+        /// </summary>
+        public EAnchorStyles Anchor = EAnchorStyles.Top | EAnchorStyles.Left;
+
+        /// <summary>
+        /// The lower limit for the size of this control. To be used in combination with Anchor
+        /// </summary>
+        public Vector2 MinSize;
+
+        /// <summary>
+        /// The upper limit for the size of this control. To be used in combination with Anchor
+        /// </summary>
+        public Vector2 MaxSize;
+        
+        /// <summary>
+        /// Gets or sets a value indicating whether the control can accept data that the user drags onto it
+        /// </summary>
+        public bool AllowDrop;
+        
 		/// <summary>
 		/// The rectangle used for drawing in OnGUI
 		/// </summary>
@@ -51,14 +71,16 @@ namespace TNRD.Editor.Core {
 
 		[JsonProperty]
 		private int controlHint = -1;
-
-		[JsonIgnore]
+        
 		private bool initializedGUI = false;
+        
+        private Vector2 previousWindowPosition;
+        private Vector2 previousWindowSize;
 
-		/// <summary>
-		/// Creates a new instance of ExtendedControl
-		/// </summary>
-		public ExtendedControl() { }
+        /// <summary>
+        /// Creates a new instance of ExtendedControl
+        /// </summary>
+        public ExtendedControl() { }
 
 		/// <summary>
 		/// Called when the control is added to a window
@@ -106,8 +128,76 @@ namespace TNRD.Editor.Core {
 		public virtual void OnGUI() {
 			if ( !initializedGUI ) {
 				OnInitializeGUI();
-			}
-		}
+
+                if ( Window.Settings.IsFullscreen ) {
+                    previousWindowPosition = Window.Editor.position.position;
+                    previousWindowSize = Window.Editor.position.size;
+                } else {
+                    previousWindowPosition = Window.Position;
+                    previousWindowSize = Window.Size;
+                }
+            }
+
+            Vector2 currentWindowPos;
+            Vector2 currentWindowSize;
+
+            if ( Window.Settings.IsFullscreen ) {
+                currentWindowPos = Window.Editor.position.position;
+                currentWindowSize = Window.Editor.position.size;
+            } else {
+                currentWindowPos = Window.Position;
+                currentWindowSize = Window.Size;
+            }
+
+            if ( currentWindowPos != previousWindowPosition || currentWindowSize != previousWindowSize ) {
+                if ( ( Anchor & EAnchorStyles.Top ) != EAnchorStyles.Top) {
+                    if ( currentWindowPos.y != previousWindowPosition.y && currentWindowSize.y != previousWindowSize.y ) {
+                        var d = currentWindowPos.y - previousWindowPosition.y;
+                        Position.y -= d;
+                        Size.y += d;
+                    }
+                }
+
+                if ( ( Anchor & EAnchorStyles.Bottom ) == EAnchorStyles.Bottom ) {
+                    if (currentWindowSize.y != previousWindowSize.y ) {
+                        var d = currentWindowSize.y - previousWindowSize.y;
+                        Size.y += d;
+                    }
+                }
+                
+                if ( ( Anchor & EAnchorStyles.Left ) != EAnchorStyles.Left) {
+                    if (currentWindowPos.x != previousWindowPosition.x && currentWindowSize.x != previousWindowSize.x ) {
+                        var d = currentWindowPos.x - previousWindowPosition.x;
+                        Position.x -= d;
+                        Size.x += d;
+                    }
+                }
+
+                if ( ( Anchor & EAnchorStyles.Right ) == EAnchorStyles.Right ) {
+                    if (currentWindowSize.x != previousWindowSize.x ) {
+                        var d = currentWindowSize.x - previousWindowSize.x;
+                        Size.x += d;
+                    }
+                }
+            }
+
+            previousWindowPosition = currentWindowPos;
+            previousWindowSize = currentWindowSize;
+
+            if ( MinSize.x > 0 && Size.x < MinSize.x ) {
+                Size.x = MinSize.x;
+            }
+            if ( MinSize.y > 0 && Size.y < MinSize.y ) {
+                Size.y = MinSize.y;
+            }
+
+            if ( MaxSize.x > 0 && Size.x > MaxSize.x ) {
+                Size.x = MaxSize.x;
+            }
+            if ( MaxSize.y > 0 && Size.y > MaxSize.y ) {
+                Size.y = MaxSize.y;
+            }
+        }
 
 		/// <summary>
 		/// Implement your own SceneGUI logic here
@@ -144,12 +234,16 @@ namespace TNRD.Editor.Core {
 		/// <param name="position">The mouse position</param>
 		public virtual void OnDragPerform( string[] paths, Vector2 position ) { }
 
-		/// <summary>
-		/// Invoked when a DragUpdate event occurs
-		/// </summary>
-		/// <param name="paths">Path(s) of the file(s) being dragged onto the editor</param>
-		/// <param name="position">The mouse position</param>
-		public virtual void OnDragUpdate( string[] paths, Vector2 position ) { }
+        /// <summary>
+        /// Invoked when a DragUpdate event occurs
+        /// </summary>
+        /// <param name="paths">Path(s) of the file(s) being dragged onto the editor</param>
+        /// <param name="position">The mouse position</param>
+        public virtual void OnDragUpdate( string[] paths, Vector2 position ) {
+            if ( Rectangle.Contains( position ) ) {
+                DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
+            }
+        }
 		#endregion
 	}
 }

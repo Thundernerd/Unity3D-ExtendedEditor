@@ -377,8 +377,10 @@ namespace TNRD.Editor.Core {
 						break;
 					case EventType.DragPerform:
 						OnDragPerform( DragAndDrop.paths, e.mousePosition );
-						break;
+                        DragAndDrop.visualMode = DragAndDropVisualMode.None;
+                        break;
 					case EventType.DragUpdated:
+                        DragAndDrop.visualMode = DragAndDropVisualMode.None;
 						OnDragUpdate( DragAndDrop.paths, e.mousePosition );
 						break;
 				}
@@ -667,20 +669,24 @@ namespace TNRD.Editor.Core {
 		/// <param name="position">The mouse position</param>
 		public virtual void OnDragPerform( string[] paths, Vector2 position ) {
 			for ( int i = controlsToProcess.Count - 1; i >= 0; i-- ) {
-				controlsToProcess[i].OnDragPerform( paths, position );
+                if ( controlsToProcess[i].AllowDrop && controlsToProcess[i].Rectangle.Contains( position ) ) {
+                    controlsToProcess[i].OnDragPerform( paths, position );
+                }
 			}
 		}
 
-		/// <summary>
-		/// Invoked when a DragUpdate event occurs
-		/// </summary>
-		/// <param name="paths">Path(s) of the file(s) being dragged onto the editor</param>
-		/// <param name="position">The mouse position</param>
-		public virtual void OnDragUpdate( string[] paths, Vector2 position ) {
-			for ( int i = controlsToProcess.Count - 1; i >= 0; i-- ) {
-				controlsToProcess[i].OnDragUpdate( paths, position );
-			}
-		}
+        /// <summary>
+        /// Invoked when a DragUpdate event occurs
+        /// </summary>
+        /// <param name="paths">Path(s) of the file(s) being dragged onto the editor</param>
+        /// <param name="position">The mouse position</param>
+        public virtual void OnDragUpdate( string[] paths, Vector2 position ) {
+            for ( int i = controlsToProcess.Count - 1; i >= 0; i-- ) {
+                if ( controlsToProcess[i].AllowDrop && controlsToProcess[i].Rectangle.Contains( position ) ) {
+                    controlsToProcess[i].OnDragUpdate( paths, position );
+                }
+            }
+        }
 		#endregion
 
 		#region Notifications
