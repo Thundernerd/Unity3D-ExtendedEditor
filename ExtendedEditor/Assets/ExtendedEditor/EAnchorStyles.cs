@@ -1,4 +1,6 @@
-﻿namespace TNRD {
+﻿#if UNITY_EDITOR
+
+namespace TNRD.Editor.Core {
     /// <summary>
     /// Specifies how a control anchors to the edges of its window
     /// </summary>
@@ -25,3 +27,5 @@
         Right = 8
     }
 }
+
+#endif
