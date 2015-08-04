@@ -6,165 +6,165 @@ using UnityEditor;
 using UnityEngine;
 
 namespace TNRD.Editor.Controls {
-	public class ListControl : ExtendedControl {
+    public class ListControl : ExtendedControl {
 
-		public class ListEventArgs : EventArgs {
+        public class ListEventArgs : EventArgs {
 
-			public readonly int Index;
-			public readonly string Item;
+            public readonly int Index;
+            public readonly string Item;
 
-			public ListEventArgs() : base() { }
+            public ListEventArgs() : base() { }
 
-			public ListEventArgs( int index, string item ) : this() {
-				Index = index;
-				Item = item;
-			}
-		}
+            public ListEventArgs( int index, string item ) : this() {
+                Index = index;
+                Item = item;
+            }
+        }
 
-		public event EventHandler<ListEventArgs> OnSelectedItemChanged;
-		public event EventHandler<ListEventArgs> OnItemDoubleClick;
+        public event EventHandler<ListEventArgs> OnSelectedItemChanged;
+        public event EventHandler<ListEventArgs> OnItemDoubleClick;
 
-		new public Rect Rectangle {
-			get {
-				return new Rect( Position.x, Position.y, Size.x, Size.y );
-			}
-		}
+        new public Rect Rectangle {
+            get {
+                return new Rect( Position.x, Position.y, Size.x, Size.y );
+            }
+        }
 
-		private string[] items;
+        private string[] items;
 
-		private int index = -1;
+        private int index = -1;
 
-		private bool scrollable = true;
-		private bool searchable = false;
-		private string searchText = "";
-		
-		private Vector2 scrollPosition;
+        private bool scrollable = true;
+        private bool searchable = false;
+        private string searchText = "";
 
-		private Color highlightColor = new Color( 0.243f, 0.372f, 0.588f );
-		private Color alternateColor = new Color( 0.267f, 0.267f, 0.267f, 0.75f );
+        private Vector2 scrollPosition;
 
-		private ListControl() { }
-		public ListControl( Vector2 position, Vector2 size, string[] items, bool scrollable = true, bool searchable = false ) {
-			Position = position;
-			Size = size;
-			this.items = items;
-			this.scrollable = scrollable;
-			this.searchable = searchable;
-		}
+        private Color highlightColor = new Color( 0.243f, 0.372f, 0.588f );
+        private Color alternateColor = new Color( 0.267f, 0.267f, 0.267f, 0.75f );
 
-		public ListControl( string[] items ) : this( items, true ) { }
-		public ListControl( string[] items, bool scrollable ) {
-			this.items = items;
-			this.scrollable = scrollable;
-		}
+        private ListControl() { }
+        public ListControl( Vector2 position, Vector2 size, string[] items, bool scrollable = true, bool searchable = false ) {
+            Position = position;
+            Size = size;
+            this.items = items;
+            this.scrollable = scrollable;
+            this.searchable = searchable;
+        }
 
-		public override void OnInitialize() {
-			base.OnInitialize();
-		}
+        public ListControl( string[] items ) : this( items, true ) { }
+        public ListControl( string[] items, bool scrollable ) {
+            this.items = items;
+            this.scrollable = scrollable;
+        }
 
-		public override void OnGUI() {
-			if ( items.Length == 0 ) return;
-			base.OnGUI();
+        public override void OnInitialize() {
+            base.OnInitialize();
+        }
 
-			var itemsToProcess = new List<string>( items );
-			var listRect = Rectangle;
-			var viewRect = Rectangle;
-			var boxRect = new Rect( Rectangle.x - 1, Rectangle.y - 1, Rectangle.width + 2, Rectangle.height + 2 );
-			var lineHeight = GUI.skin.label.CalcSize( new GUIContent( items[0] ) ).y;
-			var mouseDown = Input.ButtonPressed( EMouseButton.Left );
-			var mousePos = Input.MousePosition;
-			var controlID = GetControlID( FocusType.Passive );
+        public override void OnGUI() {
+            if ( items.Length == 0 ) return;
+            base.OnGUI();
 
-			GUI.Box( boxRect, "", EditorStyles.helpBox );
+            var itemsToProcess = new List<string>( items );
+            var listRect = Rectangle;
+            var viewRect = Rectangle;
+            var boxRect = new Rect( Rectangle.x - 1, Rectangle.y - 1, Rectangle.width + 2, Rectangle.height + 2 );
+            var lineHeight = GUI.skin.label.CalcSize( new GUIContent( items[0] ) ).y;
+            var mouseDown = Input.ButtonPressed( EMouseButton.Left );
+            var mousePos = Input.MousePosition;
+            var controlID = GetControlID( FocusType.Passive );
 
-			if ( searchable ) {
-				searchText = ExtendedGUI.ToolbarSearchFieldWithBackground( listRect, searchText ).ToLower();
+            GUI.Box( boxRect, "", EditorStyles.helpBox );
 
-				for ( int i = itemsToProcess.Count - 1; i >= 0; i-- ) {
-					if ( !itemsToProcess[i].ToLower().Contains( searchText ) ) {
-						itemsToProcess.RemoveAt( i );
-					}
-				}
+            if ( searchable ) {
+                searchText = ExtendedGUI.ToolbarSearchFieldWithBackground( listRect, searchText ).ToLower();
 
-				listRect.y += 17.5f;
-				listRect.height -= 17.5f;
-			}
+                for ( int i = itemsToProcess.Count - 1; i >= 0; i-- ) {
+                    if ( !itemsToProcess[i].ToLower().Contains( searchText ) ) {
+                        itemsToProcess.RemoveAt( i );
+                    }
+                }
 
-			if ( scrollable ) {
-				var h = lineHeight * itemsToProcess.Count;
-				if ( h > viewRect.height ) {
-					viewRect.height = h;
-					viewRect.width -= 15f;
-				}
+                listRect.y += 17.5f;
+                listRect.height -= 17.5f;
+            }
 
-				if ( searchable ) {
-					viewRect.y += 17.5f;
-					viewRect.height -= 17.5f;
-				}
-			}
+            if ( scrollable ) {
+                var h = lineHeight * itemsToProcess.Count;
+                if ( h > viewRect.height ) {
+                    viewRect.height = h;
+                    viewRect.width -= 15f;
+                }
 
-			if ( mouseDown ) {
-				index = -1;
+                if ( searchable ) {
+                    viewRect.y += 17.5f;
+                    viewRect.height -= 17.5f;
+                }
+            }
 
-				if ( new Rect( listRect.x, listRect.y, viewRect.width, listRect.height ).Contains( mousePos ) ) {
-					GUIUtility.hotControl = controlID;
-					GUIUtility.keyboardControl = 0;
-				}
-			}
+            if ( mouseDown ) {
+                index = -1;
 
-			scrollPosition = GUI.BeginScrollView( listRect, scrollPosition, viewRect, false, false );
+                if ( new Rect( listRect.x, listRect.y, viewRect.width, listRect.height ).Contains( mousePos ) ) {
+                    GUIUtility.hotControl = controlID;
+                    GUIUtility.keyboardControl = 0;
+                }
+            }
 
-			for ( int i = 0; i < itemsToProcess.Count; i++ ) {
-				var r = new Rect( viewRect.x, viewRect.y + ( i * lineHeight ), viewRect.width, lineHeight );
+            scrollPosition = GUI.BeginScrollView( listRect, scrollPosition, viewRect, false, false );
 
-				if ( i % 2 == 0 ) {
-					EditorGUI.DrawRect( r, alternateColor );
-				}
+            for ( int i = 0; i < itemsToProcess.Count; i++ ) {
+                var r = new Rect( viewRect.x, viewRect.y + ( i * lineHeight ), viewRect.width, lineHeight );
 
-				if ( mouseDown ) {
-					if ( listRect.Contains( mousePos ) ) {
-						if ( r.Contains( mousePos + scrollPosition ) ) {
-							index = i;
+                if ( i % 2 == 0 ) {
+                    EditorGUI.DrawRect( r, alternateColor );
+                }
 
-							if ( OnSelectedItemChanged != null ) {
-								OnSelectedItemChanged.Invoke( this, new ListEventArgs( i, itemsToProcess[i] ) );
-							}
+                if ( mouseDown ) {
+                    if ( listRect.Contains( mousePos ) ) {
+                        if ( r.Contains( mousePos + scrollPosition ) ) {
+                            index = i;
 
-							GUIUtility.keyboardControl = 0;
-						}
-					}
-				} else {
-					GUI.Label( r, itemsToProcess[i] );
-				}
+                            if ( OnSelectedItemChanged != null ) {
+                                OnSelectedItemChanged.Invoke( this, new ListEventArgs( i, itemsToProcess[i] ) );
+                            }
 
-				if ( index == i ) {
-					EditorGUI.DrawRect( r, highlightColor );
-					GUI.Label( r, itemsToProcess[i] );
-				} else {
-					GUI.Label( r, itemsToProcess[i] );
-				}
+                            GUIUtility.keyboardControl = 0;
+                        }
+                    }
+                } else {
+                    GUI.Label( r, itemsToProcess[i] );
+                }
 
-				if ( Input.IsDoubleClick && Input.Button == EMouseButton.Left ) {
-					if ( listRect.Contains( mousePos ) ) {
-						if ( r.Contains( mousePos + scrollPosition ) ) {
-							if ( OnItemDoubleClick != null ) {
-								OnItemDoubleClick.Invoke( this, new ListEventArgs( i, itemsToProcess[i] ) );
-							}
-						}
-					}
-				}
-			}
+                if ( index == i ) {
+                    EditorGUI.DrawRect( r, highlightColor );
+                    GUI.Label( r, itemsToProcess[i] );
+                } else {
+                    GUI.Label( r, itemsToProcess[i] );
+                }
 
-			GUI.EndScrollView();
+                if ( Input.IsDoubleClick && Input.Button == EMouseButton.Left ) {
+                    if ( listRect.Contains( mousePos ) ) {
+                        if ( r.Contains( mousePos + scrollPosition ) ) {
+                            if ( OnItemDoubleClick != null ) {
+                                OnItemDoubleClick.Invoke( this, new ListEventArgs( i, itemsToProcess[i] ) );
+                            }
+                        }
+                    }
+                }
+            }
 
-			if ( Input.ButtonUp( EMouseButton.Left ) && GUIUtility.hotControl == controlID ) {
-				GUIUtility.hotControl = 0;
-			}
-		}
+            GUI.EndScrollView();
 
-		public void UpdateItems( string[] items ) {
-			this.items = items;
-		}
-	}
+            if ( Input.ButtonUp( EMouseButton.Left ) && GUIUtility.hotControl == controlID ) {
+                GUIUtility.hotControl = 0;
+            }
+        }
+
+        public void UpdateItems( string[] items ) {
+            this.items = items;
+        }
+    }
 }
 #endif

@@ -5,141 +5,141 @@ using TNRD.Json;
 using UnityEngine;
 
 namespace TNRD.Editor.Controls {
-	public class SelectorControl : ExtendedControl {
+    public class SelectorControl : ExtendedControl {
 
-		[JsonIgnore]
-		public List<SelectableControl> SelectedControls = new List<SelectableControl>();
+        [JsonIgnore]
+        public List<SelectableControl> SelectedControls = new List<SelectableControl>();
 
-		private Vector2 start;
-		private Vector2 end;
+        private Vector2 start;
+        private Vector2 end;
 
-		private bool startedDrag = false;
-		private bool dragControls = false;
+        private bool startedDrag = false;
+        private bool dragControls = false;
 
-		public SelectorControl() { }
+        public SelectorControl() { }
 
-		new public Rect Rectangle {
-			get {
-				return new Rect( Position.x, Position.y, Size.x, Size.y );
-			}
-		}
+        new public Rect Rectangle {
+            get {
+                return new Rect( Position.x, Position.y, Size.x, Size.y );
+            }
+        }
 
-		public override void OnGUI() {
-			var id = GetControlID( FocusType.Passive );
-			if ( GUIUtility.hotControl != 0 && GUIUtility.hotControl != id ) return;
-			if ( Input.KeyDown( KeyCode.LeftAlt ) || Input.KeyDown( KeyCode.RightAlt ) ) return;
+        public override void OnGUI() {
+            var id = GetControlID( FocusType.Passive );
+            if ( GUIUtility.hotControl != 0 && GUIUtility.hotControl != id ) return;
+            if ( Input.KeyDown( KeyCode.LeftAlt ) || Input.KeyDown( KeyCode.RightAlt ) ) return;
 
-			if ( ( Input.KeyDown( KeyCode.LeftShift ) || Input.KeyDown( KeyCode.RightShift ) ) && Input.ButtonReleased( EMouseButton.Left ) ) {
-				var controls = Window.GetControlsByBaseType<SelectableControl>();
-				foreach ( var item in controls ) {
-					if ( item.Contains( Input.MousePosition ) ) {
-						item.OnSelect();
-						SelectedControls.Add( item );
-						return;
-					}
-				}
-			}
+            if ( ( Input.KeyDown( KeyCode.LeftShift ) || Input.KeyDown( KeyCode.RightShift ) ) && Input.ButtonReleased( EMouseButton.Left ) ) {
+                var controls = Window.GetControlsByBaseType<SelectableControl>();
+                foreach ( var item in controls ) {
+                    if ( item.Contains( Input.MousePosition ) ) {
+                        item.OnSelect();
+                        SelectedControls.Add( item );
+                        return;
+                    }
+                }
+            }
 
-			if ( Input.ButtonDown( EMouseButton.Left ) ) {
-				if ( SelectedControls.Count < 2 ) {
-					var controls = Window.GetControlsByBaseType<SelectableControl>();
-					var newControls = new List<SelectableControl>();
+            if ( Input.ButtonDown( EMouseButton.Left ) ) {
+                if ( SelectedControls.Count < 2 ) {
+                    var controls = Window.GetControlsByBaseType<SelectableControl>();
+                    var newControls = new List<SelectableControl>();
 
-					for ( int i = 0; i < controls.Count; i++ ) {
-						if ( controls[i].Contains( Input.MousePosition ) ) {
-							newControls.Add( controls[i] );
-						}
-					}
+                    for ( int i = 0; i < controls.Count; i++ ) {
+                        if ( controls[i].Contains( Input.MousePosition ) ) {
+                            newControls.Add( controls[i] );
+                        }
+                    }
 
-					if ( newControls.Count == 1 ) {
-						for ( int i = 0; i < SelectedControls.Count; i++ ) {
-							SelectedControls[i].OnDeselect();
-						}
+                    if ( newControls.Count == 1 ) {
+                        for ( int i = 0; i < SelectedControls.Count; i++ ) {
+                            SelectedControls[i].OnDeselect();
+                        }
 
-						SelectedControls.Clear();
-						SelectedControls.Add( newControls[0] );
-						newControls[0].OnSelect();
-					}
-				}
-			}
+                        SelectedControls.Clear();
+                        SelectedControls.Add( newControls[0] );
+                        newControls[0].OnSelect();
+                    }
+                }
+            }
 
-			if ( Input.Type == EventType.MouseDrag && Input.ButtonDown( EMouseButton.Left ) ) {
-				var controls = Window.GetControlsByBaseType<SelectableControl>();
+            if ( Input.Type == EventType.MouseDrag && Input.ButtonDown( EMouseButton.Left ) ) {
+                var controls = Window.GetControlsByBaseType<SelectableControl>();
 
-				var delta = Input.MouseDelta;
-				if ( Window.Settings.UseCamera ) {
-					delta = Window.ScaleMatrix.inverse.MultiplyVector( delta );
-				}
+                var delta = Input.MouseDelta;
+                if ( Window.Settings.UseCamera ) {
+                    delta = Window.ScaleMatrix.inverse.MultiplyVector( delta );
+                }
 
-				if ( !startedDrag && SelectedControls.Count > 0 ) {
-					for ( int i = 0; i < SelectedControls.Count; i++ ) {
-						if ( !dragControls ) {
-							if ( SelectedControls[i].Contains( Input.MousePosition ) ) {
-								GUIUtility.hotControl = id;
-								GUIUtility.keyboardControl = 0;
-								
-								dragControls = true;
-								i = -1;
-							}
-						} else {
-							SelectedControls[i].Move( delta );
-						}
-					}
-				}
+                if ( !startedDrag && SelectedControls.Count > 0 ) {
+                    for ( int i = 0; i < SelectedControls.Count; i++ ) {
+                        if ( !dragControls ) {
+                            if ( SelectedControls[i].Contains( Input.MousePosition ) ) {
+                                GUIUtility.hotControl = id;
+                                GUIUtility.keyboardControl = 0;
 
-				if ( dragControls ) return;
+                                dragControls = true;
+                                i = -1;
+                            }
+                        } else {
+                            SelectedControls[i].Move( delta );
+                        }
+                    }
+                }
 
-				if ( !startedDrag ) {
-					GUIUtility.hotControl = id;
-					GUIUtility.keyboardControl = 0;
+                if ( dragControls ) return;
 
-					start = Input.MousePosition;
-					startedDrag = true;
-				}
+                if ( !startedDrag ) {
+                    GUIUtility.hotControl = id;
+                    GUIUtility.keyboardControl = 0;
 
-				end = Input.MousePosition;
+                    start = Input.MousePosition;
+                    startedDrag = true;
+                }
 
-				var minx = Mathf.Min( start.x, end.x );
-				var maxx = Mathf.Max( start.x, end.x );
-				var miny = Mathf.Min( start.y, end.y );
-				var maxy = Mathf.Max( start.y, end.y );
+                end = Input.MousePosition;
 
-				Position.Set( minx, miny );
-				Size.Set( maxx - minx, maxy - miny );
+                var minx = Mathf.Min( start.x, end.x );
+                var maxx = Mathf.Max( start.x, end.x );
+                var miny = Mathf.Min( start.y, end.y );
+                var maxy = Mathf.Max( start.y, end.y );
 
-				foreach ( var item in controls ) {
-					if ( Rectangle.Contains( item.Center() ) ) {
-						if ( !item.IsSelected ) {
-							item.OnSelect();
-							SelectedControls.Add( item );
-						}
-					} else {
-						if ( item.IsSelected ) {
-							item.OnDeselect();
-							SelectedControls.Remove( item );
-						}
-					}
-				}
+                Position.Set( minx, miny );
+                Size.Set( maxx - minx, maxy - miny );
 
-			} else if ( Input.IsDoubleClick && Input.Button == EMouseButton.Left ) {
-				foreach ( var item in SelectedControls ) {
-					item.OnDeselect();
-				}
+                foreach ( var item in controls ) {
+                    if ( Rectangle.Contains( item.Center() ) ) {
+                        if ( !item.IsSelected ) {
+                            item.OnSelect();
+                            SelectedControls.Add( item );
+                        }
+                    } else {
+                        if ( item.IsSelected ) {
+                            item.OnDeselect();
+                            SelectedControls.Remove( item );
+                        }
+                    }
+                }
 
-				SelectedControls.Clear();
-			} else if ( Input.ButtonReleased( EMouseButton.Left ) ) {
-				startedDrag = false;
-				dragControls = false;
+            } else if ( Input.IsDoubleClick && Input.Button == EMouseButton.Left ) {
+                foreach ( var item in SelectedControls ) {
+                    item.OnDeselect();
+                }
 
-				if ( GUIUtility.hotControl == id ) {
-					GUIUtility.hotControl = 0;
-				}
-			}
+                SelectedControls.Clear();
+            } else if ( Input.ButtonReleased( EMouseButton.Left ) ) {
+                startedDrag = false;
+                dragControls = false;
 
-			if ( startedDrag ) {
-				GUI.Box( Rectangle, "" );
-			}
-		}
-	}
+                if ( GUIUtility.hotControl == id ) {
+                    GUIUtility.hotControl = 0;
+                }
+            }
+
+            if ( startedDrag ) {
+                GUI.Box( Rectangle, "" );
+            }
+        }
+    }
 }
 #endif
