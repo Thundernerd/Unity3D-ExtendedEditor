@@ -12,6 +12,57 @@ namespace TNRD.Editor.Core {
     /// </summary>
     public class ExtendedWindow {
 
+        private static ExtendedWindow currentWindow;
+
+        /// <summary>
+        /// Converts the given value into a valid world position
+        /// </summary>
+        /// <param name="value">The value to convert</param>
+        public static Vector2 ToWorldPosition( Vector2 value ) {
+            var size = currentWindow.Size;
+            var nValue = new Vector2( value.x - ( size.x / 2 ), value.y - ( size.y / 2 ) ) / 100;
+            nValue.y *= -1;
+            nValue /= currentWindow.Camera.z;
+            return nValue;
+        }
+
+        /// <summary>
+        /// Converts the given value into a valid screen (GUI) position
+        /// </summary>
+        /// <param name="value">The value to convert</param>
+        /// <returns></returns>
+        public static Vector2 ToScreenPosition( Vector2 value ) {
+            var temp = value * currentWindow.Camera.z;
+
+            var nValue = currentWindow.Size / 2;
+            nValue.x += temp.x * 100;
+            nValue.y -= temp.y * 100;
+
+            nValue.x += currentWindow.Camera.x * currentWindow.Camera.z;
+            nValue.y += currentWindow.Camera.y * currentWindow.Camera.z;
+
+            return nValue;
+        }
+
+        public static Vector2 ToScreenPositionUnscaled(Vector2 value) {
+            var temp = value * currentWindow.Camera.z;
+
+            var nValue = currentWindow.Size / 2;
+            nValue.x += temp.x * 100;
+            nValue.y -= temp.y * 100;
+
+            return nValue;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static Vector2 ToScreenSize(Vector2 value) {
+            return value * 100 * currentWindow.Camera.z;
+        }
+
         /// <summary>
         /// The asset manager for this window
         /// </summary>
@@ -367,6 +418,8 @@ namespace TNRD.Editor.Core {
                 OnInitializeGUI();
             }
 
+            currentWindow = this;
+
             var e = Editor.CurrentEvent;
             Input.OnGUI( e );
 
@@ -419,7 +472,7 @@ namespace TNRD.Editor.Core {
             Rect area = WindowRect;
             area.position = new Vector2( 0, 0 );
 
-            var mousePosition = Input.MousePosition;
+            var mousePosition = Input.RawMousePosition;
             if ( WindowStyle != null && WindowStyle.name == "window" ) {
                 area.y += 17.5f;
                 area.height -= 17.5f;
@@ -430,7 +483,7 @@ namespace TNRD.Editor.Core {
                 area.height -= 17.5f;
                 mousePosition.y -= 17.5f;
             }
-            Input.MousePosition = mousePosition;
+            Input.RawMousePosition = mousePosition;
 
             GUILayout.BeginArea( area );
             ExtendedGUI.BeginArea( new ExtendedGUIOption() { Type = ExtendedGUIOption.EType.WindowSize, Value = area.size } );
@@ -452,9 +505,9 @@ namespace TNRD.Editor.Core {
 
         public void EndGUI() {
             if ( Settings.DrawToolbar ) {
-                var pos = Input.MousePosition;
+                var pos = Input.RawMousePosition;
                 pos.y += 17.5f;
-                Input.MousePosition = pos;
+                Input.RawMousePosition = pos;
             }
 
             ExtendedGUI.EndArea();

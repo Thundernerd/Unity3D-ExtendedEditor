@@ -63,9 +63,12 @@ namespace TNRD.Editor.Core {
         [JsonIgnore]
         public Rect Rectangle {
             get {
-                var scaledPosition = Window.ScaleMatrix.MultiplyVector( Position + (Vector2)Window.Camera );
-                var scaledSize = Window.ScaleMatrix.MultiplyVector( Size );
-                return new Rect( scaledPosition.x, scaledPosition.y, scaledSize.x, scaledSize.y );
+                return new Rect(
+                    ExtendedWindow.ToScreenPosition( Position - new Vector2( Size.x / 2, -Size.y / 2 ) ),
+                    ExtendedWindow.ToScreenSize( Size ) );
+                //var scaledPosition = Window.ScaleMatrix.MultiplyVector( Position + (Vector2)Window.Camera );
+                //var scaledSize = Window.ScaleMatrix.MultiplyVector( Size );
+                //return new Rect( scaledPosition.x, scaledPosition.y, scaledSize.x, scaledSize.y );
             }
         }
 
