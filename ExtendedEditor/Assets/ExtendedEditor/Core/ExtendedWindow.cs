@@ -21,7 +21,7 @@ namespace TNRD.Editor.Core {
         public static Vector2 ToWorldPosition( Vector2 value ) {
             var size = currentWindow.Size;
             var nValue = new Vector2( value.x, value.y );
-            nValue.x -= currentWindow.Camera.x * currentWindow.Camera.z;
+            nValue.x += currentWindow.Camera.x * currentWindow.Camera.z;
             nValue.y -= currentWindow.Camera.y * currentWindow.Camera.z;
             nValue -= size / 2;
             nValue.y *= -1;
@@ -40,7 +40,7 @@ namespace TNRD.Editor.Core {
             var nValue = currentWindow.Size / 2;
             nValue.x += temp.x * 100;
             nValue.y -= temp.y * 100;
-            nValue.x += currentWindow.Camera.x * currentWindow.Camera.z;
+            nValue.x -= currentWindow.Camera.x * currentWindow.Camera.z;
             nValue.y += currentWindow.Camera.y * currentWindow.Camera.z;
             return nValue;
         }
@@ -50,7 +50,7 @@ namespace TNRD.Editor.Core {
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static Vector2 ToScreenSize(Vector2 value) {
+        public static Vector2 ToScreenSize( Vector2 value ) {
             return value * 100 * currentWindow.Camera.z;
         }
 
@@ -59,7 +59,7 @@ namespace TNRD.Editor.Core {
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static Vector2 ToWorldSize(Vector2 value) {
+        public static Vector2 ToWorldSize( Vector2 value ) {
             return value / 100 / currentWindow.Camera.z;
         }
 
@@ -362,14 +362,14 @@ namespace TNRD.Editor.Core {
                     }
 
                     if ( Input.Type == EventType.MouseDrag && Input.ButtonDown( EMouseButton.Middle ) ) {
-                        Camera += ScaleMatrix.inverse.MultiplyVector( Input.MouseDelta );
+                        Camera += new Vector3( -Input.MouseDelta.x, Input.MouseDelta.y, 0 ) / Camera.z;//ScaleMatrix.inverse.MultiplyVector( Input.MouseDelta );
                     }
 
                     if ( Input.KeyDown( KeyCode.LeftArrow ) ) {
-                        Camera.x += ( cameraSpeed * ( 1f / Camera.z ) ) * Editor.DeltaTime;
+                        Camera.x -= ( cameraSpeed * ( 1f / Camera.z ) ) * Editor.DeltaTime;
                     }
                     if ( Input.KeyDown( KeyCode.RightArrow ) ) {
-                        Camera.x -= ( cameraSpeed * ( 1f / Camera.z ) ) * Editor.DeltaTime;
+                        Camera.x += ( cameraSpeed * ( 1f / Camera.z ) ) * Editor.DeltaTime;
                     }
                     if ( Input.KeyDown( KeyCode.UpArrow ) ) {
                         Camera.y += ( cameraSpeed * ( 1f / Camera.z ) ) * Editor.DeltaTime;
