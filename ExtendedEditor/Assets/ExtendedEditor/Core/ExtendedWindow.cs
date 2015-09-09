@@ -20,8 +20,12 @@ namespace TNRD.Editor.Core {
         /// <param name="value">The value to convert</param>
         public static Vector2 ToWorldPosition( Vector2 value ) {
             var size = currentWindow.Size;
-            var nValue = new Vector2( value.x - ( size.x / 2 ), value.y - ( size.y / 2 ) ) / 100;
+            var nValue = new Vector2( value.x, value.y );
+            nValue.x -= currentWindow.Camera.x * currentWindow.Camera.z;
+            nValue.y -= currentWindow.Camera.y * currentWindow.Camera.z;
+            nValue -= size / 2;
             nValue.y *= -1;
+            nValue /= 100;
             nValue /= currentWindow.Camera.z;
             return nValue;
         }
@@ -33,24 +37,11 @@ namespace TNRD.Editor.Core {
         /// <returns></returns>
         public static Vector2 ToScreenPosition( Vector2 value ) {
             var temp = value * currentWindow.Camera.z;
-
             var nValue = currentWindow.Size / 2;
             nValue.x += temp.x * 100;
             nValue.y -= temp.y * 100;
-
             nValue.x += currentWindow.Camera.x * currentWindow.Camera.z;
             nValue.y += currentWindow.Camera.y * currentWindow.Camera.z;
-
-            return nValue;
-        }
-
-        public static Vector2 ToScreenPositionUnscaled(Vector2 value) {
-            var temp = value * currentWindow.Camera.z;
-
-            var nValue = currentWindow.Size / 2;
-            nValue.x += temp.x * 100;
-            nValue.y -= temp.y * 100;
-
             return nValue;
         }
 
@@ -61,6 +52,15 @@ namespace TNRD.Editor.Core {
         /// <returns></returns>
         public static Vector2 ToScreenSize(Vector2 value) {
             return value * 100 * currentWindow.Camera.z;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static Vector2 ToWorldSize(Vector2 value) {
+            return value / 100 / currentWindow.Camera.z;
         }
 
         /// <summary>
