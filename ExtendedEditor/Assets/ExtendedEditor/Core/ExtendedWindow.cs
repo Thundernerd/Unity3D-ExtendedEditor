@@ -19,6 +19,8 @@ namespace TNRD.Editor.Core {
         /// </summary>
         /// <param name="value">The value to convert</param>
         public static Vector2 ToWorldPosition( Vector2 value ) {
+            if ( currentWindow == null ) return new Vector2();
+
             var size = currentWindow.Size;
             var nValue = new Vector2( value.x, value.y );
             nValue.x += currentWindow.Camera.x * currentWindow.Camera.z;
@@ -36,6 +38,8 @@ namespace TNRD.Editor.Core {
         /// <param name="value">The value to convert</param>
         /// <returns></returns>
         public static Vector2 ToScreenPosition( Vector2 value ) {
+            if ( currentWindow == null ) return new Vector2();
+
             var temp = value * currentWindow.Camera.z;
             var nValue = currentWindow.Size / 2;
             nValue.x += temp.x * 100;
@@ -51,6 +55,7 @@ namespace TNRD.Editor.Core {
         /// <param name="value"></param>
         /// <returns></returns>
         public static Vector2 ToScreenSize( Vector2 value ) {
+            if ( currentWindow == null ) return new Vector2();
             return value * 100 * currentWindow.Camera.z;
         }
 
@@ -60,6 +65,7 @@ namespace TNRD.Editor.Core {
         /// <param name="value"></param>
         /// <returns></returns>
         public static Vector2 ToWorldSize( Vector2 value ) {
+            if ( currentWindow == null ) return new Vector2();
             return value / 100 / currentWindow.Camera.z;
         }
 
@@ -496,8 +502,6 @@ namespace TNRD.Editor.Core {
                 var startPos = ToScreenPosition( new Vector2( startGrid.x, y ) );
                 var endPos = ToScreenPosition( new Vector2( endGrid.x, y ) );
 
-                Handles.DrawLine( startPos, endPos );
-
                 if ( Mathf.Ceil( y ) % 3 == 0 ) {
                     Handles.color = mainGridColor;
                     Handles.DrawLine( startPos, endPos );
@@ -602,7 +606,7 @@ namespace TNRD.Editor.Core {
                     Camera.z *= 1.1f;
                 }
 
-                if (Camera.z < 0.1f) {
+                if ( Camera.z < 0.1f ) {
                     Camera.z = 0.1f;
                 }
             }
