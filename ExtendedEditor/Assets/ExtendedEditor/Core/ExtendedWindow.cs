@@ -347,22 +347,25 @@ namespace TNRD.Editor.Core {
 
             if ( windowHasFocus ) {
                 if ( Settings.UseCamera ) {
-                    if ( Input.KeyDown( KeyCode.LeftAlt ) || Input.KeyDown( KeyCode.RightAlt ) ) {
-                        if ( Input.ButtonDown( EMouseButton.Left ) ) {
-                            Camera += ScaleMatrix.inverse.MultiplyVector( Input.MouseDelta );
-                        } else if ( Input.ButtonDown( EMouseButton.Right ) ) {
-                            var delta = Input.MouseDelta / 1000f;
-                            Camera.z += delta.x;
-                            Camera.z -= delta.y;
+                    if ( Input.Type == EventType.MouseDrag ) {
+                        if ( Input.KeyDown( KeyCode.LeftAlt, KeyCode.RightAlt ) ) {
+                            if ( Input.ButtonDown( EMouseButton.Left ) ) {
+                                Camera += new Vector3( -Input.MouseDelta.x, Input.MouseDelta.y, 0 ) / Camera.z;
+                            } else if ( Input.ButtonDown( EMouseButton.Right ) ) {
+                                var delta = Input.MouseDelta / 1000f;
+                                Camera.z += delta.x;
+                                Camera.z -= delta.y;
 
-                            if ( Camera.z < 0.1f ) {
-                                Camera.z = 0.1f;
+                                if ( Camera.z < 0.1f ) {
+                                    Camera.z = 0.1f;
+                                }
                             }
                         }
                     }
 
+
                     if ( Input.Type == EventType.MouseDrag && Input.ButtonDown( EMouseButton.Middle ) ) {
-                        Camera += new Vector3( -Input.MouseDelta.x, Input.MouseDelta.y, 0 ) / Camera.z;//ScaleMatrix.inverse.MultiplyVector( Input.MouseDelta );
+                        Camera += new Vector3( -Input.MouseDelta.x, Input.MouseDelta.y, 0 ) / Camera.z;
                     }
 
                     if ( Input.KeyDown( KeyCode.LeftArrow ) ) {
@@ -450,12 +453,65 @@ namespace TNRD.Editor.Core {
             EndGUI();
         }
 
+        private Color subGridColor = new Color( 0.5f, 0.5f, 0.5f, 0.3f );
+        private Color mainGridColor = new Color( 0.5f, 0.5f, 0.5f, 0.8f );
+
+        private void DrawGrid() {
+            var hc = Handles.color;
+            Handles.color = subGridColor;
+
+            var size = new Vector2(
+                Mathf.CeilToInt( Size.x / 2 / 100 / Camera.z ),
+                Mathf.CeilToInt( Size.y / 2 / 100 / Camera.z ) );
+
+            var step = ToWorldSize( new Vector2( 100, 100 ) ) * Camera.z;
+            var startGrid = new Vector2( -size.x, -size.y );
+            var endGrid = new Vector2( size.x, size.y );
+
+            var camPos = ToWorldSize( Camera );
+
+            camPos.x = Mathf.Round( camPos.x * Camera.z );
+            camPos.y = Mathf.Round( camPos.y * Camera.z );
+
+            startGrid += camPos;
+            endGrid += camPos;
+
+            startGrid -= step;
+            endGrid += step;
+
+            for ( float x = startGrid.x; x < endGrid.x + step.x; x += step.x ) {
+                var startPos = ToScreenPosition( new Vector2( x, startGrid.y ) );
+                var endPos = ToScreenPosition( new Vector2( x, endGrid.y ) );
+
+                if ( Mathf.Ceil( x ) % 3 == 0 ) {
+                    Handles.color = mainGridColor;
+                    Handles.DrawLine( startPos, endPos );
+                    Handles.color = subGridColor;
+                } else {
+                    Handles.DrawLine( startPos, endPos );
+                }
+            }
+
+            for ( float y = startGrid.y; y < endGrid.y + step.y; y += step.y ) {
+                var startPos = ToScreenPosition( new Vector2( startGrid.x, y ) );
+                var endPos = ToScreenPosition( new Vector2( endGrid.x, y ) );
+
+                Handles.DrawLine( startPos, endPos );
+
+                if ( Mathf.Ceil( y ) % 3 == 0 ) {
+                    Handles.color = mainGridColor;
+                    Handles.DrawLine( startPos, endPos );
+                    Handles.color = subGridColor;
+                } else {
+                    Handles.DrawLine( startPos, endPos );
+                }
+            }
+
+            Handles.color = hc;
+        }
+
         public void BeginGUI() {
             if ( Settings.UseCamera ) {
-                var translation = Matrix4x4.TRS( WindowRect.TopLeft(), Quaternion.identity, Vector3.one );
-                var scale = Matrix4x4.Scale( new Vector3( Camera.z, Camera.z, 1f ) );
-                ScaleMatrix = translation * scale * translation.inverse * GUI.matrix;
-
                 if ( Input.KeyDown( KeyCode.LeftAlt ) || Input.KeyDown( KeyCode.RightAlt ) ) {
                     if ( Input.ButtonDown( EMouseButton.Right ) ) {
                         EditorGUIUtility.AddCursorRect( WindowRect, MouseCursor.Zoom );
@@ -487,6 +543,10 @@ namespace TNRD.Editor.Core {
 
             GUILayout.BeginArea( area );
             ExtendedGUI.BeginArea( new ExtendedGUIOption() { Type = ExtendedGUIOption.EType.WindowSize, Value = area.size } );
+
+            if ( Settings.DrawGrid ) {
+                DrawGrid();
+            }
 
             foreach ( var item in controlsToProcess ) {
                 item.OnGUI();
@@ -540,6 +600,10 @@ namespace TNRD.Editor.Core {
                     Camera.z *= 0.9f;
                 } else if ( delta < 0 ) {
                     Camera.z *= 1.1f;
+                }
+
+                if (Camera.z < 0.1f) {
+                    Camera.z = 0.1f;
                 }
             }
 
