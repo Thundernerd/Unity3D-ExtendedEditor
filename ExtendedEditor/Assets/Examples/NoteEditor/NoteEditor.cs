@@ -7,7 +7,7 @@ public class NoteEditor : ExtendedEditor {
 
     [MenuItem( "Window/Editor Examples/Note Editor" )]
     private static void Create() {
-        var window = GetWindow<NoteEditor>( "Notes", true, Utils.InspectorWindow );
+        var window = GetWindow<NoteEditor>( "Notes", true, Utils.InspectorWindowType );
         window.minSize = new Vector2( 400, 400 );
         window.Show();
     }

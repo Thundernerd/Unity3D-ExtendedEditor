@@ -37,11 +37,17 @@ public class NoteWindow : ExtendedWindow {
         previousScene = EditorApplication.currentScene;
 
         var notes = GetControlsByType<NoteControl>();
-        var position = new Vector2( 10, 10 );
+        var position = ToWorldSize( new Vector2( -Size.x, Size.y ) / 2 );
+        var isFirst = true;
         foreach ( var item in notes ) {
+            if (isFirst) {
+                isFirst = false;
+                position += new Vector2( item.Size.x, -item.Size.y ) / 2;
+                position += new Vector2( 0.1f, -0.1f );
+            }
             item.Position = position;
-            position.y += item.Size.y;
-            position.y += 10;
+            position.y -= item.Size.y;
+            position.y -= 0.1f;
         }
     }
 
