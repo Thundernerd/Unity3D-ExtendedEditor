@@ -32,7 +32,7 @@ namespace TNRD.Editor.Controls {
             if ( ( Input.KeyDown( KeyCode.LeftShift ) || Input.KeyDown( KeyCode.RightShift ) ) && Input.ButtonReleased( EMouseButton.Left ) ) {
                 var controls = Window.GetControlsByBaseType<SelectableControl>();
                 foreach ( var item in controls ) {
-                    if ( item.Contains( Input.MousePosition ) ) {
+                    if ( item.Contains( Input.RawMousePosition ) ) {
                         item.OnSelect();
                         SelectedControls.Add( item );
                         return;
@@ -46,7 +46,7 @@ namespace TNRD.Editor.Controls {
                     var newControls = new List<SelectableControl>();
 
                     for ( int i = 0; i < controls.Count; i++ ) {
-                        if ( controls[i].Contains( Input.MousePosition ) ) {
+                        if ( controls[i].Contains( Input.RawMousePosition ) ) {
                             newControls.Add( controls[i] );
                         }
                     }
@@ -67,14 +67,14 @@ namespace TNRD.Editor.Controls {
                 var controls = Window.GetControlsByBaseType<SelectableControl>();
 
                 var delta = Input.MouseDelta;
-                if ( Window.Settings.UseCamera ) {
-                    delta = Window.ScaleMatrix.inverse.MultiplyVector( delta );
-                }
+                //if ( Window.Settings.UseCamera ) {
+                //    delta *= Window.Camera.z;
+                //}
 
                 if ( !startedDrag && SelectedControls.Count > 0 ) {
                     for ( int i = 0; i < SelectedControls.Count; i++ ) {
                         if ( !dragControls ) {
-                            if ( SelectedControls[i].Contains( Input.MousePosition ) ) {
+                            if ( SelectedControls[i].Contains( Input.RawMousePosition ) ) {
                                 GUIUtility.hotControl = id;
                                 GUIUtility.keyboardControl = 0;
 
@@ -93,11 +93,11 @@ namespace TNRD.Editor.Controls {
                     GUIUtility.hotControl = id;
                     GUIUtility.keyboardControl = 0;
 
-                    start = Input.MousePosition;
+                    start = Input.RawMousePosition;
                     startedDrag = true;
                 }
 
-                end = Input.MousePosition;
+                end = Input.RawMousePosition;
 
                 var minx = Mathf.Min( start.x, end.x );
                 var maxx = Mathf.Max( start.x, end.x );

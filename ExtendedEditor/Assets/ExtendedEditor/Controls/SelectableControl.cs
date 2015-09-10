@@ -19,7 +19,8 @@ namespace TNRD.Editor.Controls {
             return Rectangle.Contains( value );
         }
         public virtual void Move( Vector2 delta ) {
-            Position += delta;
+            delta.y *= -1;
+            Position += ExtendedWindow.ToWorldSize( delta );
         }
     }
 }
