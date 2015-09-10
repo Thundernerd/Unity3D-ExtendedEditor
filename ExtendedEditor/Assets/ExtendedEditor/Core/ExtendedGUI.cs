@@ -70,6 +70,7 @@ namespace TNRD.Editor.Core {
         }
         #endregion
 
+        #region Internal Styles
         private static GUIStyle toolbarStyle = new GUIStyle( EditorStyles.toolbar );
         private static GUIStyle toolbarButtonStyle = new GUIStyle( EditorStyles.toolbarButton );
         private static GUIStyle toolbarDropDownStyle = new GUIStyle( EditorStyles.toolbarDropDown );
@@ -79,6 +80,7 @@ namespace TNRD.Editor.Core {
         private static GUIStyle toolbarSearchStyleEndEmpty = new GUIStyle( "ToolbarSeachCancelButtonEmpty" );
         private static GUIStyle toolbarTextFieldStyle = new GUIStyle( EditorStyles.toolbarTextField );
         private static GUIStyle dropdownPopupStyle = new GUIStyle( EditorStyles.popup );
+        #endregion
 
         #region Blocks
         /// <summary>
