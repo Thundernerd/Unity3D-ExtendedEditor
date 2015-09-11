@@ -459,18 +459,30 @@ namespace TNRD.Editor.Core {
             EndGUI();
         }
 
-        private Color subGridColor = new Color( 0.5f, 0.5f, 0.5f, 0.3f );
-        private Color mainGridColor = new Color( 0.5f, 0.5f, 0.5f, 0.8f );
+        private Color smallSubGridColor = new Color( 0.5f, 0.5f, 0.5f, 1 );
+        private Color subGridColor = new Color( 0.5f, 0.5f, 0.5f, 0.1f );
+        private Color mainGridColor = new Color( 0.5f, 0.5f, 0.5f, 1f );
+        private Color masterGridColor = new Color( 0.5f, 0.5f, 0.5f, 1f );
 
-        private void DrawGrid() {
+        private float Range( float min, float max, float value ) {
+            return Mathf.Clamp01( ( value - min ) / ( max - min ) );
+        }
+
+        private void DrawGrid( Color color, float multiplier = 1 ) {
+            if ( color.a == 0 ) return;
+
             var hc = Handles.color;
-            Handles.color = subGridColor;
+            Handles.color = color;
 
             var size = new Vector2(
                 Mathf.CeilToInt( Size.x / 2 / 100 / Camera.z ),
                 Mathf.CeilToInt( Size.y / 2 / 100 / Camera.z ) );
 
-            var step = ToWorldSize( new Vector2( 100, 100 ) ) * Camera.z;
+            var tempM = multiplier;
+            if ( multiplier > 1 )
+                multiplier = 1;
+
+            var step = ToWorldSize( new Vector2( multiplier, multiplier ) * 100 ) * Camera.z;
             var startGrid = new Vector2( -size.x, -size.y );
             var endGrid = new Vector2( size.x, size.y );
 
@@ -489,10 +501,10 @@ namespace TNRD.Editor.Core {
                 var startPos = ToScreenPosition( new Vector2( x, startGrid.y ) );
                 var endPos = ToScreenPosition( new Vector2( x, endGrid.y ) );
 
-                if ( Mathf.Ceil( x ) % 3 == 0 ) {
-                    Handles.color = mainGridColor;
-                    Handles.DrawLine( startPos, endPos );
-                    Handles.color = subGridColor;
+                if ( tempM > 1 ) {
+                    if ( Mathf.Round( x ) % tempM == 0 ) {
+                        Handles.DrawLine( startPos, endPos );
+                    }
                 } else {
                     Handles.DrawLine( startPos, endPos );
                 }
@@ -502,10 +514,10 @@ namespace TNRD.Editor.Core {
                 var startPos = ToScreenPosition( new Vector2( startGrid.x, y ) );
                 var endPos = ToScreenPosition( new Vector2( endGrid.x, y ) );
 
-                if ( Mathf.Ceil( y ) % 3 == 0 ) {
-                    Handles.color = mainGridColor;
-                    Handles.DrawLine( startPos, endPos );
-                    Handles.color = subGridColor;
+                if ( tempM > 1 ) {
+                    if ( Mathf.Round( y ) % tempM == 0 ) {
+                        Handles.DrawLine( startPos, endPos );
+                    }
                 } else {
                     Handles.DrawLine( startPos, endPos );
                 }
@@ -549,7 +561,15 @@ namespace TNRD.Editor.Core {
             ExtendedGUI.BeginArea( new ExtendedGUIOption() { Type = ExtendedGUIOption.EType.WindowSize, Value = area.size } );
 
             if ( Settings.DrawGrid ) {
-                DrawGrid();
+                smallSubGridColor.a = 0.8f * Range( 5, 20, Camera.z );
+                subGridColor.a = 0.8f * Range( 0.75f, 5, Camera.z );
+                mainGridColor.a = 0.8f * Range( 0.15f, 1.5f, Camera.z );
+                masterGridColor.a = 0.8f * ( 1 - Range( 0, 0.75f, Camera.z ) );
+
+                DrawGrid( smallSubGridColor, 0.0625f );
+                DrawGrid( subGridColor, 0.25f );
+                DrawGrid( mainGridColor );
+                DrawGrid( masterGridColor, 3f );
             }
 
             foreach ( var item in controlsToProcess ) {
