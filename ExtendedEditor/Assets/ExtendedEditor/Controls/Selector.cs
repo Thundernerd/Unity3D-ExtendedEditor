@@ -32,7 +32,7 @@ namespace TNRD.Editor.Controls {
             if ( ( Input.KeyDown( KeyCode.LeftShift ) || Input.KeyDown( KeyCode.RightShift ) ) && Input.ButtonReleased( EMouseButton.Left ) ) {
                 var controls = Window.GetControlsByBaseType<Selectable>();
                 foreach ( var item in controls ) {
-                    if ( item.Contains( Input.RawMousePosition ) ) {
+                    if ( item.Contains( Input.MousePosition ) ) {
                         item.OnSelect();
                         SelectedControls.Add( item );
                         return;
@@ -46,7 +46,7 @@ namespace TNRD.Editor.Controls {
                     var newControls = new List<Selectable>();
 
                     for ( int i = 0; i < controls.Count; i++ ) {
-                        if ( controls[i].Contains( Input.RawMousePosition ) ) {
+                        if ( controls[i].Contains( Input.MousePosition ) ) {
                             newControls.Add( controls[i] );
                         }
                     }
@@ -74,7 +74,7 @@ namespace TNRD.Editor.Controls {
                 if ( !startedDrag && SelectedControls.Count > 0 ) {
                     for ( int i = 0; i < SelectedControls.Count; i++ ) {
                         if ( !dragControls ) {
-                            if ( SelectedControls[i].Contains( Input.RawMousePosition ) ) {
+                            if ( SelectedControls[i].Contains( Input.MousePosition ) ) {
                                 GUIUtility.hotControl = id;
                                 GUIUtility.keyboardControl = 0;
 
@@ -93,11 +93,11 @@ namespace TNRD.Editor.Controls {
                     GUIUtility.hotControl = id;
                     GUIUtility.keyboardControl = 0;
 
-                    start = Input.RawMousePosition;
+                    start = Input.MousePosition;
                     startedDrag = true;
                 }
 
-                end = Input.RawMousePosition;
+                end = Input.MousePosition;
 
                 var minx = Mathf.Min( start.x, end.x );
                 var maxx = Mathf.Max( start.x, end.x );
