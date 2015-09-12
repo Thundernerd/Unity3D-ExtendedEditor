@@ -3,27 +3,27 @@ using TNRD.Editor.Core;
 
 namespace TNRD.Editor.Controls {
 
-    public class ImageControl : ExtendedControl {
+    public class Image : ExtendedControl {
 
         private Texture2D image;
         private string imageToLoad = "";
 
         public ScaleMode ScaleMode;
 
-        public ImageControl() { }
+        public Image() { }
 
-        public ImageControl( string name ) :
+        public Image( string name ) :
             this( name, ScaleMode.StretchToFill ) { }
 
-        public ImageControl( string name, ScaleMode scaleMode ) {
+        public Image( string name, ScaleMode scaleMode ) {
             imageToLoad = name;
             ScaleMode = scaleMode;
         }
 
-        public ImageControl( Texture2D texture )
+        public Image( Texture2D texture )
             : this( texture, ScaleMode.StretchToFill ) { }
 
-        public ImageControl( Texture2D texture, ScaleMode scaleMode ) {
+        public Image( Texture2D texture, ScaleMode scaleMode ) {
             image = texture;
             ScaleMode = scaleMode;
         }

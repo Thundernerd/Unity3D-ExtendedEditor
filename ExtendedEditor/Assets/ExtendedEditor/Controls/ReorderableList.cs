@@ -7,7 +7,7 @@ using UnityEditorInternal;
 using UnityEngine;
 
 namespace TNRD.Editor.Controls {
-    public class ReorderableListControl<T> : ExtendedControl {
+    public class ReorderableList<T> : ExtendedControl {
 
         public class ReorderableListEventArgs : EventArgs {
             public readonly ReorderableList List;
@@ -45,11 +45,11 @@ namespace TNRD.Editor.Controls {
         public event EventHandler<ReorderableListEventArgs> OnAddedItem;
         public event EventHandler<ReorderableListEventArgs> OnRemovedItem;
 
-        public ReorderableListControl( string label = "" )
+        public ReorderableList( string label = "" )
             : this( label, new List<T>() ) { }
-        public ReorderableListControl( List<T> collection )
+        public ReorderableList( List<T> collection )
             : this( "", collection ) { }
-        public ReorderableListControl( string label, List<T> collection ) {
+        public ReorderableList( string label, List<T> collection ) {
             this.label = label;
             this.collection = collection;
         }

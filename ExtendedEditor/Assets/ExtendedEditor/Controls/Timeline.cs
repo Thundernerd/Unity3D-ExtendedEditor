@@ -6,7 +6,7 @@ using UnityEditor;
 using UnityEngine;
 
 namespace TNRD.Editor.Controls {
-    public class TimelineControl : ExtendedControl {
+    public class Timeline : ExtendedControl {
 
         public enum EPlayMode {
             Normal,
@@ -47,7 +47,7 @@ namespace TNRD.Editor.Controls {
 
         private Dictionary<int, Color> markers = new Dictionary<int, Color>();
 
-        public TimelineControl( string name = "Empty", int frameCount = 120 ) {
+        public Timeline( string name = "Empty", int frameCount = 120 ) {
             Name = name;
             FrameCount = frameCount;
         }
