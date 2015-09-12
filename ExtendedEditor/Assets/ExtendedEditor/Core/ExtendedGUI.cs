@@ -466,6 +466,15 @@ namespace TNRD.Editor.Core {
             GUI.skin.label.fontSize = pFontSize;
         }
 
+        /// <summary>
+        /// Draws a box like GUI.Box but without transparency
+        /// </summary>
+        /// <param name="rect">The rectangle to draw the box at</param>
+        /// <param name="label">The label for the box</param>
+        public static void Box(Rect rect, string label) {
+            GUI.Box( rect, label, ExtendedEditor.BoxStyle );
+        }
+
         #region Dropdown extras
         private static int dropdownHash = "btrDropDown".GetHashCode();
 
