@@ -260,6 +260,8 @@ namespace TNRD.Editor.Core {
             }
 
             RemoveBrokenControls();
+
+            Controls.Sort();
         }
 
         private void RemoveBrokenControls() {
@@ -398,6 +400,8 @@ namespace TNRD.Editor.Core {
                     controlsDict[control.GetType()].Remove( control );
                     Controls.Remove( control );
                 }
+
+                Controls.Sort();
             }
 
             Input.Update();
@@ -669,6 +673,8 @@ namespace TNRD.Editor.Core {
 
             controlsDict[type].Add( control );
             Controls.Add( control );
+
+            Controls.Sort();
         }
 
         /// <summary>
@@ -766,6 +772,10 @@ namespace TNRD.Editor.Core {
             }
 
             return list;
+        }
+
+        public void SortControls() {
+            Controls.Sort();
         }
         #endregion
 
