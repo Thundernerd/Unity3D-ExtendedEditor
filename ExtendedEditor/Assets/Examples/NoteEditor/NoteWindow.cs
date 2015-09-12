@@ -11,18 +11,21 @@ public class NoteWindow : ExtendedWindow {
 
     public NoteWindow() : base( new ExtendedWindowSettings() { DrawToolbar = true, UseOnSceneGUI = true } ) { }
 
+    private ControlList controlList = new ControlList( new Vector2( 10, 10 ) );
+
     public override void OnInitialize() {
         base.OnInitialize();
 
         WindowStyle = GUIStyle.none;
+        AddControl( controlList );
     }
 
     public override void OnToolbarGUI() {
         if ( ExtendedGUI.ToolbarButton( "Add Note" ) ) {
-            AddControl( new NoteControl() );
+            controlList.Add( new NoteControl() );
         }
         if ( ExtendedGUI.ToolbarButton( "Clear Notes" ) ) {
-            Controls.Clear();
+            controlList.Clear();
             SaveNotes();
         }
     }
@@ -35,24 +38,10 @@ public class NoteWindow : ExtendedWindow {
         }
 
         previousScene = EditorApplication.currentScene;
-
-        var notes = GetControlsByType<NoteControl>();
-        var position = ToWorldSize( new Vector2( -Size.x, Size.y ) / 2 );
-        var isFirst = true;
-        foreach ( var item in notes ) {
-            if (isFirst) {
-                isFirst = false;
-                position += new Vector2( item.Size.x, -item.Size.y ) / 2;
-                position += new Vector2( 0.1f, -0.1f );
-            }
-            item.Position = position;
-            position.y -= item.Size.y;
-            position.y -= 0.1f;
-        }
     }
 
     public void SaveNotes() {
-        var controls = GetControlsByType<NoteControl>();
+        var controls = controlList.GetAll<NoteControl>();
         var notes = new List<NoteControl.Serializable>();
         foreach ( var item in controls ) {
             notes.Add( NoteControl.Serializable.FromNote( item ) );
@@ -67,10 +56,7 @@ public class NoteWindow : ExtendedWindow {
     }
 
     private void ReloadNotes() {
-        var controls = GetControlsByType<NoteControl>();
-        foreach ( var item in controls ) {
-            RemoveControl( item );
-        }
+        controlList.Clear();
 
         var path = GetNotePath();
         if ( !string.IsNullOrEmpty( path ) && File.Exists( path ) ) {
@@ -78,7 +64,7 @@ public class NoteWindow : ExtendedWindow {
             if ( !string.IsNullOrEmpty( json ) ) {
                 var notes = JsonConvert.DeserializeObject<List<NoteControl.Serializable>>( json );
                 foreach ( var item in notes ) {
-                    AddControl( NoteControl.Serializable.ToNote( item ) );
+                    controlList.Add( NoteControl.Serializable.ToNote( item ) );
                 }
             }
         }
