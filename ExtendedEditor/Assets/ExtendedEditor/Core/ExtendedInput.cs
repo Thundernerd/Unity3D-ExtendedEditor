@@ -13,12 +13,15 @@ namespace TNRD.Editor.Core {
         private Dictionary<KeyCode, State<bool>> kStates = new Dictionary<KeyCode, State<bool>>();
         private Dictionary<EMouseButton, State<bool>> mStates = new Dictionary<EMouseButton, State<bool>>();
 
-        public Vector2 RawMousePosition;
         /// <summary>
-        /// The current mouse position in the editor/window
+        /// The current mouse position in screen coordinates
         /// </summary>
-        public Vector2 MousePosition {
-            get { return ExtendedWindow.ToWorldPosition( RawMousePosition ); }
+        public Vector2 MousePosition;
+        /// <summary>
+        /// The current mouse position in world coordinates
+        /// </summary>
+        public Vector2 MouseWorldPosition {
+            get { return ExtendedWindow.ToWorldPosition( MousePosition ); }
         }
 
         /// <summary>
@@ -52,7 +55,7 @@ namespace TNRD.Editor.Core {
         private int lastButton = -1;
 
         public ExtendedInput() {
-            RawMousePosition = new Vector2();
+            MousePosition = new Vector2();
             MouseDelta = new Vector2();
         }
 
@@ -148,7 +151,7 @@ namespace TNRD.Editor.Core {
                     break;
             }
 
-            RawMousePosition = e.mousePosition;
+            MousePosition = e.mousePosition;
             MouseDelta = e.delta;
         }
 

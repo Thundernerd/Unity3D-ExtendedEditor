@@ -282,7 +282,7 @@ namespace TNRD.Editor.Core {
                 var window = windowsToProcess[i];
                 if ( window.Settings.AllowResize ) {
                     var rect = new Rect( window.WindowRect.position + window.WindowRect.size - new Vector2( 16, 16 ), new Vector2( 24, 24 ) );
-                    if ( rect.Contains( Input.RawMousePosition ) ) {
+                    if ( rect.Contains( Input.MousePosition ) ) {
                         EditorGUIUtility.AddCursorRect( rect, MouseCursor.ResizeUpLeft );
 
                         if ( Input.ButtonPressed( EMouseButton.Left ) ) {
@@ -297,7 +297,7 @@ namespace TNRD.Editor.Core {
 
                 if ( window.Settings.AllowRepositioning ) {
                     var rect = new Rect( window.WindowRect.position, new Vector2( window.WindowRect.width, 16.5f ) );
-                    if ( rect.Contains( Input.RawMousePosition ) ) {
+                    if ( rect.Contains( Input.MousePosition ) ) {
                         if ( Input.ButtonPressed( EMouseButton.Left ) ) {
                             windowToDrag = window;
                         }

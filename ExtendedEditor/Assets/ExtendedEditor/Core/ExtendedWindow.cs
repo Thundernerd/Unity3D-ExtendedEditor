@@ -544,7 +544,7 @@ namespace TNRD.Editor.Core {
             Rect area = WindowRect;
             area.position = new Vector2( 0, 0 );
 
-            var mousePosition = Input.RawMousePosition;
+            var mousePosition = Input.MousePosition;
             if ( WindowStyle != null && WindowStyle.name == "window" ) {
                 area.y += 17.5f;
                 area.height -= 17.5f;
@@ -555,7 +555,7 @@ namespace TNRD.Editor.Core {
                 area.height -= 17.5f;
                 mousePosition.y -= 17.5f;
             }
-            Input.RawMousePosition = mousePosition;
+            Input.MousePosition = mousePosition;
 
             GUILayout.BeginArea( area );
             ExtendedGUI.BeginArea( new ExtendedGUIOption() { Type = ExtendedGUIOption.EType.WindowSize, Value = area.size } );
@@ -589,9 +589,9 @@ namespace TNRD.Editor.Core {
 
         public void EndGUI() {
             if ( Settings.DrawToolbar ) {
-                var pos = Input.RawMousePosition;
+                var pos = Input.MousePosition;
                 pos.y += 17.5f;
-                Input.RawMousePosition = pos;
+                Input.MousePosition = pos;
             }
 
             ExtendedGUI.EndArea();
