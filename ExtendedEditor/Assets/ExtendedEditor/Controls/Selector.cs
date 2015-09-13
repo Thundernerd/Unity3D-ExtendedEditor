@@ -28,21 +28,10 @@ namespace TNRD.Editor.Controls {
             var id = GetControlID( FocusType.Passive );
             if ( GUIUtility.hotControl != 0 && GUIUtility.hotControl != id ) return;
             if ( Input.KeyDown( KeyCode.LeftAlt ) || Input.KeyDown( KeyCode.RightAlt ) ) return;
-
-            if ( ( Input.KeyDown( KeyCode.LeftShift ) || Input.KeyDown( KeyCode.RightShift ) ) && Input.ButtonReleased( EMouseButton.Left ) ) {
-                var controls = Window.GetControlsByBaseType<SelectableControl>();
-                foreach ( var item in controls ) {
-                    if ( item.Contains( Input.MousePosition ) ) {
-                        item.OnSelect();
-                        SelectedControls.Add( item );
-                        return;
-                    }
-                }
-            }
+            var controls = Window.GetControlsByBaseType<SelectableControl>();
 
             if ( Input.ButtonDown( EMouseButton.Left ) ) {
                 if ( SelectedControls.Count < 2 ) {
-                    var controls = Window.GetControlsByBaseType<SelectableControl>();
                     var newControls = new List<SelectableControl>();
 
                     for ( int i = 0; i < controls.Count; i++ ) {
@@ -64,12 +53,7 @@ namespace TNRD.Editor.Controls {
             }
 
             if ( Input.Type == EventType.MouseDrag && Input.ButtonDown( EMouseButton.Left ) ) {
-                var controls = Window.GetControlsByBaseType<SelectableControl>();
-
                 var delta = Input.MouseDelta;
-                //if ( Window.Settings.UseCamera ) {
-                //    delta *= Window.Camera.z;
-                //}
 
                 if ( !startedDrag && SelectedControls.Count > 0 ) {
                     for ( int i = 0; i < SelectedControls.Count; i++ ) {
@@ -121,18 +105,40 @@ namespace TNRD.Editor.Controls {
                     }
                 }
 
-            } else if ( Input.IsDoubleClick && Input.Button == EMouseButton.Left ) {
-                foreach ( var item in SelectedControls ) {
-                    item.OnDeselect();
-                }
-
-                SelectedControls.Clear();
             } else if ( Input.ButtonReleased( EMouseButton.Left ) ) {
-                startedDrag = false;
-                dragControls = false;
+                if ( startedDrag ) {
+                    startedDrag = false;
+                    dragControls = false;
 
-                if ( GUIUtility.hotControl == id ) {
-                    GUIUtility.hotControl = 0;
+                    if ( GUIUtility.hotControl == id ) {
+                        GUIUtility.hotControl = 0;
+                    }
+                } else {
+                    if ( Input.KeyDown( KeyCode.LeftShift, KeyCode.RightShift ) ) {
+                        foreach ( var item in controls ) {
+                            if ( item.Contains( Input.MousePosition ) ) {
+                                item.OnSelect();
+                                SelectedControls.Add( item );
+                                return;
+                            }
+                        }
+                    } else {
+                        dragControls = false;
+                        startedDrag = false;
+
+                        foreach ( var item in SelectedControls ) {
+                            item.OnDeselect();
+                        }
+                        SelectedControls.Clear();
+                        
+                        foreach ( var item in controls ) {
+                            if ( item.Contains( Input.MousePosition ) ) {
+                                item.OnSelect();
+                                SelectedControls.Add( item );
+                                return;
+                            }
+                        }
+                    }
                 }
             }
 
