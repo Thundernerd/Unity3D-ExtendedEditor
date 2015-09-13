@@ -8,7 +8,7 @@ namespace TNRD.Editor.Controls {
     public class Selector : ExtendedControl {
 
         [JsonIgnore]
-        public List<Selectable> SelectedControls = new List<Selectable>();
+        public List<SelectableControl> SelectedControls = new List<SelectableControl>();
 
         private Vector2 start;
         private Vector2 end;
@@ -30,7 +30,7 @@ namespace TNRD.Editor.Controls {
             if ( Input.KeyDown( KeyCode.LeftAlt ) || Input.KeyDown( KeyCode.RightAlt ) ) return;
 
             if ( ( Input.KeyDown( KeyCode.LeftShift ) || Input.KeyDown( KeyCode.RightShift ) ) && Input.ButtonReleased( EMouseButton.Left ) ) {
-                var controls = Window.GetControlsByBaseType<Selectable>();
+                var controls = Window.GetControlsByBaseType<SelectableControl>();
                 foreach ( var item in controls ) {
                     if ( item.Contains( Input.MousePosition ) ) {
                         item.OnSelect();
@@ -42,8 +42,8 @@ namespace TNRD.Editor.Controls {
 
             if ( Input.ButtonDown( EMouseButton.Left ) ) {
                 if ( SelectedControls.Count < 2 ) {
-                    var controls = Window.GetControlsByBaseType<Selectable>();
-                    var newControls = new List<Selectable>();
+                    var controls = Window.GetControlsByBaseType<SelectableControl>();
+                    var newControls = new List<SelectableControl>();
 
                     for ( int i = 0; i < controls.Count; i++ ) {
                         if ( controls[i].Contains( Input.MousePosition ) ) {
@@ -64,7 +64,7 @@ namespace TNRD.Editor.Controls {
             }
 
             if ( Input.Type == EventType.MouseDrag && Input.ButtonDown( EMouseButton.Left ) ) {
-                var controls = Window.GetControlsByBaseType<Selectable>();
+                var controls = Window.GetControlsByBaseType<SelectableControl>();
 
                 var delta = Input.MouseDelta;
                 //if ( Window.Settings.UseCamera ) {

@@ -4,7 +4,7 @@ using TNRD.Json;
 using UnityEngine;
 
 namespace TNRD.Editor.Controls {
-    public abstract class Selectable : ExtendedControl {
+    public abstract class SelectableControl : ExtendedControl {
 
         [JsonIgnore]
         public bool IsSelected;
