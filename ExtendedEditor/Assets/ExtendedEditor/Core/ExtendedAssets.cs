@@ -132,10 +132,29 @@ namespace TNRD.Editor.Core {
             return textures[key];
         }
 
+        /// <summary>
+        /// Destroys all the textures loaded for the given window
+        /// </summary>
+        /// <param name="window"></param>
         public void Destroy( ExtendedWindow window ) {
             foreach ( var item in textures ) {
                 window.Editor.DestroyAsset( item.Value );
             }
+        }
+
+        /// <summary>
+        /// Converts a base 64 string into a texture
+        /// </summary>
+        /// <param name="b64">The base 64 string representing an image</param>
+        /// <returns></returns>
+        public static Texture2D Base64( string b64 ) {
+            var tex = new Texture2D( 1, 1 );
+            tex.hideFlags = HideFlags.HideAndDontSave;
+
+            var bytes = System.Convert.FromBase64String( b64 );
+            tex.LoadImage( bytes );
+
+            return tex;
         }
     }
 }

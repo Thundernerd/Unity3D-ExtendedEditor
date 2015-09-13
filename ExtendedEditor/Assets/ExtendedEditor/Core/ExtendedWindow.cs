@@ -239,9 +239,7 @@ namespace TNRD.Editor.Core {
             notificationTextStyle.fontSize = 17;
 
             if ( WindowStyle == null ) {
-                WindowStyle = new GUIStyle( GUI.skin.window );
-                WindowStyle.normal.background = Editor.SharedAssets["BackgroundNormal"];
-                WindowStyle.onNormal.background = Editor.SharedAssets["BackgroundActive"];
+                WindowStyle = ExtendedGUI.DefaultWindowStyle;
             }
 
             closeButtonStyle = new GUIStyle();
@@ -559,14 +557,14 @@ namespace TNRD.Editor.Core {
 
             var mousePosition = Input.MousePosition;
             if ( WindowStyle != null && WindowStyle.name == "window" ) {
-                area.y += 17.5f;
-                area.height -= 17.5f;
-                mousePosition.y -= 17.5f;
+                area.y += WindowStyle.padding.top + 1;
+                area.height -= WindowStyle.padding.top + 1;
+                mousePosition.y -= WindowStyle.padding.top + 1;
             }
             if ( Settings.DrawToolbar ) {
-                area.y += 17.5f;
-                area.height -= 17.5f;
-                mousePosition.y -= 17.5f;
+                area.y += 18;
+                area.height -= 18;
+                mousePosition.y -= 18;
             }
             Input.MousePosition = mousePosition;
 
