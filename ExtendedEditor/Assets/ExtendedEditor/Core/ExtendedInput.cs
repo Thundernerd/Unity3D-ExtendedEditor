@@ -187,11 +187,20 @@ namespace TNRD.Editor.Core {
             SetValue( KeyCode.RightAlt, value );
         }
 
+        private bool PreMouseCheck() {
+            return Type == EventType.MouseDown || Type == EventType.MouseUp;
+        }
+
+        private bool PreKeyCheck() {
+            return Type == EventType.KeyDown || Type == EventType.KeyUp;
+        }
+
         /// <summary>
         /// Did the given mouse button get pressed this frame
         /// </summary>
         /// <param name="button">the mouse button to check</param>
         public bool ButtonPressed( EMouseButton button ) {
+            if ( !PreMouseCheck() ) return false;
             if ( !mStates.ContainsKey( button ) ) return false;
             return mStates[button].IsPressed();
         }
@@ -201,6 +210,7 @@ namespace TNRD.Editor.Core {
         /// </summary>
         /// <param name="button">the mouse button to check</param>
         public bool ButtonReleased( EMouseButton button ) {
+            if ( !PreMouseCheck() ) return false;
             if ( !mStates.ContainsKey( button ) ) return false;
             return mStates[button].IsReleased();
         }
@@ -210,6 +220,7 @@ namespace TNRD.Editor.Core {
         /// </summary>
         /// <param name="button">the mouse button to check</param>
         public bool ButtonDown( EMouseButton button ) {
+            if ( !PreMouseCheck() ) return false;
             if ( !mStates.ContainsKey( button ) ) return false;
             return mStates[button].IsDown();
         }
@@ -219,6 +230,7 @@ namespace TNRD.Editor.Core {
         /// </summary>
         /// <param name="button">the mouse button to check</param>
         public bool ButtonUp( EMouseButton button ) {
+            if ( !PreMouseCheck() ) return false;
             if ( !mStates.ContainsKey( button ) ) return false;
             return mStates[button].IsUp();
         }
@@ -228,6 +240,7 @@ namespace TNRD.Editor.Core {
         /// </summary>
         /// <param name="key">the key to check</param>
         public bool KeyPressed( KeyCode key ) {
+            if ( PreKeyCheck() ) return false;
             if ( !kStates.ContainsKey( key ) ) return false;
             return kStates[key].IsPressed();
         }
@@ -237,6 +250,7 @@ namespace TNRD.Editor.Core {
         /// </summary>
         /// <param name="keys">the keys to check</param>
         public bool KeyPressed( params KeyCode[] keys ) {
+            if ( PreKeyCheck() ) return false;
             foreach ( var key in keys ) {
                 if ( kStates.ContainsKey( key ) ) {
                     if ( kStates[key].IsPressed() ) {
@@ -252,6 +266,7 @@ namespace TNRD.Editor.Core {
         /// </summary>
         /// <param name="keys">the keys to check</param>
         public bool KeysPressed( params KeyCode[] keys ) {
+            if ( PreKeyCheck() ) return false;
             foreach ( var key in keys ) {
                 if ( !kStates.ContainsKey( key ) ) return false;
                 if ( !kStates[key].IsPressed() ) return false;
@@ -264,6 +279,7 @@ namespace TNRD.Editor.Core {
         /// </summary>
         /// <param name="key">the key to check</param>
         public bool KeyReleased( KeyCode key ) {
+            if ( PreKeyCheck() ) return false;
             if ( !kStates.ContainsKey( key ) ) return false;
             return kStates[key].IsReleased();
         }
@@ -273,6 +289,7 @@ namespace TNRD.Editor.Core {
         /// </summary>
         /// <param name="keys">the keys to check</param>
         public bool KeyReleased( params KeyCode[] keys ) {
+            if ( PreKeyCheck() ) return false;
             foreach ( var key in keys ) {
                 if ( kStates.ContainsKey( key ) ) {
                     if ( kStates[key].IsReleased() ) {
@@ -288,6 +305,7 @@ namespace TNRD.Editor.Core {
         /// </summary>
         /// <param name="keys">the keys to check</param>
         public bool KeysReleased( params KeyCode[] keys ) {
+            if ( PreKeyCheck() ) return false;
             foreach ( var key in keys ) {
                 if ( !kStates.ContainsKey( key ) ) return false;
                 if ( !kStates[key].IsReleased() ) return false;
@@ -300,6 +318,7 @@ namespace TNRD.Editor.Core {
         /// </summary>
         /// <param name="key">the key to check</param>
         public bool KeyDown( KeyCode key ) {
+            if ( PreKeyCheck() ) return false;
             if ( !kStates.ContainsKey( key ) ) return false;
             return kStates[key].IsDown();
         }
@@ -309,6 +328,7 @@ namespace TNRD.Editor.Core {
         /// </summary>
         /// <param name="keys">the keys to check</param>
         public bool KeyDown( params KeyCode[] keys ) {
+            if ( PreKeyCheck() ) return false;
             foreach ( var key in keys ) {
                 if ( kStates.ContainsKey( key ) ) {
                     if ( kStates[key].IsDown() ) {
@@ -324,6 +344,7 @@ namespace TNRD.Editor.Core {
         /// </summary>
         /// <param name="keys">the keys to check</param>
         public bool KeysDown( params KeyCode[] keys ) {
+            if ( PreKeyCheck() ) return false;
             foreach ( var key in keys ) {
                 if ( !kStates.ContainsKey( key ) ) return false;
                 if ( !kStates[key].IsDown() ) return false;
@@ -336,6 +357,7 @@ namespace TNRD.Editor.Core {
         /// </summary>
         /// <param name="key">the key to check</param>
         public bool KeyUp( KeyCode key ) {
+            if ( PreKeyCheck() ) return false;
             if ( !kStates.ContainsKey( key ) ) return false;
             return kStates[key].IsUp(); ;
         }
@@ -345,6 +367,7 @@ namespace TNRD.Editor.Core {
         /// </summary>
         /// <param name="keys">the keys to check</param>
         public bool KeyUp( params KeyCode[] keys ) {
+            if ( PreKeyCheck() ) return false;
             foreach ( var key in keys ) {
                 if ( kStates.ContainsKey( key ) ) {
                     if ( kStates[key].IsUp() ) {
@@ -360,6 +383,7 @@ namespace TNRD.Editor.Core {
         /// </summary>
         /// <param name="keys">the keys to check</param>
         public bool KeysUp( params KeyCode[] keys ) {
+            if ( PreKeyCheck() ) return false;
             foreach ( var key in keys ) {
                 if ( !kStates.ContainsKey( key ) ) return false;
                 if ( !kStates[key].IsUp() ) return false;
