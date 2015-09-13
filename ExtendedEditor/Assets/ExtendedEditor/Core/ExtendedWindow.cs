@@ -78,6 +78,14 @@ namespace TNRD.Editor.Core {
             return currentWindow.Size / 100 / currentWindow.Camera.z;
         }
 
+        private struct KeyboardShortcut {
+            public KeyCode Key;
+            public Action Callback;
+            public bool Control;
+            public bool Alt;
+            public bool Shift;
+        }
+
         /// <summary>
         /// The asset manager for this window
         /// </summary>
@@ -190,6 +198,9 @@ namespace TNRD.Editor.Core {
 
         private const int cameraSpeed = 500;
 
+        [JsonProperty]
+        private List<KeyboardShortcut> keyboardShortcuts = new List<KeyboardShortcut>();
+
         private List<ExtendedNotification> notifications = new List<ExtendedNotification>();
 
         private GUIStyle notificationBackgroundStyle;
@@ -214,7 +225,6 @@ namespace TNRD.Editor.Core {
         }
 
         #region Initialization
-
         /// <summary>
         /// Called when the window is added to an editor
         /// </summary>
@@ -656,6 +666,17 @@ namespace TNRD.Editor.Core {
                     }
                 }
             }
+
+            var shortcuts = new List<KeyboardShortcut>( keyboardShortcuts );
+            foreach ( var item in shortcuts ) {
+                if ( item.Control != Input.KeysDown( KeyCode.LeftControl, KeyCode.RightControl ) ) continue;
+                if ( item.Alt != Input.KeysDown( KeyCode.LeftAlt, KeyCode.RightAlt ) ) continue;
+                if ( item.Shift != Input.KeysDown( KeyCode.LeftShift, KeyCode.RightShift ) ) continue;
+
+                if ( Input.KeyReleased( item.Key ) ) {
+                    item.Callback.Invoke();
+                }
+            }
         }
         #endregion
 
@@ -866,6 +887,92 @@ namespace TNRD.Editor.Core {
             if ( string.IsNullOrEmpty( text ) ) return;
             color.a = 0;
             notifications.Add( new ExtendedNotification( text, color, duration, notificationTextStyle ) );
+        }
+        #endregion
+
+        #region KeyboardShortcuts
+        /// <summary>
+        /// Adds a keyboard shorcut hook to this window
+        /// </summary>
+        /// <param name="key">They main key to trigger the callback</param>
+        /// <param name="callback">The callback to be invoked</param>
+        /// <param name="control">Is control a modifier for this shortcut</param>
+        /// <param name="alt">Is alt a modifier for this shortcut</param>
+        /// <param name="shift">Is shift a modifier for this shortcut</param>
+        public void AddShortcut( KeyCode key, Action callback, bool control, bool alt, bool shift ) {
+            keyboardShortcuts.Add(
+                new KeyboardShortcut() {
+                    Key = key,
+                    Callback = callback,
+                    Control = control,
+                    Alt = alt,
+                    Shift = shift
+                } );
+        }
+
+        /// <summary>
+        /// Removes registered shortcuts based on the main key
+        /// </summary>
+        /// <param name="key">The main key for shortcuts</param>
+        public void RemoveShortcut( KeyCode key ) {
+            foreach ( var item in keyboardShortcuts ) {
+                if ( item.Key == key ) {
+                    keyboardShortcuts.Remove( item );
+                    return;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Removes registered shortcuts based on the callback
+        /// </summary>
+        /// <param name="callback">The callback for the shortcuts</param>
+        public void RemoveShortcut( Action callback ) {
+            foreach ( var item in keyboardShortcuts ) {
+                if ( item.Callback == callback ) {
+                    keyboardShortcuts.Remove( item );
+                    return;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Removes registered shortcuts based on the main key and modifiers
+        /// </summary>
+        /// <param name="key">The main key for shortcuts</param>
+        /// <param name="control">Is control a modifier for this shortcut</param>
+        /// <param name="alt">Is alt a modifier for this shortcut</param>
+        /// <param name="shift">Is shift a modifier for this shortcut</param>
+        public void RemoveShortcut( KeyCode key, bool control, bool alt, bool shift ) {
+            foreach ( var item in keyboardShortcuts ) {
+                if ( item.Key == key && item.Control == control && item.Alt == alt && item.Shift == shift ) {
+                    keyboardShortcuts.Remove( item );
+                    return;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Removes registered shortcuts based on the main key, callback, and modifiers
+        /// </summary>
+        /// <param name="key">The main key for shortcuts</param>
+        /// <param name="callback">The callback for the shortcuts</param>
+        /// <param name="control">Is control a modifier for this shortcut</param>
+        /// <param name="alt">Is alt a modifier for this shortcut</param>
+        /// <param name="shift">Is shift a modifier for this shortcut</param>
+        public void RemoveShortcut( KeyCode key, Action callback, bool control, bool alt, bool shift ) {
+            foreach ( var item in keyboardShortcuts ) {
+                if ( item.Key == key && item.Callback == callback && item.Control == control && item.Alt == alt && item.Shift == shift ) {
+                    keyboardShortcuts.Remove( item );
+                    return;
+                }
+            }
+        }
+        /// <summary>
+        /// Removes all the registered shortcuts
+        /// </summary>
+        public void ClearShortcuts() {
+            keyboardShortcuts.Clear();
         }
         #endregion
     }
