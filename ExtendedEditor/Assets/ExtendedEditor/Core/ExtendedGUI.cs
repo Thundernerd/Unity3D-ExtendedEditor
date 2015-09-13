@@ -70,6 +70,7 @@ namespace TNRD.Editor.Core {
         }
         #endregion
 
+        #region Internal Styles
         private static GUIStyle toolbarStyle = new GUIStyle( EditorStyles.toolbar );
         private static GUIStyle toolbarButtonStyle = new GUIStyle( EditorStyles.toolbarButton );
         private static GUIStyle toolbarDropDownStyle = new GUIStyle( EditorStyles.toolbarDropDown );
@@ -79,6 +80,7 @@ namespace TNRD.Editor.Core {
         private static GUIStyle toolbarSearchStyleEndEmpty = new GUIStyle( "ToolbarSeachCancelButtonEmpty" );
         private static GUIStyle toolbarTextFieldStyle = new GUIStyle( EditorStyles.toolbarTextField );
         private static GUIStyle dropdownPopupStyle = new GUIStyle( EditorStyles.popup );
+        #endregion
 
         #region Blocks
         /// <summary>
@@ -462,6 +464,28 @@ namespace TNRD.Editor.Core {
             var gc = new GUIContent( content );
             GUI.Label( GetControlRect( gc, GUI.skin.label ), gc ); ;
             GUI.skin.label.fontSize = pFontSize;
+        }
+
+        /// <summary>
+        /// Draws a box like GUI.Box but without transparency
+        /// </summary>
+        /// <param name="rect">The rectangle to draw the box at</param>
+        /// <param name="label">The label for the box</param>
+        public static void Box(Rect rect, string label) {
+            GUI.Box( rect, label, ExtendedEditor.BoxStyle );
+        }
+
+        /// <summary>
+        /// Draws a box like GUI.box but without transparency and a custom color
+        /// </summary>
+        /// <param name="rect">The rectangle to draw the box at</param>
+        /// <param name="label">The label for the box</param>
+        /// <param name="color">The color to draw the box with</param>
+        public static void Box( Rect rect, string label, Color color ) {
+            var c = GUI.backgroundColor;
+            GUI.backgroundColor = color;
+            GUI.Box( rect, label, ExtendedEditor.BoxStyle );
+            GUI.backgroundColor = c;
         }
 
         #region Dropdown extras

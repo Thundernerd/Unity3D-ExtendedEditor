@@ -12,6 +12,72 @@ namespace TNRD.Editor.Core {
     /// </summary>
     public class ExtendedWindow {
 
+        private static ExtendedWindow currentWindow;
+
+        /// <summary>
+        /// Converts the given value into a valid world position
+        /// </summary>
+        /// <param name="value">The value to convert</param>
+        public static Vector2 ToWorldPosition( Vector2 value ) {
+            if ( currentWindow == null ) return new Vector2();
+
+            var size = currentWindow.Size;
+            var nValue = new Vector2( value.x, value.y );
+            nValue.x += currentWindow.Camera.x * currentWindow.Camera.z;
+            nValue.y -= currentWindow.Camera.y * currentWindow.Camera.z;
+            nValue -= size / 2;
+            nValue.y *= -1;
+            nValue /= 100;
+            nValue /= currentWindow.Camera.z;
+            return nValue;
+        }
+
+        /// <summary>
+        /// Converts the given value into a valid screen (GUI) position
+        /// </summary>
+        /// <param name="value">The value to convert</param>
+        /// <returns></returns>
+        public static Vector2 ToScreenPosition( Vector2 value ) {
+            if ( currentWindow == null ) return new Vector2();
+
+            var temp = value * currentWindow.Camera.z;
+            var nValue = currentWindow.Size / 2;
+            nValue.x += temp.x * 100;
+            nValue.y -= temp.y * 100;
+            nValue.x -= currentWindow.Camera.x * currentWindow.Camera.z;
+            nValue.y += currentWindow.Camera.y * currentWindow.Camera.z;
+            return nValue;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static Vector2 ToScreenSize( Vector2 value ) {
+            if ( currentWindow == null ) return new Vector2();
+            return value * 100 * currentWindow.Camera.z;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static Vector2 ToWorldSize( Vector2 value ) {
+            if ( currentWindow == null ) return new Vector2();
+            return value / 100 / currentWindow.Camera.z;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public static Vector2 GetScreenInWorldSize() {
+            if ( currentWindow == null ) return new Vector2();
+            return currentWindow.Size / 100 / currentWindow.Camera.z;
+        }
+
         /// <summary>
         /// The asset manager for this window
         /// </summary>
@@ -203,6 +269,8 @@ namespace TNRD.Editor.Core {
             }
 
             RemoveBrokenControls();
+
+            Controls.Sort();
         }
 
         private void RemoveBrokenControls() {
@@ -296,29 +364,32 @@ namespace TNRD.Editor.Core {
 
             if ( windowHasFocus ) {
                 if ( Settings.UseCamera ) {
-                    if ( Input.KeyDown( KeyCode.LeftAlt ) || Input.KeyDown( KeyCode.RightAlt ) ) {
-                        if ( Input.ButtonDown( EMouseButton.Left ) ) {
-                            Camera += ScaleMatrix.inverse.MultiplyVector( Input.MouseDelta );
-                        } else if ( Input.ButtonDown( EMouseButton.Right ) ) {
-                            var delta = Input.MouseDelta / 1000f;
-                            Camera.z += delta.x;
-                            Camera.z -= delta.y;
+                    if ( Input.Type == EventType.MouseDrag ) {
+                        if ( Input.KeyDown( KeyCode.LeftAlt, KeyCode.RightAlt ) ) {
+                            if ( Input.ButtonDown( EMouseButton.Left ) ) {
+                                Camera += new Vector3( -Input.MouseDelta.x, Input.MouseDelta.y, 0 ) / Camera.z;
+                            } else if ( Input.ButtonDown( EMouseButton.Right ) ) {
+                                var delta = Input.MouseDelta / 1000f;
+                                Camera.z += delta.x;
+                                Camera.z -= delta.y;
 
-                            if ( Camera.z < 0.1f ) {
-                                Camera.z = 0.1f;
+                                if ( Camera.z < 0.1f ) {
+                                    Camera.z = 0.1f;
+                                }
                             }
                         }
                     }
 
+
                     if ( Input.Type == EventType.MouseDrag && Input.ButtonDown( EMouseButton.Middle ) ) {
-                        Camera += ScaleMatrix.inverse.MultiplyVector( Input.MouseDelta );
+                        Camera += new Vector3( -Input.MouseDelta.x, Input.MouseDelta.y, 0 ) / Camera.z;
                     }
 
                     if ( Input.KeyDown( KeyCode.LeftArrow ) ) {
-                        Camera.x += ( cameraSpeed * ( 1f / Camera.z ) ) * Editor.DeltaTime;
+                        Camera.x -= ( cameraSpeed * ( 1f / Camera.z ) ) * Editor.DeltaTime;
                     }
                     if ( Input.KeyDown( KeyCode.RightArrow ) ) {
-                        Camera.x -= ( cameraSpeed * ( 1f / Camera.z ) ) * Editor.DeltaTime;
+                        Camera.x += ( cameraSpeed * ( 1f / Camera.z ) ) * Editor.DeltaTime;
                     }
                     if ( Input.KeyDown( KeyCode.UpArrow ) ) {
                         Camera.y += ( cameraSpeed * ( 1f / Camera.z ) ) * Editor.DeltaTime;
@@ -338,6 +409,8 @@ namespace TNRD.Editor.Core {
                     controlsDict[control.GetType()].Remove( control );
                     Controls.Remove( control );
                 }
+
+                Controls.Sort();
             }
 
             Input.Update();
@@ -366,6 +439,8 @@ namespace TNRD.Editor.Core {
             if ( !initializedGUI ) {
                 OnInitializeGUI();
             }
+
+            currentWindow = this;
 
             var e = Editor.CurrentEvent;
             Input.OnGUI( e );
@@ -397,12 +472,75 @@ namespace TNRD.Editor.Core {
             EndGUI();
         }
 
+        private Color smallSubGridColor = new Color( 0.5f, 0.5f, 0.5f, 1 );
+        private Color subGridColor = new Color( 0.5f, 0.5f, 0.5f, 0.1f );
+        private Color mainGridColor = new Color( 0.5f, 0.5f, 0.5f, 1f );
+        private Color masterGridColor = new Color( 0.5f, 0.5f, 0.5f, 1f );
+
+        private float Range( float min, float max, float value ) {
+            return Mathf.Clamp01( ( value - min ) / ( max - min ) );
+        }
+
+        private void DrawGrid( Color color, float multiplier = 1 ) {
+            if ( color.a == 0 ) return;
+
+            var hc = Handles.color;
+            Handles.color = color;
+
+            var size = new Vector2(
+                Mathf.CeilToInt( Size.x / 2 / 100 / Camera.z ),
+                Mathf.CeilToInt( Size.y / 2 / 100 / Camera.z ) );
+
+            var tempM = multiplier;
+            if ( multiplier > 1 )
+                multiplier = 1;
+
+            var step = ToWorldSize( new Vector2( multiplier, multiplier ) * 100 ) * Camera.z;
+            var startGrid = new Vector2( -size.x, -size.y );
+            var endGrid = new Vector2( size.x, size.y );
+
+            var camPos = ToWorldSize( Camera );
+
+            camPos.x = Mathf.Round( camPos.x * Camera.z );
+            camPos.y = Mathf.Round( camPos.y * Camera.z );
+
+            startGrid += camPos;
+            endGrid += camPos;
+
+            startGrid -= step;
+            endGrid += step;
+
+            for ( float x = startGrid.x; x < endGrid.x + step.x; x += step.x ) {
+                var startPos = ToScreenPosition( new Vector2( x, startGrid.y ) );
+                var endPos = ToScreenPosition( new Vector2( x, endGrid.y ) );
+
+                if ( tempM > 1 ) {
+                    if ( Mathf.Round( x ) % tempM == 0 ) {
+                        Handles.DrawLine( startPos, endPos );
+                    }
+                } else {
+                    Handles.DrawLine( startPos, endPos );
+                }
+            }
+
+            for ( float y = startGrid.y; y < endGrid.y + step.y; y += step.y ) {
+                var startPos = ToScreenPosition( new Vector2( startGrid.x, y ) );
+                var endPos = ToScreenPosition( new Vector2( endGrid.x, y ) );
+
+                if ( tempM > 1 ) {
+                    if ( Mathf.Round( y ) % tempM == 0 ) {
+                        Handles.DrawLine( startPos, endPos );
+                    }
+                } else {
+                    Handles.DrawLine( startPos, endPos );
+                }
+            }
+
+            Handles.color = hc;
+        }
+
         public void BeginGUI() {
             if ( Settings.UseCamera ) {
-                var translation = Matrix4x4.TRS( WindowRect.TopLeft(), Quaternion.identity, Vector3.one );
-                var scale = Matrix4x4.Scale( new Vector3( Camera.z, Camera.z, 1f ) );
-                ScaleMatrix = translation * scale * translation.inverse * GUI.matrix;
-
                 if ( Input.KeyDown( KeyCode.LeftAlt ) || Input.KeyDown( KeyCode.RightAlt ) ) {
                     if ( Input.ButtonDown( EMouseButton.Right ) ) {
                         EditorGUIUtility.AddCursorRect( WindowRect, MouseCursor.Zoom );
@@ -434,6 +572,18 @@ namespace TNRD.Editor.Core {
 
             GUILayout.BeginArea( area );
             ExtendedGUI.BeginArea( new ExtendedGUIOption() { Type = ExtendedGUIOption.EType.WindowSize, Value = area.size } );
+
+            if ( Settings.DrawGrid ) {
+                smallSubGridColor.a = 0.8f * Range( 5, 20, Camera.z );
+                subGridColor.a = 0.8f * Range( 0.75f, 5, Camera.z );
+                mainGridColor.a = 0.8f * Range( 0.15f, 1.5f, Camera.z );
+                masterGridColor.a = 0.8f * ( 1 - Range( 0, 0.75f, Camera.z ) );
+
+                DrawGrid( smallSubGridColor, 0.0625f );
+                DrawGrid( subGridColor, 0.25f );
+                DrawGrid( mainGridColor );
+                DrawGrid( masterGridColor, 3f );
+            }
 
             foreach ( var item in controlsToProcess ) {
                 item.OnGUI();
@@ -488,6 +638,10 @@ namespace TNRD.Editor.Core {
                 } else if ( delta < 0 ) {
                     Camera.z *= 1.1f;
                 }
+
+                if ( Camera.z < 0.1f ) {
+                    Camera.z = 0.1f;
+                }
             }
 
             if ( Settings.DrawTitleBarButtons ) {
@@ -528,6 +682,8 @@ namespace TNRD.Editor.Core {
 
             controlsDict[type].Add( control );
             Controls.Add( control );
+
+            Controls.Sort();
         }
 
         /// <summary>
@@ -625,6 +781,10 @@ namespace TNRD.Editor.Core {
             }
 
             return list;
+        }
+
+        public void SortControls() {
+            Controls.Sort();
         }
         #endregion
 

@@ -15,7 +15,7 @@ namespace TNRD.Editor.Utilities {
         /// <summary>
         /// Returns the InspectorWindow type to use as GetWindow's desiredDockNextTo parameter
         /// </summary>
-        public static Type InspectorWindow {
+        public static Type InspectorWindowType {
             get {
                 return Assembly.Load( "UnityEditor" ).GetType( "UnityEditor.InspectorWindow" );
             }
@@ -24,7 +24,7 @@ namespace TNRD.Editor.Utilities {
         /// <summary>
         /// Returns the SceneView type to use as GetWindow's desiredDockNextTo parameter
         /// </summary>
-        public static Type SceneView {
+        public static Type SceneViewType {
             get {
                 return typeof( SceneView );
             }
@@ -33,7 +33,7 @@ namespace TNRD.Editor.Utilities {
         /// <summary>
         /// Returns the GameView type to use as GetWindow's desiredDockNextTo parameter
         /// </summary>
-        public static Type GameView {
+        public static Type GameViewType {
             get {
                 return Assembly.Load( "UnityEditor" ).GetType( "UnityEditor.GameView" );
             }
@@ -42,7 +42,7 @@ namespace TNRD.Editor.Utilities {
         /// <summary>
         /// Returns the HierarchyWindow type to use as GetWindow's desiredDockNextTo parameter
         /// </summary>
-        public static Type HierarchyWindow {
+        public static Type HierarchyWindowType {
             get {
                 return Assembly.Load( "UnityEditor" ).GetType( "UnityEditor.SceneHierarchyWindow" );
             }
@@ -51,7 +51,7 @@ namespace TNRD.Editor.Utilities {
         /// <summary>
         /// Returns the ProjectBrowser type to use as GetWindow's desiredDockNextTo parameter
         /// </summary>
-        public static Type ProjectBrowser {
+        public static Type ProjectBrowserType {
             get {
                 return Assembly.Load( "UnityEditor" ).GetType( "UnityEditor.ProjectBrowser" );
             }
@@ -60,7 +60,7 @@ namespace TNRD.Editor.Utilities {
         /// <summary>
         /// Returns the AnimationWindow type to use as GetWindow's desiredDockNextTo parameter
         /// </summary>
-        public static Type AnimationWindow {
+        public static Type AnimationWindowType {
             get {
                 return Assembly.Load( "UnityEditor" ).GetType( "UnityEditor.AnimationWindow" );
             }
@@ -69,7 +69,7 @@ namespace TNRD.Editor.Utilities {
         /// <summary>
         /// Returns the ProfilerWindow type to use as GetWindow's desiredDockNextTo parameter
         /// </summary>
-        public static Type ProfilerWindow {
+        public static Type ProfilerWindowType {
             get {
                 return Assembly.Load( "UnityEditor" ).GetType( "UnityEditor.ProfilerWindow" );
             }
@@ -78,7 +78,7 @@ namespace TNRD.Editor.Utilities {
         /// <summary>
         /// Returns the AudioMixerWindow type to use as GetWindow's desiredDockNextTo parameter
         /// </summary>
-        public static Type AudioMixerWindow {
+        public static Type AudioMixerWindowType {
             get {
                 return Assembly.Load( "UnityEditor" ).GetType( "UnityEditor.AudioMixerWindow" );
             }

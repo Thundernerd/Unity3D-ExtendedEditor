@@ -39,6 +39,11 @@ namespace TNRD.Editor.Core {
         public Rect WindowRect = new Rect();
 
         /// <summary>
+        /// The GUIStyle for the modal window
+        /// </summary>
+        public GUIStyle WindowStyle = null;
+
+        /// <summary>
         /// The input manager
         /// </summary>
         public ExtendedInput Input { get { return Editor.Input; } }
@@ -80,6 +85,12 @@ namespace TNRD.Editor.Core {
         /// </summary>
         protected virtual void OnInitialize() {
             isInitialized = true;
+
+            if ( WindowStyle == null ) {
+                WindowStyle = new GUIStyle( GUI.skin.window );
+                WindowStyle.normal.background = Editor.SharedAssets["BackgroundNormal"];
+                WindowStyle.onNormal.background = Editor.SharedAssets["BackgroundActive"];
+            }
         }
 
         /// <summary>

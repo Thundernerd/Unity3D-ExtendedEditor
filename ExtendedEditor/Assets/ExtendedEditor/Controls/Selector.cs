@@ -5,7 +5,7 @@ using TNRD.Json;
 using UnityEngine;
 
 namespace TNRD.Editor.Controls {
-    public class SelectorControl : ExtendedControl {
+    public class Selector : ExtendedControl {
 
         [JsonIgnore]
         public List<SelectableControl> SelectedControls = new List<SelectableControl>();
@@ -16,7 +16,7 @@ namespace TNRD.Editor.Controls {
         private bool startedDrag = false;
         private bool dragControls = false;
 
-        public SelectorControl() { }
+        public Selector() { }
 
         new public Rect Rectangle {
             get {
@@ -67,9 +67,9 @@ namespace TNRD.Editor.Controls {
                 var controls = Window.GetControlsByBaseType<SelectableControl>();
 
                 var delta = Input.MouseDelta;
-                if ( Window.Settings.UseCamera ) {
-                    delta = Window.ScaleMatrix.inverse.MultiplyVector( delta );
-                }
+                //if ( Window.Settings.UseCamera ) {
+                //    delta *= Window.Camera.z;
+                //}
 
                 if ( !startedDrag && SelectedControls.Count > 0 ) {
                     for ( int i = 0; i < SelectedControls.Count; i++ ) {

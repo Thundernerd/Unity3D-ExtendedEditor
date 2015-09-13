@@ -13,11 +13,16 @@ namespace TNRD.Editor.Core {
         private Dictionary<KeyCode, State<bool>> kStates = new Dictionary<KeyCode, State<bool>>();
         private Dictionary<EMouseButton, State<bool>> mStates = new Dictionary<EMouseButton, State<bool>>();
 
-
         /// <summary>
-        /// The current mouse position in the editor/window
+        /// The current mouse position in screen coordinates
         /// </summary>
-        public Vector2 MousePosition { get; set; }
+        public Vector2 MousePosition;
+        /// <summary>
+        /// The current mouse position in world coordinates
+        /// </summary>
+        public Vector2 MouseWorldPosition {
+            get { return ExtendedWindow.ToWorldPosition( MousePosition ); }
+        }
 
         /// <summary>
         /// The current mouse delta in the editor/window (including scrollwheel delta)

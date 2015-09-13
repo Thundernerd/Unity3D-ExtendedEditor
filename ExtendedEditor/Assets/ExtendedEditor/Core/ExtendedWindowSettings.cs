@@ -29,6 +29,11 @@ namespace TNRD.Editor.Core {
         public bool AllowRepositioning = false;
 
         /// <summary>
+        /// Draw a grid in the window
+        /// </summary>
+        public bool DrawGrid = false;
+
+        /// <summary>
         /// Draw the maximize and close buttons
         /// </summary>
         public bool DrawTitleBarButtons = false;

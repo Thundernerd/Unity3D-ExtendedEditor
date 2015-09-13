@@ -1,4 +1,6 @@
 ﻿#if UNITY_EDITOR
+using System;
+using System.Collections.Generic;
 using TNRD.Json;
 using UnityEditor;
 using UnityEngine;
@@ -8,7 +10,7 @@ namespace TNRD.Editor.Core {
     /// <summary>
     /// Base class for controls that can be added to ExtendedWindows
     /// </summary>
-    public class ExtendedControl {
+    public class ExtendedControl : IComparable<ExtendedControl> {
 
         /// <summary>
         /// The window this control is added to
@@ -58,14 +60,34 @@ namespace TNRD.Editor.Core {
         public bool AllowDrop;
 
         /// <summary>
+        /// Defines where along the line of all the controls this control gets its Update and GUI calls
+        /// </summary>
+        public int ExecutionOrder {
+            get {
+                return executionOrder;
+            }
+            set {
+                executionOrder = value;
+
+                if ( Window != null ) {
+                    Window.SortControls();
+                }
+            }
+        }
+        private int executionOrder = 0;
+
+        /// <summary>
         /// The rectangle used for drawing in OnGUI
         /// </summary>
         [JsonIgnore]
         public Rect Rectangle {
             get {
-                var scaledPosition = Window.ScaleMatrix.MultiplyVector( Position + (Vector2)Window.Camera );
-                var scaledSize = Window.ScaleMatrix.MultiplyVector( Size );
-                return new Rect( scaledPosition.x, scaledPosition.y, scaledSize.x, scaledSize.y );
+                return new Rect(
+                    ExtendedWindow.ToScreenPosition( Position - new Vector2( Size.x / 2, -Size.y / 2 ) ),
+                    ExtendedWindow.ToScreenSize( Size ) );
+                //var scaledPosition = Window.ScaleMatrix.MultiplyVector( Position + (Vector2)Window.Camera );
+                //var scaledSize = Window.ScaleMatrix.MultiplyVector( Size );
+                //return new Rect( scaledPosition.x, scaledPosition.y, scaledSize.x, scaledSize.y );
             }
         }
 
@@ -243,6 +265,10 @@ namespace TNRD.Editor.Core {
             if ( Rectangle.Contains( position ) ) {
                 DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
             }
+        }
+
+        public int CompareTo( ExtendedControl other ) {
+            return executionOrder.CompareTo( other.executionOrder );
         }
         #endregion
     }

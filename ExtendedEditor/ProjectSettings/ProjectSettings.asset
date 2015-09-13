@@ -60,11 +60,23 @@ PlayerSettings:
   xboxSpeechDB: 0
   xboxEnableHeadOrientation: 0
   xboxEnableGuest: 0
+  n3dsDisableStereoscopicView: 0
+  n3dsEnableSharedListOpt: 1
+  n3dsEnableVSync: 0
   xboxOneResolution: 0
   ps3SplashScreen: {fileID: 0}
   videoMemoryForVertexBuffers: 0
   psp2PowerMode: 0
   psp2AcquireBGM: 1
+  wiiUTVResolution: 0
+  wiiUGamePadMSAA: 1
+  wiiUSupportsNunchuk: 0
+  wiiUSupportsClassicController: 0
+  wiiUSupportsBalanceBoard: 0
+  wiiUSupportsMotionPlus: 0
+  wiiUSupportsProController: 0
+  wiiUAllowScreenCapture: 1
+  wiiUControllerCount: 0
   m_SupportedAspectRatios:
     4:3: 1
     5:4: 1
@@ -77,20 +89,26 @@ PlayerSettings:
   metroEnableIndependentInputSource: 0
   metroEnableLowLatencyPresentationAPI: 0
   xboxOneDisableKinectGpuReservation: 0
+  virtualRealitySupported: 0
   productGUID: 9ef2587cb18be4343887f8513a024090
   AndroidBundleVersionCode: 1
   AndroidMinSdkVersion: 9
   AndroidPreferredInstallLocation: 1
   aotOptions: 
   apiCompatibilityLevel: 1
+  stripEngineCode: 1
   iPhoneStrippingLevel: 0
   iPhoneScriptCallOptimization: 0
+  iPhoneBuildNumber: 0
   ForceInternetPermission: 0
   ForceSDCardPermission: 0
   CreateWallpaper: 0
   APKExpansionFiles: 0
   preloadShaders: 0
   StripUnusedMeshComponents: 0
+  VertexChannelCompressionMask:
+    serializedVersion: 2
+    m_Bits: 238
   iPhoneSdkVersion: 988
   iPhoneTargetOSVersion: 22
   uIPrerenderedIcon: 0
@@ -140,6 +158,23 @@ PlayerSettings:
   m_BuildTargetGraphicsAPIs: []
   webPlayerTemplate: APPLICATION:Default
   m_TemplateCustomTags: {}
+  wiiUTitleID: 0005000011000000
+  wiiUGroupID: 00010000
+  wiiUCommonSaveSize: 4096
+  wiiUAccountSaveSize: 2048
+  wiiUOlvAccessKey: 0
+  wiiUTinCode: 0
+  wiiUJoinGameId: 0
+  wiiUJoinGameModeMask: 0000000000000000
+  wiiUCommonBossSize: 0
+  wiiUAccountBossSize: 0
+  wiiUAddOnUniqueIDs: []
+  wiiUMainThreadStackSize: 3072
+  wiiULoaderThreadStackSize: 1024
+  wiiUSystemHeapSize: 128
+  wiiUTVStartupScreen: {fileID: 0}
+  wiiUGamePadStartupScreen: {fileID: 0}
+  wiiUProfilerLibPath: 
   actionOnDotNetUnhandledException: 1
   enableInternalProfiler: 0
   logObjCUncaughtExceptions: 1
@@ -190,15 +225,18 @@ PlayerSettings:
   ps4BackgroundImagePath: 
   ps4StartupImagePath: 
   ps4SaveDataImagePath: 
+  ps4SdkOverride: 
   ps4BGMPath: 
   ps4ShareFilePath: 
   ps4NPtitleDatPath: 
   ps4RemotePlayKeyAssignment: -1
+  ps4RemotePlayKeyMappingDir: 
   ps4EnterButtonAssignment: 1
   ps4ApplicationParam1: 0
   ps4ApplicationParam2: 0
   ps4ApplicationParam3: 0
   ps4ApplicationParam4: 0
+  ps4DownloadDataSize: 0
   ps4GarlicHeapSize: 2048
   ps4Passcode: frAQBc8Wsa1xVPfvJcrgRYwTiizs2trQ
   ps4pnSessions: 1
@@ -206,6 +244,11 @@ PlayerSettings:
   ps4pnFriends: 1
   ps4pnGameCustomData: 1
   playerPrefsSupport: 0
+  ps4ReprojectionSupport: 0
+  ps4attribUserManagement: 0
+  ps4attribMoveSupport: 0
+  ps4attrib3DSupport: 0
+  ps4attribShareSupport: 0
   monoEnv: 
   psp2Splashimage: {fileID: 0}
   psp2NPTrophyPackPath: 
@@ -254,7 +297,6 @@ PlayerSettings:
   psp2InfoBarOnStartup: 0
   psp2InfoBarColor: 0
   psmSplashimage: {fileID: 0}
-  virtualRealitySupported: 0
   spritePackerPolicy: 
   scriptingDefineSymbols: {}
   metroPackageName: ExtendedEditor
@@ -346,6 +388,17 @@ PlayerSettings:
   tizenSigningProfileName: 
   tizenGPSPermissions: 0
   tizenMicrophonePermissions: 0
+  n3dsUseExtSaveData: 0
+  n3dsCompressStaticMem: 1
+  n3dsExtSaveDataNumber: 0x12345
+  n3dsStackSize: 131072
+  n3dsTargetPlatform: 2
+  n3dsRegion: 7
+  n3dsMediaSize: 0
+  n3dsLogoStyle: 3
+  n3dsTitle: GameName
+  n3dsProductCode: 
+  n3dsApplicationId: 0xFF3FF
   stvDeviceAddress: 
   stvProductDescription: 
   stvProductAuthor: 
@@ -371,37 +424,182 @@ PlayerSettings:
   XboxOneAllowedProductIds: []
   XboxOnePersistentLocalStorageSize: 0
   intPropertyNames:
+  - Android::ScriptingBackend
   - Metro::ScriptingBackend
+  - Standalone::ScriptingBackend
   - WP8::ScriptingBackend
   - WebGL::ScriptingBackend
   - WebGL::audioCompressionFormat
   - WebGL::exceptionSupport
   - WebGL::memorySize
+  - XboxOne::CERO (Japan)
+  - XboxOne::COB-AU (Australia)
+  - XboxOne::CSRR (Taiwan)
+  - XboxOne::DJCTQ (Brazil)
+  - XboxOne::ESRB (US)
+  - XboxOne::FPB (South Africa)
+  - XboxOne::GRB (South Korea)
+  - XboxOne::MDA (Singapore)
+  - XboxOne::Microsoft
+  - XboxOne::OFLC-NZ (New Zealand)
+  - XboxOne::PCBP (Russia)
+  - XboxOne::PEGI (Europe)
+  - XboxOne::ScriptingBackend
+  - XboxOne::USK (Germany)
   - iOS::Architecture
   - iOS::ScriptingBackend
+  Android::ScriptingBackend: 0
   Metro::ScriptingBackend: 2
+  Standalone::ScriptingBackend: 0
   WP8::ScriptingBackend: 2
   WebGL::ScriptingBackend: 1
   WebGL::audioCompressionFormat: 4
   WebGL::exceptionSupport: 0
   WebGL::memorySize: 256
+  XboxOne::CERO (Japan): 0
+  XboxOne::COB-AU (Australia): 0
+  XboxOne::CSRR (Taiwan): 0
+  XboxOne::DJCTQ (Brazil): 0
+  XboxOne::ESRB (US): 0
+  XboxOne::FPB (South Africa): 0
+  XboxOne::GRB (South Korea): 0
+  XboxOne::MDA (Singapore): 0
+  XboxOne::Microsoft: 0
+  XboxOne::OFLC-NZ (New Zealand): 0
+  XboxOne::PCBP (Russia): 0
+  XboxOne::PEGI (Europe): 0
+  XboxOne::ScriptingBackend: 0
+  XboxOne::USK (Germany): 0
   iOS::Architecture: 2
   iOS::ScriptingBackend: 0
   boolPropertyNames:
   - WebGL::analyzeBuildSize
   - WebGL::dataCaching
+  - WebGL::useEmbeddedResources
+  - XboxOne::ContentRestrictions
+  - XboxOne::DocumentsLibrary
+  - XboxOne::InternetClientServer
+  - XboxOne::KinectAudio
+  - XboxOne::KinectExpressions
+  - XboxOne::KinectFace
+  - XboxOne::KinectGamechat
+  - XboxOne::KinectRequired
+  - XboxOne::KinectVision
+  - XboxOne::PrivateNetworkClientServer
+  - XboxOne::dadk
+  - XboxOne::deat
+  - XboxOne::dech
+  - XboxOne::dede
+  - XboxOne::enae
+  - XboxOne::enau
+  - XboxOne::enca
+  - XboxOne::encz
+  - XboxOne::engb
+  - XboxOne::engr
+  - XboxOne::enhk
+  - XboxOne::enhu
+  - XboxOne::enie
+  - XboxOne::enil
+  - XboxOne::enin
+  - XboxOne::ennz
+  - XboxOne::ensa
+  - XboxOne::ensg
+  - XboxOne::ensk
   - XboxOne::enus
+  - XboxOne::enza
+  - XboxOne::escl
+  - XboxOne::esco
+  - XboxOne::eses
+  - XboxOne::esmx
+  - XboxOne::fifi
+  - XboxOne::frbe
+  - XboxOne::frca
+  - XboxOne::frch
+  - XboxOne::frfr
+  - XboxOne::itit
+  - XboxOne::jajp
+  - XboxOne::kokr
+  - XboxOne::nbno
+  - XboxOne::nlbe
+  - XboxOne::nlnl
+  - XboxOne::plpl
+  - XboxOne::ptbr
+  - XboxOne::ptpt
+  - XboxOne::ruru
+  - XboxOne::svse
+  - XboxOne::trtr
+  - XboxOne::zhcn
+  - XboxOne::zhhk
+  - XboxOne::zhsg
+  - XboxOne::zhtw
   WebGL::analyzeBuildSize: 0
   WebGL::dataCaching: 0
+  WebGL::useEmbeddedResources: 0
+  XboxOne::ContentRestrictions: 0
+  XboxOne::DocumentsLibrary: 0
+  XboxOne::InternetClientServer: 0
+  XboxOne::KinectAudio: 0
+  XboxOne::KinectExpressions: 0
+  XboxOne::KinectFace: 0
+  XboxOne::KinectGamechat: 0
+  XboxOne::KinectRequired: 0
+  XboxOne::KinectVision: 0
+  XboxOne::PrivateNetworkClientServer: 0
+  XboxOne::dadk: 0
+  XboxOne::deat: 0
+  XboxOne::dech: 0
+  XboxOne::dede: 0
+  XboxOne::enae: 0
+  XboxOne::enau: 0
+  XboxOne::enca: 0
+  XboxOne::encz: 0
+  XboxOne::engb: 0
+  XboxOne::engr: 0
+  XboxOne::enhk: 0
+  XboxOne::enhu: 0
+  XboxOne::enie: 0
+  XboxOne::enil: 0
+  XboxOne::enin: 0
+  XboxOne::ennz: 0
+  XboxOne::ensa: 0
+  XboxOne::ensg: 0
+  XboxOne::ensk: 0
   XboxOne::enus: 1
+  XboxOne::enza: 0
+  XboxOne::escl: 0
+  XboxOne::esco: 0
+  XboxOne::eses: 0
+  XboxOne::esmx: 0
+  XboxOne::fifi: 0
+  XboxOne::frbe: 0
+  XboxOne::frca: 0
+  XboxOne::frch: 0
+  XboxOne::frfr: 0
+  XboxOne::itit: 0
+  XboxOne::jajp: 0
+  XboxOne::kokr: 0
+  XboxOne::nbno: 0
+  XboxOne::nlbe: 0
+  XboxOne::nlnl: 0
+  XboxOne::plpl: 0
+  XboxOne::ptbr: 0
+  XboxOne::ptpt: 0
+  XboxOne::ruru: 0
+  XboxOne::svse: 0
+  XboxOne::trtr: 0
+  XboxOne::zhcn: 0
+  XboxOne::zhhk: 0
+  XboxOne::zhsg: 0
+  XboxOne::zhtw: 0
   stringPropertyNames:
   - WebGL::emscriptenArgs
   - WebGL::template
+  - additionalIl2CppArgs::additionalIl2CppArgs
   WebGL::emscriptenArgs: 
   WebGL::template: APPLICATION:Default
+  additionalIl2CppArgs::additionalIl2CppArgs: 
   firstStreamedSceneWithResources: 0
   cloudProjectId: 
-  projectId: 
   projectName: 
   organizationId: 
   cloudEnabled: 0

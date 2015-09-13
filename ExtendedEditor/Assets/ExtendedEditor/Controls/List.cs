@@ -6,7 +6,7 @@ using UnityEditor;
 using UnityEngine;
 
 namespace TNRD.Editor.Controls {
-    public class ListControl : ExtendedControl {
+    public class List : ExtendedControl {
 
         public class ListEventArgs : EventArgs {
 
@@ -26,7 +26,9 @@ namespace TNRD.Editor.Controls {
 
         new public Rect Rectangle {
             get {
-                return new Rect( Position.x, Position.y, Size.x, Size.y );
+                return new Rect(
+                    ExtendedWindow.ToScreenPosition( Position ),
+                    ExtendedWindow.ToScreenSize( Size ) );
             }
         }
 
@@ -43,8 +45,8 @@ namespace TNRD.Editor.Controls {
         private Color highlightColor = new Color( 0.243f, 0.372f, 0.588f );
         private Color alternateColor = new Color( 0.267f, 0.267f, 0.267f, 0.75f );
 
-        private ListControl() { }
-        public ListControl( Vector2 position, Vector2 size, string[] items, bool scrollable = true, bool searchable = false ) {
+        private List() { }
+        public List( Vector2 position, Vector2 size, string[] items, bool scrollable = true, bool searchable = false ) {
             Position = position;
             Size = size;
             this.items = items;
@@ -52,8 +54,11 @@ namespace TNRD.Editor.Controls {
             this.searchable = searchable;
         }
 
-        public ListControl( string[] items ) : this( items, true ) { }
-        public ListControl( string[] items, bool scrollable ) {
+        public List( string[] items ) : this( items, true ) {
+            Position = ExtendedWindow.ToWorldPosition( new Vector2( 0, 0 ) );
+            Size = ExtendedWindow.GetScreenInWorldSize();
+        }
+        public List( string[] items, bool scrollable ) {
             this.items = items;
             this.scrollable = scrollable;
         }
@@ -95,6 +100,7 @@ namespace TNRD.Editor.Controls {
                 if ( h > viewRect.height ) {
                     viewRect.height = h;
                     viewRect.width -= 15f;
+                    listRect.height -= 17.5f;
                 }
 
                 if ( searchable ) {
@@ -111,7 +117,6 @@ namespace TNRD.Editor.Controls {
                     GUIUtility.keyboardControl = 0;
                 }
             }
-
             scrollPosition = GUI.BeginScrollView( listRect, scrollPosition, viewRect, false, false );
 
             for ( int i = 0; i < itemsToProcess.Count; i++ ) {

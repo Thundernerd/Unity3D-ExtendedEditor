@@ -56,7 +56,7 @@ public class NoteControl : ExtendedControl {
     public override void OnInitialize() {
         base.OnInitialize();
 
-        Position.Set( 10, 10 );
+        Position.Set( 0.1f, 0.1f );
 
         cross = Window.Assets["Cross"];
         downArrow = Window.Assets["DownArrow"];
@@ -197,7 +197,7 @@ public class NoteControl : ExtendedControl {
         var textHeight = textStyle.CalcHeight( new GUIContent( Text ), textWidth );
         var boxHeight = textHeight + 40;
 
-        Size.Set( boxWidth, boxHeight );
+        Size = ExtendedWindow.ToWorldSize( new Vector2( boxWidth, boxHeight ) );
         textSize.Set( textWidth, textHeight );
     }
 
