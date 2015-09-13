@@ -475,6 +475,19 @@ namespace TNRD.Editor.Core {
             GUI.Box( rect, label, ExtendedEditor.BoxStyle );
         }
 
+        /// <summary>
+        /// Draws a box like GUI.box but without transparency and a custom color
+        /// </summary>
+        /// <param name="rect">The rectangle to draw the box at</param>
+        /// <param name="label">The label for the box</param>
+        /// <param name="color">The color to draw the box with</param>
+        public static void Box( Rect rect, string label, Color color ) {
+            var c = GUI.backgroundColor;
+            GUI.backgroundColor = color;
+            GUI.Box( rect, label, ExtendedEditor.BoxStyle );
+            GUI.backgroundColor = c;
+        }
+
         #region Dropdown extras
         private static int dropdownHash = "btrDropDown".GetHashCode();
 

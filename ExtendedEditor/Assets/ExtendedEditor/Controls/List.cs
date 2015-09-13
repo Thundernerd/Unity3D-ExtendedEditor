@@ -52,7 +52,10 @@ namespace TNRD.Editor.Controls {
             this.searchable = searchable;
         }
 
-        public List( string[] items ) : this( items, true ) { }
+        public List( string[] items ) : this( items, true ) {
+            Position = ExtendedWindow.ToWorldPosition( new Vector2( 0, 0 ) );
+            Size = ExtendedWindow.GetScreenInWorldSize();
+        }
         public List( string[] items, bool scrollable ) {
             this.items = items;
             this.scrollable = scrollable;

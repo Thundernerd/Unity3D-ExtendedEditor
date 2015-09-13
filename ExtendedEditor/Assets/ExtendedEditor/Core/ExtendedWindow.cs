@@ -70,6 +70,15 @@ namespace TNRD.Editor.Core {
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public static Vector2 GetScreenInWorldSize() {
+            if ( currentWindow == null ) return new Vector2();
+            return currentWindow.Size / 100 / currentWindow.Camera.z;
+        }
+
+        /// <summary>
         /// The asset manager for this window
         /// </summary>
         [JsonProperty]
