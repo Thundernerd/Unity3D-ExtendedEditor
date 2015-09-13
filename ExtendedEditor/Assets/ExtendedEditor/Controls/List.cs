@@ -26,7 +26,9 @@ namespace TNRD.Editor.Controls {
 
         new public Rect Rectangle {
             get {
-                return new Rect( Position.x, Position.y, Size.x, Size.y );
+                return new Rect(
+                    ExtendedWindow.ToScreenPosition( Position ),
+                    ExtendedWindow.ToScreenSize( Size ) );
             }
         }
 
@@ -98,6 +100,7 @@ namespace TNRD.Editor.Controls {
                 if ( h > viewRect.height ) {
                     viewRect.height = h;
                     viewRect.width -= 15f;
+                    listRect.height -= 17.5f;
                 }
 
                 if ( searchable ) {
@@ -114,7 +117,6 @@ namespace TNRD.Editor.Controls {
                     GUIUtility.keyboardControl = 0;
                 }
             }
-
             scrollPosition = GUI.BeginScrollView( listRect, scrollPosition, viewRect, false, false );
 
             for ( int i = 0; i < itemsToProcess.Count; i++ ) {
