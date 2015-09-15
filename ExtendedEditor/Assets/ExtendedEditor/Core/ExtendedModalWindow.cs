@@ -87,9 +87,7 @@ namespace TNRD.Editor.Core {
             isInitialized = true;
 
             if ( WindowStyle == null ) {
-                WindowStyle = new GUIStyle( GUI.skin.window );
-                WindowStyle.normal.background = Editor.SharedAssets["BackgroundNormal"];
-                WindowStyle.onNormal.background = Editor.SharedAssets["BackgroundActive"];
+                WindowStyle = ExtendedGUI.DefaultWindowStyle;
             }
         }
 

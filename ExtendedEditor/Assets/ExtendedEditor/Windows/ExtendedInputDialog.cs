@@ -1,5 +1,6 @@
 ﻿#if UNITY_EDITOR
 using TNRD.Editor.Core;
+using UnityEditor;
 using UnityEngine;
 
 namespace TNRD.Editor.Windows {
@@ -58,8 +59,10 @@ namespace TNRD.Editor.Windows {
 
             GUI.Label( new Rect( 20, 35, WindowRect.width - 40, 20 ), message );
 
+            GUI.SetNextControlName( "eidTextField" );
             var rect = new Rect( 20, 55, WindowRect.width - 40, 20 );
             InputText = GUI.TextField( rect, InputText );
+            GUI.FocusControl( "eidTextField" );
         }
     }
 }

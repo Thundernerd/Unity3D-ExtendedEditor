@@ -18,6 +18,11 @@ namespace TNRD.Editor.Controls {
 
         public Selector() { }
 
+        public override void OnInitialize() {
+            base.OnInitialize();
+            ExecutionOrder = int.MaxValue - 1000; // Really really high :D
+        }
+
         new public Rect Rectangle {
             get {
                 return new Rect( Position.x, Position.y, Size.x, Size.y );
@@ -130,7 +135,7 @@ namespace TNRD.Editor.Controls {
                             item.OnDeselect();
                         }
                         SelectedControls.Clear();
-                        
+
                         foreach ( var item in controls ) {
                             if ( item.Contains( Input.MousePosition ) ) {
                                 item.OnSelect();

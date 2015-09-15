@@ -78,6 +78,24 @@ namespace TNRD.Editor.Core {
             return currentWindow.Size / 100 / currentWindow.Camera.z;
         }
 
+        /// <summary>
+        /// Makes sure that the given position is at the center of the window
+        /// </summary>
+        /// <param name="position">The position to center on</param>
+        public void LookAt( Vector2 position ) {
+            var newCameraPosition = position * 100;
+            Camera.x = newCameraPosition.x;
+            Camera.y = newCameraPosition.y;
+        }
+
+        /// <summary>
+        /// Makes sure that the given control is at the center of the window
+        /// </summary>
+        /// <param name="control">The control to center on</param>
+        public void LookAt( ExtendedControl control ) {
+            LookAt( control.Position );
+        }
+
         private struct KeyboardShortcut {
             public KeyCode Key;
             public Action Callback;
