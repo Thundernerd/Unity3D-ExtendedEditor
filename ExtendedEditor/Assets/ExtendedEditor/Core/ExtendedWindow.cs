@@ -472,17 +472,22 @@ namespace TNRD.Editor.Core {
             Input.OnGUI( e );
 
             if ( WindowRect.Contains( e.mousePosition ) ) {
+                var pos = e.mousePosition;
+                if ( Settings.DrawToolbar ) {
+                    pos.y -= 18f;
+                }
+
                 switch ( e.type ) {
                     case EventType.ContextClick:
-                        OnContextClick( e.mousePosition );
+                        OnContextClick( pos );
                         break;
                     case EventType.DragPerform:
-                        OnDragPerform( DragAndDrop.paths, e.mousePosition );
+                        OnDragPerform( DragAndDrop.paths, pos );
                         DragAndDrop.visualMode = DragAndDropVisualMode.None;
                         break;
                     case EventType.DragUpdated:
                         DragAndDrop.visualMode = DragAndDropVisualMode.None;
-                        OnDragUpdate( DragAndDrop.paths, e.mousePosition );
+                        OnDragUpdate( DragAndDrop.paths, pos );
                         break;
                 }
             }
@@ -841,10 +846,6 @@ namespace TNRD.Editor.Core {
         /// <param name="position">The location of the right-mouse click</param>
         /// <param name="used">-</param>
         public virtual void OnContextClick( Vector2 position, ref bool used ) {
-            if ( Settings.DrawToolbar ) {
-                position.y -= 17.5f;
-            }
-
             for ( int i = controlsToProcess.Count - 1; i >= 0; i-- ) {
                 controlsToProcess[i].OnContextClick( position, ref used );
             }
@@ -893,6 +894,10 @@ namespace TNRD.Editor.Core {
         /// <param name="text">The text to display on the notification</param>
         public void ShowNotification( string text ) {
             ShowNotification( text, Color.white, 1.25f );
+        }
+
+        public void ShowErrorNotification( string text ) {
+            ShowNotification( text, Color.red, 2f );
         }
 
         /// <summary>
