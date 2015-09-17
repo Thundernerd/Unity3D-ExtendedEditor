@@ -733,6 +733,7 @@ namespace TNRD.Editor.Core {
         /// </summary>
         /// <param name="control">The control to remove</param>
         public virtual void RemoveControl( ExtendedControl control ) {
+            if ( controlsToRemove.Contains( control ) ) return;
             controlsToRemove.Add( control );
         }
 
@@ -896,6 +897,10 @@ namespace TNRD.Editor.Core {
             ShowNotification( text, Color.white, 1.25f );
         }
 
+        /// <summary>
+        /// Shows a notification a the bottom-right corner of the window in red text and stays a bit longer than a normal notification
+        /// </summary>
+        /// <param name="text">The text to display on the notification</param>
         public void ShowErrorNotification( string text ) {
             ShowNotification( text, Color.red, 2f );
         }

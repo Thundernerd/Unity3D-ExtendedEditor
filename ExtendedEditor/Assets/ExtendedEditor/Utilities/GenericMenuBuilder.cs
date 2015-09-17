@@ -47,10 +47,23 @@ public class GenericMenuBuilder {
     /// </summary>
     /// <param name="content">The content to display</param>
     /// <param name="showTick">Should the item show a check in front of it</param>
-    /// <param name="func">The function to call when this item is clicked</param>
-    public GenericMenuBuilder AddItem( string content, bool showTick, GenericMenu.MenuFunction func ) {
-        Menu.AddItem( new GUIContent( content ), showTick, func );
-        return this;
+    /// <param name="enabled">Should the item be enabled or disabled</param>
+    public GenericMenuBuilder AddItem( string content, bool showTick, bool enabled = true ) {
+        return enabled
+            ? AddItem( content, showTick, null, enabled )
+            : AddDisabledItem( content );
+    }
+
+    /// <summary>
+    /// Adds an item to the menu
+    /// </summary>
+    /// <param name="content">The content to display</param>
+    /// <param name="showTick">Should the item show a check in front of it</param>
+    /// <param name="enabled">Should the item be enabled or disabled</param>
+    public GenericMenuBuilder AddItem( GUIContent content, bool showTick, bool enabled = true ) {
+        return enabled
+            ? AddItem( content, showTick, null, enabled )
+            : AddDisabledItem( content );
     }
 
     /// <summary>
@@ -59,9 +72,27 @@ public class GenericMenuBuilder {
     /// <param name="content">The content to display</param>
     /// <param name="showTick">Should the item show a check in front of it</param>
     /// <param name="func">The function to call when this item is clicked</param>
-    public GenericMenuBuilder AddItem( GUIContent content, bool showTick, GenericMenu.MenuFunction func ) {
-        Menu.AddItem( content, showTick, func );
-        return this;
+    /// <param name="enabled">Should the item be enabled or disabled</param>
+    public GenericMenuBuilder AddItem( string content, bool showTick, GenericMenu.MenuFunction func, bool enabled = true ) {
+        return enabled
+            ? AddItem( new GUIContent( content ), showTick, func, enabled )
+            : AddDisabledItem( content );
+    }
+
+    /// <summary>
+    /// Adds an item to the menu
+    /// </summary>
+    /// <param name="content">The content to display</param>
+    /// <param name="showTick">Should the item show a check in front of it</param>
+    /// <param name="func">The function to call when this item is clicked</param>
+    /// <param name="enabled">Should the item be enabled or disabled</param>
+    public GenericMenuBuilder AddItem( GUIContent content, bool showTick, GenericMenu.MenuFunction func, bool enabled = true ) {
+        if ( enabled ) {
+            Menu.AddItem( content, showTick, func );
+            return this;
+        } else {
+            return AddDisabledItem( content );
+        }
     }
 
     /// <summary>
@@ -71,9 +102,11 @@ public class GenericMenuBuilder {
     /// <param name="showTick">Should the item show a check in front of it</param>
     /// <param name="func">The function to call when this item is clicked</param>
     /// <param name="data">The data to pass to the function</param>
-    public GenericMenuBuilder AddItem( string content, bool showTick, GenericMenu.MenuFunction2 func, object data ) {
-        Menu.AddItem( new GUIContent( content ), showTick, func, data );
-        return this;
+    /// <param name="enabled">Should the item be enabled or disabled</param>
+    public GenericMenuBuilder AddItem( string content, bool showTick, GenericMenu.MenuFunction2 func, object data, bool enabled = true ) {
+        return enabled
+            ? AddItem( new GUIContent( content ), showTick, func, data )
+            : AddDisabledItem( content );
     }
 
     /// <summary>
@@ -82,10 +115,15 @@ public class GenericMenuBuilder {
     /// <param name="content">The content to display</param>
     /// <param name="showTick">Should the item show a check in front of it</param>
     /// <param name="func">The function to call when this item is clicked</param>
-    /// /// <param name="data">The data to pass to the function</param>
-    public GenericMenuBuilder AddItem( GUIContent content, bool showTick, GenericMenu.MenuFunction2 func, object data ) {
-        Menu.AddItem( content, showTick, func, data );
-        return this;
+    /// <param name="data">The data to pass to the function</param>
+    /// <param name="enabled">Should the item be enabled or disabled</param>
+    public GenericMenuBuilder AddItem( GUIContent content, bool showTick, GenericMenu.MenuFunction2 func, object data, bool enabled = true ) {
+        if ( enabled ) {
+            Menu.AddItem( content, showTick, func, data );
+            return this;
+        } else {
+            return AddDisabledItem( content );
+        }
     }
 
     /// <summary>
