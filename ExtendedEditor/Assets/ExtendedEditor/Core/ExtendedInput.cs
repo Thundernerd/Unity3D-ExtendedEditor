@@ -188,11 +188,11 @@ namespace TNRD.Editor.Core {
         }
 
         private bool PreMouseCheck() {
-            return Type != EventType.Used || Type != EventType.Ignore || Type == EventType.MouseDown || Type == EventType.MouseUp || Type == EventType.MouseMove || Type == EventType.MouseDrag;
+            return ( Type != EventType.Used && Type != EventType.Ignore ) && ( Type == EventType.MouseDown || Type == EventType.MouseUp || Type == EventType.MouseMove || Type == EventType.MouseDrag );
         }
 
         private bool PreKeyCheck() {
-            return Type != EventType.Used || Type != EventType.Ignore || Type == EventType.KeyDown || Type == EventType.KeyUp;
+            return ( Type != EventType.Used && Type != EventType.Ignore ) && ( Type == EventType.KeyDown || Type == EventType.KeyUp );
         }
 
         /// <summary>
