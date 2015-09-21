@@ -142,6 +142,19 @@ namespace TNRD.Editor.Core {
             }
         }
 
+        public static Texture2D FromPath( string path ) {
+            if ( !File.Exists( path ) ) return null;
+
+            var tex = new Texture2D( 1, 1 );
+            tex.hideFlags = HideFlags.HideAndDontSave;
+
+            var bytes = File.ReadAllBytes( path );
+            tex.LoadImage( bytes );
+
+            return tex;
+        }
+
+
         /// <summary>
         /// Converts a base 64 string into a texture
         /// </summary>

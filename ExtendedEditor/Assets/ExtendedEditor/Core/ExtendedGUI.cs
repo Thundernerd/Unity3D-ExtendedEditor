@@ -351,6 +351,10 @@ namespace TNRD.Editor.Core {
             GUILayout.Label( content, toolbarButtonStyle );
         }
 
+        public static bool ToolbarToggle( bool value, string label ) {
+            return GUILayout.Toggle( value, label, toolbarButtonStyle, new GUILayoutOption[0] );
+        }
+
         /// <summary>
         /// Adds a popup list in toolbar style
         /// </summary>

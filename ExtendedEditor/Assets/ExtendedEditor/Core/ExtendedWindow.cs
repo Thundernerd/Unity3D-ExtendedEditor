@@ -426,8 +426,10 @@ namespace TNRD.Editor.Core {
                 }
             }
 
-            if ( controlsToRemove.Count > 0 ) {
-                foreach ( var control in controlsToRemove ) {
+            var ctr = new List<ExtendedControl>( controlsToRemove );
+            controlsToRemove.Clear();
+            if ( ctr.Count > 0 ) {
+                foreach ( var control in ctr ) {
                     if ( control.IsInitialized ) {
                         control.OnDestroy();
                     }
