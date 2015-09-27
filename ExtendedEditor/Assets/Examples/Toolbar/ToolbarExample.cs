@@ -19,8 +19,6 @@ public class ToolbarExample : ExtendedEditor {
     private class ToolWindow : ExtendedWindow {
 
         private enum TempEnum {
-            Hello,
-            World,
             Enum,
             Extended,
             Editor
@@ -29,8 +27,6 @@ public class ToolbarExample : ExtendedEditor {
         private TempEnum tempEnum;
         private int popupIndex = 0;
         private string[] popupItems = {
-            "Hello",
-            "World",
             "Popup",
             "Extended",
             "Editor"
@@ -47,14 +43,14 @@ public class ToolbarExample : ExtendedEditor {
         public override void OnToolbarGUI() {
             base.OnToolbarGUI();
 
-            if ( ExtendedGUI.ToolbarButton( "HelloButton" ) ) { }
-            if ( ExtendedGUI.ToolbarDropDown( "HelloDropdown" ) ) { }
+            if ( ExtendedGUI.ToolbarButton( "Button" ) ) { }
+            if ( ExtendedGUI.ToolbarDropDown( "Dropdown" ) ) { }
             tempEnum = (TempEnum)ExtendedGUI.ToolbarEnumPopup( tempEnum );
-            ExtendedGUI.ToolbarLabel( "HelloLabel" );
+            ExtendedGUI.ToolbarLabel( "Label" );
             popupIndex = ExtendedGUI.ToolbarPopup( popupIndex, popupItems );
-            ExtendedGUI.ToolbarSearchField( "HelloSearchField" );
-            ExtendedGUI.ToolbarTextField( "HelloTextField" );
-            toggle = ExtendedGUI.ToolbarToggle( toggle, "HelloToggle" );
+            ExtendedGUI.ToolbarSearchField( "SearchField" );
+            ExtendedGUI.ToolbarTextField( "TextField" );
+            toggle = ExtendedGUI.ToolbarToggle( toggle, "Toggle" );
         }
     }
 }
