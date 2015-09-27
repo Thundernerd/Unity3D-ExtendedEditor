@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+	<html lang="en" class="no-js">
+	    <head>
+	        <title>Extended Editor Documentation</title>
+	        <meta name="msapplication-TileColor" content="#222c37" />
+	        <script type="text/javascript" src="js/jquery.js"></script>
+	        <script type="text/javascript" src="js/toc.js"></script>
+	        <script type="text/javascript" src="js/core.js"></script>
+	        <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,700,400italic" rel="stylesheet" type="text/css" />
+	        <link rel="stylesheet" type="text/css" href="css/core.css" />
+	    </head>
+	    <body>
+	        <div class="header-wrapper">
+	            <div id="header" class="header">
+	                <div class="content">
+	                    <div class="more">
+	                    </div>
+	                </div>
+	            </div>
+	            <div class="toolbar">
+	                <div class="content clear"></div>
+	            </div>
+	        </div>
+	        <div id="master-wrapper" class="master-wrapper clear">
+	            <div id="sidebar" class="sidebar">
+	                <div class="sidebar-wrap">
+	                    <div class="content">
+	                        <div class="sidebar-menu">
+	                            <div class="toc">
+	                                <h2>Scripting API</h2>
+	                            </div>
+	                        </div>
+	                        <p>
+	                            <br/>
+	                        </p>
+	                    </div>
+	                </div>
+	            </div>
+	            <div id="content-wrap" class="content-wrap">
+	                <div class="content-block">
+						<div class="content"><div class="section">
+					<div class="mb20 clear" id="">
+						<h1 class="heading inherit">
+						<a href="TNRD.Editor.Core.ExtendedEditor">ExtendedEditor</a>.DestroyAsset</h1>
+						<div class="clear"></div>
+						<div class="clear"></div>
+						<div class="clear"></div>
+					</div><div class="subsection">
+					<div class="signature"><div class="signature-CS sig-block">
+						public void <span class="sig-kw">DestroyAsset</span>(UnityEngine.Object <span class="sig-kw">obj</span>);
+					</div><div class="signature-CS sig-block">
+						public void <span class="sig-kw">DestroyAsset</span>(string <span class="sig-kw">name</span>);
+					</div><div class="signature-CS sig-block">
+						public void <span class="sig-kw">DestroyAsset</span>(<span class="sig-kw">names</span>);
+					</div><div class="signature-CS sig-block">
+						public void <span class="sig-kw">DestroyAsset</span>(UnityEngine.Object <span class="sig-kw">obj</span>, bool <span class="sig-kw">allowDestroyingAssets</span>);
+					</div>	</div>
+				</div><div class="subsection">
+					<h2>Parameters</h2>
+					<table class="list">
+						<tbody><tr>
+						<td class="name lbl">obj</td>
+						<td class="desc">The asset to destroy</td>
+					</tr><tr>
+						<td class="name lbl">name</td>
+						<td class="desc">The name of the asset to destroy</td>
+					</tr><tr>
+						<td class="name lbl">names</td>
+						<td class="desc">The names of the assets to destroy</td>
+					</tr><tr>
+						<td class="name lbl">allowDestroyingAssets</td>
+						<td class="desc">True means allowing an asset to be deleted from disk</td>
+					</tr>		</tbody>
+					</table>
+				</div><div class="subsection">
+							<h2>Description</h2>
+							<p>Destroys the given asset</p>
+						</div><hr class="section">
+<div class="subsection">
+					<div class="signature"><div class="signature-CS sig-block">
+						public void <span class="sig-kw">DestroyAsset</span>(UnityEngine.Object <span class="sig-kw">obj</span>);
+					</div>	</div>
+				</div><div class="subsection">
+					<h2>Parameters</h2>
+					<table class="list">
+						<tbody><tr>
+						<td class="name lbl">obj</td>
+						<td class="desc">The asset to destroy</td>
+					</tr>		</tbody>
+						</table>
+					</div><div class="subsection">
+							<h2>Description</h2>
+							<p>Destroys the given asset</p>
+						</div><hr class="section">
+<div class="subsection">
+					<div class="signature"><div class="signature-CS sig-block">
+						public void <span class="sig-kw">DestroyAsset</span>(string <span class="sig-kw">name</span>);
+					</div>	</div>
+				</div><div class="subsection">
+					<h2>Parameters</h2>
+					<table class="list">
+						<tbody><tr>
+						<td class="name lbl">name</td>
+						<td class="desc">The name of the asset to destroy</td>
+					</tr>		</tbody>
+						</table>
+					</div><div class="subsection">
+							<h2>Description</h2>
+							<p>Looks for the asset by name and then destroys the first occurence</p>
+						</div><hr class="section">
+<div class="subsection">
+					<div class="signature"><div class="signature-CS sig-block">
+						public void <span class="sig-kw">DestroyAsset</span>(<span class="sig-kw">names</span>);
+					</div>	</div>
+				</div><div class="subsection">
+					<h2>Parameters</h2>
+					<table class="list">
+						<tbody><tr>
+						<td class="name lbl">names</td>
+						<td class="desc">The names of the assets to destroy</td>
+					</tr>		</tbody>
+						</table>
+					</div><div class="subsection">
+							<h2>Description</h2>
+							<p>Looks for assets with the given names and then destroys the first instances of them</p>
+						</div><hr class="section">
+<div class="subsection">
+					<div class="signature"><div class="signature-CS sig-block">
+						public void <span class="sig-kw">DestroyAsset</span>(UnityEngine.Object <span class="sig-kw">obj</span>, bool <span class="sig-kw">allowDestroyingAssets</span>);
+					</div>	</div>
+				</div><div class="subsection">
+					<h2>Parameters</h2>
+					<table class="list">
+						<tbody><tr>
+						<td class="name lbl">obj</td>
+						<td class="desc">The asset to destroy</td>
+					</tr><tr>
+						<td class="name lbl">allowDestroyingAssets</td>
+						<td class="desc">True means allowing an asset to be deleted from disk</td>
+					</tr>		</tbody>
+						</table>
+					</div><div class="subsection">
+							<h2>Description</h2>
+							<p>Destroys the given asset</p>
+						</div>                </div>
+	                <div class="footer-wrapper">
+	                    <div class="footer clear"></div>
+	                </div>
+	            </div>
+				</div>
+	        </div>
+	    </div>
+	</div>
+	</body>
+	</html>

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+	<html lang="en" class="no-js">
+	    <head>
+	        <title>Extended Editor Documentation</title>
+	        <meta name="msapplication-TileColor" content="#222c37" />
+	        <script type="text/javascript" src="js/jquery.js"></script>
+	        <script type="text/javascript" src="js/toc.js"></script>
+	        <script type="text/javascript" src="js/core.js"></script>
+	        <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,700,400italic" rel="stylesheet" type="text/css" />
+	        <link rel="stylesheet" type="text/css" href="css/core.css" />
+	    </head>
+	    <body>
+	        <div class="header-wrapper">
+	            <div id="header" class="header">
+	                <div class="content">
+	                    <div class="more">
+	                    </div>
+	                </div>
+	            </div>
+	            <div class="toolbar">
+	                <div class="content clear"></div>
+	            </div>
+	        </div>
+	        <div id="master-wrapper" class="master-wrapper clear">
+	            <div id="sidebar" class="sidebar">
+	                <div class="sidebar-wrap">
+	                    <div class="content">
+	                        <div class="sidebar-menu">
+	                            <div class="toc">
+	                                <h2>Scripting API</h2>
+	                            </div>
+	                        </div>
+	                        <p>
+	                            <br/>
+	                        </p>
+	                    </div>
+	                </div>
+	            </div>
+	            <div id="content-wrap" class="content-wrap">
+	                <div class="content-block">
+						<div class="content"><div class="section">
+		<div class="mb20 clear" id="">
+			<h1 class="heading inherit">ExtendedModalWindow</h1>
+			<div class="clear"></div>
+			<p class="cl mb0 left mr10">Class in TNRD.Editor.Core</p>
+	        <div class="clear"></div>
+		</div>
+		<div class="subsection">
+			<h2>Description</h2>
+			<p>Base class for modal windows that can be added to ExtendedWindows</p>
+		</div><div clas="subsection">
+		<h2>Fields</h2>
+		<table class="list">
+			<tbody><tr>
+		<td class="lbl">
+			<a href="TNRD.Editor.Core.ExtendedModalWindow-Editor.html">Editor</a>
+		</td>
+		<td class="desc">The editor this modal window is shown in</td>
+	</tr><tr>
+		<td class="lbl">
+			<a href="TNRD.Editor.Core.ExtendedModalWindow-shouldAlignToCenter.html">shouldAlignToCenter</a>
+		</td>
+		<td class="desc">Should the modal window be aligned to the center of the editor</td>
+	</tr><tr>
+		<td class="lbl">
+			<a href="TNRD.Editor.Core.ExtendedModalWindow-showCancelButton.html">showCancelButton</a>
+		</td>
+		<td class="desc">Should the modal window show the Cancel/Close button</td>
+	</tr><tr>
+		<td class="lbl">
+			<a href="TNRD.Editor.Core.ExtendedModalWindow-showOKButton.html">showOKButton</a>
+		</td>
+		<td class="desc">Should the modal window show the OK/Accept button</td>
+	</tr><tr>
+		<td class="lbl">
+			<a href="TNRD.Editor.Core.ExtendedModalWindow-textCancelButton.html">textCancelButton</a>
+		</td>
+		<td class="desc">The text to show on the Cancel/Close button</td>
+	</tr><tr>
+		<td class="lbl">
+			<a href="TNRD.Editor.Core.ExtendedModalWindow-textOKButton.html">textOKButton</a>
+		</td>
+		<td class="desc">The text to show on the OK/Accept button</td>
+	</tr><tr>
+		<td class="lbl">
+			<a href="TNRD.Editor.Core.ExtendedModalWindow-Title.html">Title</a>
+		</td>
+		<td class="desc">The title of the modal window</td>
+	</tr><tr>
+		<td class="lbl">
+			<a href="TNRD.Editor.Core.ExtendedModalWindow-WindowRect.html">WindowRect</a>
+		</td>
+		<td class="desc">The rectangle used to draw the modal window</td>
+	</tr><tr>
+		<td class="lbl">
+			<a href="TNRD.Editor.Core.ExtendedModalWindow-WindowStyle.html">WindowStyle</a>
+		</td>
+		<td class="desc">The GUIStyle for the modal window</td>
+	</tr>		</tbody>
+		</table>
+	</div><div clas="subsection">
+		<h2>Properties</h2>
+		<table class="list">
+			<tbody><tr>
+		<td class="lbl">
+			<a href="TNRD.Editor.Core.ExtendedModalWindow-Input.html">Input</a>
+		</td>
+		<td class="desc">The input manager</td>
+	</tr><tr>
+		<td class="lbl">
+			<a href="TNRD.Editor.Core.ExtendedModalWindow-IsDone.html">IsDone</a>
+		</td>
+		<td class="desc">Is the modal window ready to close</td>
+	</tr><tr>
+		<td class="lbl">
+			<a href="TNRD.Editor.Core.ExtendedModalWindow-IsDraggable.html">IsDraggable</a>
+		</td>
+		<td class="desc">Can the modal window be dragged around</td>
+	</tr><tr>
+		<td class="lbl">
+			<a href="TNRD.Editor.Core.ExtendedModalWindow-Result.html">Result</a>
+		</td>
+		<td class="desc">The result of a closed modal window</td>
+	</tr>		</tbody>
+		</table>
+	</div><div clas="subsection">
+		<h2>Constructors</h2>
+		<table class="list">
+			<tbody><tr>
+		<td class="lbl">
+			<a href="TNRD.Editor.Core.ExtendedModalWindow-ExtendedModalWindow.html">ExtendedModalWindow</a>
+		</td>
+		<td class="desc">Creates an instance of ExtendedModalWindow</td>
+	</tr>		</tbody>
+		</table>
+	</div><div clas="subsection">
+		<h2>Methods</h2>
+		<table class="list">
+			<tbody><tr>
+		<td class="lbl">
+			<a href="TNRD.Editor.Core.ExtendedModalWindow-AlignToCenter.html">AlignToCenter</a>
+		</td>
+		<td class="desc">Aligns the modal window to the center of the editor</td>
+	</tr><tr>
+		<td class="lbl">
+			<a href="TNRD.Editor.Core.ExtendedModalWindow-Cancel.html">Cancel</a>
+		</td>
+		<td class="desc">Closes the modal window with the Cancel result</td>
+	</tr><tr>
+		<td class="lbl">
+			<a href="TNRD.Editor.Core.ExtendedModalWindow-OK.html">OK</a>
+		</td>
+		<td class="desc">Closes the modal window with the OK result</td>
+	</tr><tr>
+		<td class="lbl">
+			<a href="TNRD.Editor.Core.ExtendedModalWindow-OnContextClick.html">OnContextClick</a>
+		</td>
+		<td class="desc">Invoked when a ContextClick event occurs</td>
+	</tr><tr>
+		<td class="lbl">
+			<a href="TNRD.Editor.Core.ExtendedModalWindow-OnDestroy.html">OnDestroy</a>
+		</td>
+		<td class="desc">Called when the modal window gets closed</td>
+	</tr><tr>
+		<td class="lbl">
+			<a href="TNRD.Editor.Core.ExtendedModalWindow-OnDragExited.html">OnDragExited</a>
+		</td>
+		<td class="desc">Invoked when a DragExited event occurs</td>
+	</tr><tr>
+		<td class="lbl">
+			<a href="TNRD.Editor.Core.ExtendedModalWindow-OnDragPerform.html">OnDragPerform</a>
+		</td>
+		<td class="desc">Invoked when a DragPerform event occurs</td>
+	</tr><tr>
+		<td class="lbl">
+			<a href="TNRD.Editor.Core.ExtendedModalWindow-OnDragUpdate.html">OnDragUpdate</a>
+		</td>
+		<td class="desc">Invoked when a DragUpdate event occurs</td>
+	</tr><tr>
+		<td class="lbl">
+			<a href="TNRD.Editor.Core.ExtendedModalWindow-OnGUI.html">OnGUI</a>
+		</td>
+		<td class="desc">Implement your own GUI logic here</td>
+	</tr><tr>
+		<td class="lbl">
+			<a href="TNRD.Editor.Core.ExtendedModalWindow-OnInitialize.html">OnInitialize</a>
+		</td>
+		<td class="desc">Called the first time OnGUI is called on this modal window</td>
+	</tr><tr>
+		<td class="lbl">
+			<a href="TNRD.Editor.Core.ExtendedModalWindow-Update.html">Update</a>
+		</td>
+		<td class="desc">Called 100 times per second</td>
+	</tr>		</tbody>
+		</table>
+	</div>                </div>
+	                <div class="footer-wrapper">
+	                    <div class="footer clear"></div>
+	                </div>
+	            </div>
+				</div>
+	        </div>
+	    </div>
+	</div>
+	</body>
+	</html>
