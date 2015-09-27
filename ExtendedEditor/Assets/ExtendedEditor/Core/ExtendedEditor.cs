@@ -326,12 +326,6 @@ namespace TNRD.Editor.Core {
         public virtual void AddWindow( ExtendedWindow window ) {
             if ( Windows.Contains( window ) ) return;
 
-            window.Editor = this;
-
-            if ( !window.IsInitialized ) {
-                window.OnInitialize();
-            }
-
             var type = window.GetType();
             if ( !windowsDict.ContainsKey( type ) ) {
                 windowsDict.Add( type, new List<ExtendedWindow>() );
@@ -339,6 +333,11 @@ namespace TNRD.Editor.Core {
 
             windowsDict[type].Add( window );
             Windows.Add( window );
+
+            window.Editor = this;
+            if ( !window.IsInitialized ) {
+                window.OnInitialize();
+            }
         }
 
         /// <summary>

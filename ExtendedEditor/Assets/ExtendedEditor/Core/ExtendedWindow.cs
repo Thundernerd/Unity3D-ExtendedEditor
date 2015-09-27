@@ -206,7 +206,7 @@ namespace TNRD.Editor.Core {
 
         private List<ExtendedControl> controlsToProcess = new List<ExtendedControl>();
 
-        private List<ExtendedControl> controlsToRemove = new List<ExtendedControl>();
+        //private List<ExtendedControl> controlsToRemove = new List<ExtendedControl>();
 
         private Dictionary<Type, List<ExtendedControl>> controlsDict = new Dictionary<Type, List<ExtendedControl>>();
 
@@ -424,21 +424,6 @@ namespace TNRD.Editor.Core {
                         Camera.y -= ( cameraSpeed * ( 1f / Camera.z ) ) * Editor.DeltaTime;
                     }
                 }
-            }
-
-            var ctr = new List<ExtendedControl>( controlsToRemove );
-            controlsToRemove.Clear();
-            if ( ctr.Count > 0 ) {
-                foreach ( var control in ctr ) {
-                    if ( control.IsInitialized ) {
-                        control.OnDestroy();
-                    }
-
-                    controlsDict[control.GetType()].Remove( control );
-                    Controls.Remove( control );
-                }
-
-                Controls.Sort();
             }
 
             Input.Update();
@@ -735,15 +720,27 @@ namespace TNRD.Editor.Core {
         /// </summary>
         /// <param name="control">The control to remove</param>
         public virtual void RemoveControl( ExtendedControl control ) {
-            if ( controlsToRemove.Contains( control ) ) return;
-            controlsToRemove.Add( control );
+            if ( !Controls.Contains( control ) ) return;
+            if ( !controlsDict.ContainsKey( control.GetType() ) ) return;
+            if ( !controlsDict[control.GetType()].Contains( control ) ) return;
+
+            if ( control.IsInitialized ) {
+                control.OnDestroy();
+            }
+
+            controlsDict[control.GetType()].Remove( control );
+            Controls.Remove( control );
+
+            Controls.Sort();
         }
 
         /// <summary>
         /// Removes all controls from the window
         /// </summary>
         public virtual void ClearControls() {
-            controlsToRemove.AddRange( Controls );
+            for ( int i = Controls.Count - 1; i >= 0; i-- ) {
+                RemoveControl( Controls[i] );
+            }
         }
 
         /// <summary>

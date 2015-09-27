@@ -126,16 +126,12 @@ namespace TNRD.Editor.Core {
 
             if ( showOKButton ) {
                 if ( Input.KeyPressed( KeyCode.KeypadEnter ) || Input.KeyPressed( KeyCode.Return ) ) {
-                    Event.current.Use();
-                    Result = EExtendedModalWindowResult.OK;
-                    IsDone = true;
+                    OK();
                 }
             }
             if ( showCancelButton ) {
                 if ( Input.KeyPressed( KeyCode.Escape ) ) {
-                    Event.current.Use();
-                    Result = EExtendedModalWindowResult.Cancel;
-                    IsDone = true;
+                    Cancel();
                 }
             }
 

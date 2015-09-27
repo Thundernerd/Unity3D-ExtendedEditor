@@ -712,16 +712,16 @@ namespace TNRD.Editor.Core {
         }
 
         private static int InternalDropdownList( Rect position, int current, GUIContent[] items, GUIStyle style ) {
-            if ( items.Length == 0 ) {
-                items = new GUIContent[] { new GUIContent( "-" ) };
-            }
-
             int controlID = GUIUtility.GetControlID( dropdownHash, FocusType.Native, position );
             var mask = DropdownCallbackInfo.GetSelectedValueForControl( controlID, current );
 
             var evt = Event.current;
             if ( evt.type == EventType.Repaint ) {
-                style.Draw( position, new GUIContent( items[current] ), controlID, false );
+                if ( items.Length == 0 ) {
+                    style.Draw( position, new GUIContent( "-" ), controlID, false );
+                } else {
+                    style.Draw( position, items[current], controlID, false );
+                }
             } else if ( evt.type == EventType.MouseDown && position.Contains( evt.mousePosition ) ) {
                 DropdownCallbackInfo.instance = new DropdownCallbackInfo( controlID );
                 GUIUtility.keyboardControl = GUIUtility.hotControl = 0;
