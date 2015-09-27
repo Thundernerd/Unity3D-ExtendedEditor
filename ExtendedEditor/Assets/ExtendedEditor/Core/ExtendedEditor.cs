@@ -17,7 +17,7 @@ namespace TNRD.Editor.Core {
         /// If true the editor will try to repaint every update
         /// </summary>
         [JsonProperty]
-        protected bool RepaintOnUpdate = false;
+        public bool RepaintOnUpdate = false;
 
         /// <summary>
         /// The active shared objects in this editor

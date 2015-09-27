@@ -639,6 +639,9 @@ namespace TNRD.Editor.Core {
                 GUI.backgroundColor = GUI.color = item.Color;
                 GUI.Box( new Rect( xp, yp, item.Size.x, item.Size.y ), "", notificationBackgroundStyle );
                 GUI.Label( new Rect( xp, yp, item.Size.x, item.Size.y ), item.Text, notificationTextStyle );
+                if ( !Editor.RepaintOnUpdate ) {
+                    Editor.Repaint();
+                }
             }
             GUI.backgroundColor = backgroundColor;
             GUI.color = color;
