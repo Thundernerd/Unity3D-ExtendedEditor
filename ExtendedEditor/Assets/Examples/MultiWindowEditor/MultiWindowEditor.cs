@@ -24,7 +24,7 @@ public class MultiWindowEditor : ExtendedEditor {
         AddWindow( w2 );
         AddWindow( w3 );
 
-        w2.Position = new Vector2( position.size.x / 2 + 50, 50 );
-        w3.Position = new Vector2( position.size.x / 2 + 100, 250 );
+        w2.Position = new Vector2( Mathf.Round( position.size.x / 2 + 50 ), 50 );
+        w3.Position = new Vector2( Mathf.Round( position.size.x / 2 + 100 ), 250 );
     }
 }
