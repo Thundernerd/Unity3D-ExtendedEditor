@@ -1,7 +1,9 @@
 # ExtendedEditor
 Extended Editor is a framework for building editors in Unity3D.
+Below you can find a list of some of the features this framework houses.
+If you're curious on how some things work you can always try out some of the examples in the Examples folder.
 
-Features:
+#Features:
 
 **Entity-like framework**
 
