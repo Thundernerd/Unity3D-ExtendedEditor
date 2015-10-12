@@ -3,9 +3,7 @@ Extended Editor is a framework for building editors in Unity3D.
 Below you can find a list of some of the features this framework houses.
 If you're curious on how some things work you can always try out some of the examples in the Examples folder.
 
-#Features:
-
-**Entity-like framework**
+##Entity-like framework
 
 The framework consists of three core classes. 
 
@@ -15,7 +13,7 @@ The *ExtendedWindow* class, which is a container that shows controls (or custom 
 
 The *ExtendedControl* class. You can easily separate code by using controls. These controls are added to windows and their update and draw calls will be called automatically.
 
-**Easy coordinate system**
+##Easy coordinate system
 
 No need to think in pixels, you can just use the coordinate system that you are used to in Unity. 0,0 is the center of your window. You can also easily convert from and to pixels with these functions
 
@@ -23,7 +21,7 @@ No need to think in pixels, you can just use the coordinate system that you are 
     ExtendedWindow.ToWorldPosition( new Vector2( 350, 125 ) );
     ExtendedWindow.GetScreenInWorldSize();
 
-**Input Handling**
+##Input Handling
 
 The *ExtendedInput* class handles the input for your editor. No need to check Event.current anymore. You can easily check if a key or mouse button is down, up, pressed, or released.
 
@@ -38,7 +36,7 @@ The *ExtendedInput* class handles the input for your editor. No need to check Ev
 	if ( Input.ButtonUp( EMouseButton.Middle ) ) { }
     if ( Input.ButtonReleased( EMouseButton.Left ) ) { }
 
-**Settings Per Window**
+##Per Window Settings
 
 Settings that allow you to customize some behaviours for windows. 
 
@@ -56,14 +54,14 @@ Settings that allow you to customize some behaviours for windows.
     Settings.UseCamera = true;
     Settings.UseOnSceneGUI = true;
 
-**Asset loading**
+##Asset Loading
 
 Put your images into an asset folder and let them be loaded and unloaded by the *ExtendedAssets* class.
 
 	Texture2D hWorld = Assets["HelloWorld"];
 	Texture2D nWorld = Assets.Load( "HelloWorld" );
 
-**Modal Windows**
+##Modal Windows
 
 The *ExtendedModalWindow* class is a base class to create easy popups that can be put on top of all the other windows. The following are included already.
 
@@ -73,7 +71,7 @@ The *ExtendedModalWindow* class is a base class to create easy popups that can b
 (Input Box)
 ![Input Box](http://puu.sh/kpXdv/0c8ccc0e65.png)
 
-**Notifications**
+##Notifications
 
 Show notifcations at the bottom-right corner with to notify the user of your editor with ease.
 
@@ -81,14 +79,14 @@ Show notifcations at the bottom-right corner with to notify the user of your edi
     // Error notifications are in red and longer visible
     ShowErrorNotification( "ErrorWorld" );
 
-**Shortcut key hooks**
+##Shortcut Key Hooks
 
 Register key command and hook them to callbacks.
 
     // Keycode, callback, control (command), alt, shift
     AddShortcut( KeyCode.A, shortcutCallback, true, false, true );
 
-**Sharing objects between windows**
+##Sharing Data (objects)
 
 The *ExtendedSharedObject* class is a base for objects that are stored inside the editor and can be called fetched from all the windows inside the editor.
 
