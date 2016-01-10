@@ -72,6 +72,30 @@ namespace TNRD.Editor.Core {
         [JsonIgnore]
         public Event CurrentEvent { get; private set; }
 
+        /// <summary>
+        /// The position of the editor window
+        /// </summary>
+        public Vector2 Position {
+            get { return position.position; }
+            set {
+                var r = position;
+                r.position = value;
+                position = r;
+            }
+        }
+
+        /// <summary>
+        /// The size of the editor window
+        /// </summary>
+        public Vector2 Size {
+            get { return position.size; }
+            set {
+                var r = position;
+                r.size = value;
+                position = r;
+            }
+        }
+
         private object initializer;
         private object guiInitializer;
 
