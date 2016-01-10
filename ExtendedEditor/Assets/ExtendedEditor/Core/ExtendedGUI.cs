@@ -271,18 +271,32 @@ namespace TNRD.Editor.Core {
         #endregion
 
         #region Toolbar
+        private static bool doFlexibleSpace = false;
+
         /// <summary>
         /// Begins a new Toolbar group
         /// </summary>
         public static void BeginToolbar() {
             GUILayout.BeginHorizontal( toolbarStyle );
+            doFlexibleSpace = false;
+        }
+
+        /// <summary>
+        /// Inserts a flexible space element
+        /// </summary>
+        public static void FlexibleSpace() {
+            GUILayout.FlexibleSpace();
+            doFlexibleSpace = false;
         }
 
         /// <summary>
         /// Ends a Toolbar group
         /// </summary>
         public static void EndToolbar() {
-            GUILayout.FlexibleSpace();
+            if ( doFlexibleSpace ) {
+                GUILayout.FlexibleSpace();
+            }
+
             GUILayout.EndHorizontal();
         }
 

@@ -917,6 +917,9 @@ namespace TNRD.Editor.Core {
             if ( string.IsNullOrEmpty( text ) ) return;
             color.a = 0;
             notifications.Add( new ExtendedNotification( text, color, duration, notificationTextStyle ) );
+            if ( !Editor.RepaintOnUpdate ) {
+                Editor.Repaint();
+            }
         }
         #endregion
 
