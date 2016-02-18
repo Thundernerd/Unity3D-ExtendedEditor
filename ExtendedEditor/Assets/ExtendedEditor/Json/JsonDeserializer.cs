@@ -26,33 +26,33 @@ namespace TNRD.Editor.Json {
         private List<JsonType> jsonTypes = new List<JsonType>();
 
         private object DeserializeObject( string json, Type type ) {
-            ReadJsonTypes( json );
+            //ReadJsonTypes( ref json );
             return null;
         }
 
         private T DeserializeObject<T>( string json ) {
-            ReadJsonTypes( json );
+            ReadJsonTypes( ref json );
             return default( T );
         }
 
-        private void ReadJsonTypes( string json ) {
+        private void ReadJsonTypes( ref string json ) {
             var index = json.IndexOf( "$types" );
 
             var start = json.IndexOf( "[", index ) + 1;
             var end = json.IndexOf( "]", index );
 
-            json = json.Substring( start, end - start );
+            var jtemp = json.Substring( start, end - start );
 
-            var splits = json.Split( new string[] { "}," }, StringSplitOptions.RemoveEmptyEntries );
+            var splits = jtemp.Split( new string[] { "}," }, StringSplitOptions.RemoveEmptyEntries );
             foreach ( var item in splits ) {
                 var temp = item.Trim( ' ', '{' );
                 var jType = new JsonType();
-                index = temp.IndexOf( "\"Typename\"" );
+                var tid = temp.IndexOf( "\"Typename\"" );
 
-                var assembly = temp.Substring( 0, index ).Trim( ' ', ',' );
+                var assembly = temp.Substring( 0, tid ).Trim( ' ', ',' );
                 assembly = assembly.Remove( 0, 11 );
 
-                var typename = temp.Substring( index );
+                var typename = temp.Substring( tid );
                 typename = typename.Remove( 0, 11 );
 
                 jType.Assembly = assembly.Trim( ' ', '\"' );
@@ -60,6 +60,9 @@ namespace TNRD.Editor.Json {
 
                 jsonTypes.Add( jType );
             }
+
+            // -1 & +3 for " and ],
+            json = json.Remove( index - 1, end - index + 3 );
         }
     }
 }
