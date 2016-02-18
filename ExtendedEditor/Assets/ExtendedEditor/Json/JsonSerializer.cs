@@ -38,8 +38,17 @@ namespace TNRD.Editor.Json {
         private string SerializeObject( object value ) {
             var type = value.GetType();
 
-            var members = type.GetMembers( BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic ).Where( m =>
-                m.MemberType == MemberTypes.Field || m.MemberType == MemberTypes.Property ).ToList();
+            var jType = new JsonType() {
+                Assembly = type.Assembly.FullName,
+                Typename = type.FullName
+            };
+
+            var typeId = jsonTypes.IndexOf( jType );
+
+            if ( typeId == -1 ) {
+                jsonTypes.Add( jType );
+                typeId = jsonTypes.Count - 1;
+            }
 
             var builder = new StringBuilder();
             var writtenAnything = false;
@@ -58,18 +67,6 @@ namespace TNRD.Editor.Json {
             builder.Append( propertyJson );
             if ( !writtenAnything ) {
                 writtenAnything = !string.IsNullOrEmpty( propertyJson );
-            }
-
-            var jType = new JsonType() {
-                Assembly = type.Assembly.FullName,
-                Typename = type.FullName
-            };
-
-            var typeId = jsonTypes.IndexOf( jType );
-
-            if ( typeId == -1 ) {
-                jsonTypes.Add( jType );
-                typeId = jsonTypes.Count - 1;
             }
 
             if ( writtenAnything ) {
@@ -211,16 +208,19 @@ namespace TNRD.Editor.Json {
             var keys = dict.Keys;
             var kEnumerator = keys.GetEnumerator();
             var kBuilder = new StringBuilder( "[" );
+            var kJsonType = new JsonType();
 
             var values = dict.Values;
             var vEnumerator = values.GetEnumerator();
             var vBuilder = new StringBuilder( "[" );
+            var vJsonType = new JsonType();
 
             var builder = new StringBuilder();
             builder.Append( "{" );
 
             kEnumerator.MoveNext();
             vEnumerator.MoveNext();
+
 
             for ( int i = 0; i < keys.Count; i++, kEnumerator.MoveNext(), vEnumerator.MoveNext() ) {
                 var kCurrent = kEnumerator.Current;
@@ -241,10 +241,33 @@ namespace TNRD.Editor.Json {
                     kBuilder.Append( "," );
                     vBuilder.Append( "," );
                 }
+
+                if ( i == 0 ) {
+                    kJsonType.Assembly = kType.Assembly.FullName;
+                    kJsonType.Typename = kType.FullName;
+
+                    vJsonType.Assembly = vType.Assembly.FullName;
+                    vJsonType.Typename = vType.FullName;
+                }
             }
 
             kBuilder.Append( "]" );
             vBuilder.Append( "]" );
+
+            var kTypeId = jsonTypes.IndexOf( kJsonType );
+            if ( kTypeId == -1 ) {
+                jsonTypes.Add( kJsonType );
+                kTypeId = jsonTypes.Count - 1;
+            }
+
+            var vTypeId = jsonTypes.IndexOf( vJsonType );
+            if ( vTypeId == -1 ) {
+                jsonTypes.Add( vJsonType );
+                vTypeId = jsonTypes.Count - 1;
+            }
+
+            builder.AppendFormat( "\"ktypeid\":{0},", kTypeId );
+            builder.AppendFormat( "\"vtypeid\":{0},", vTypeId );
 
             builder.AppendFormat( "\"keys\":{0}", kBuilder.ToString() );
             builder.Append( "," );
