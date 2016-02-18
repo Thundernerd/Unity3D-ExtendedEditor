@@ -114,17 +114,7 @@ namespace TNRD.Editor.Json {
                 string fname = finfo.Name;
                 string fvalue = "";
 
-                //switch ( ftype.ToString() ) {
-                //    case "System.String":
-                //        var temp = finfo.GetValue( value );
-                //        if ( temp == null ) {
-                //            fvalue = "null";
-                //        } else {
-                //            fvalue = string.Format( "\"{0}\"", Regex.Escape( temp.ToString().ToLower() ) );
-                //        }
-                //        goto WriteField;
-                //}
-
+                // Do weird string check
                 if ( ftype.IsPrimitive || ftype.ToString() == "System.String" ) {
                     var temp = finfo.GetValue( value );
                     fvalue = temp == null ? "null" : temp.ToString().ToLower();
@@ -149,20 +139,6 @@ namespace TNRD.Editor.Json {
                     // Not sure what would happen here
                 }
 
-                //if ( ftype.IsClass || ( ftype.IsValueType && !ftype.IsEnum && !ftype.IsPrimitive ) ) {
-                //    var temp = finfo.GetValue( value );
-                //    fvalue = temp == null ? "null" : SerializeObject( temp );
-                //} else if ( ftype.IsArray ) {
-                //    fvalue = "[]";
-                //} else if ( ftype.IsEnum ) {
-                //    var temp = finfo.GetValue( value );
-                //    fvalue = temp == null ? "null" : string.Format( "\"{0}\"", temp.ToString().ToLower() );
-                //} else {
-                //    var temp = finfo.GetValue( value );
-                //    fvalue = temp == null ? "null" : temp.ToString().ToLower();
-                //}
-
-                //WriteField:
                 if ( i < fields.Count - 1 ) {
                     builder.AppendFormat( "\"{0}\":{1}, ", fname, fvalue );
                 } else {
@@ -221,31 +197,31 @@ namespace TNRD.Editor.Json {
                 string fname = pinfo.Name;
                 string fvalue = "";
 
-                switch ( ptype.ToString() ) {
-                    case "System.String":
-                        var temp = pinfo.GetValue( value, null );
-                        if ( temp == null ) {
-                            fvalue = "null";
-                        } else {
-                            fvalue = string.Format( "\"{0}\"", Regex.Escape( temp.ToString().ToLower() ) );
-                        }
-                        goto WriteProperty;
-                }
-
-                if ( ptype.IsClass || ( ptype.IsValueType && !ptype.IsEnum && !ptype.IsPrimitive ) ) {
+                // Do weird string check
+                if ( ptype.IsPrimitive || ptype.ToString() == "System.String" ) {
                     var temp = pinfo.GetValue( value, null );
-                    fvalue = temp == null ? "null" : SerializeObject( temp );
-                } else if ( ptype.IsArray ) {
-                    fvalue = "[]";
+                    fvalue = temp == null ? "null" : temp.ToString().ToLower();
+
+                    if ( fvalue != "null" ) {
+                        switch ( ptype.ToString() ) {
+                            case "System.String":
+                            case "System.Char":
+                                fvalue = string.Format( "\"{0}\"", Regex.Escape( fvalue ) );
+                                break;
+                        }
+                    }
+                } else if ( IsArray( ptype ) ) {
+                    fvalue = WriteArray( pinfo.GetValue( value, null ) );
                 } else if ( ptype.IsEnum ) {
                     var temp = pinfo.GetValue( value, null );
                     fvalue = temp == null ? "null" : string.Format( "\"{0}\"", temp.ToString().ToLower() );
-                } else {
+                } else if ( ptype.IsClass || ptype.IsValueType ) {
                     var temp = pinfo.GetValue( value, null );
-                    fvalue = temp == null ? "null" : temp.ToString().ToLower();
+                    fvalue = temp == null ? "null" : SerializeObject( temp );
+                } else {
+                    // Not sure what would happen here
                 }
-
-                WriteProperty:
+                
                 if ( i < properties.Count - 1 ) {
                     builder.AppendFormat( "\"{0}\":{1}, ", fname, fvalue );
                 } else {
