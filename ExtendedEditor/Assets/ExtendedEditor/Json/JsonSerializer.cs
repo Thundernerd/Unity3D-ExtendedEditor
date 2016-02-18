@@ -100,39 +100,17 @@ namespace TNRD.Editor.Json {
             for ( int i = 0; i < fields.Count; i++ ) {
                 var finfo = fields[i];
                 var ftype = finfo.FieldType;
+                var fvalue = finfo.GetValue( value );
 
-                string fname = finfo.Name;
-                string fvalue = "";
+                string jname = finfo.Name;
+                string jvalue = "";
 
-                // Do weird string check
-                if ( ftype.IsPrimitive || ftype.ToString() == "System.String" ) {
-                    var temp = finfo.GetValue( value );
-                    fvalue = temp == null ? "null" : temp.ToString().ToLower();
-
-                    if ( fvalue != "null" ) {
-                        switch ( ftype.ToString() ) {
-                            case "System.String":
-                            case "System.Char":
-                                fvalue = string.Format( "\"{0}\"", Regex.Escape( fvalue ) );
-                                break;
-                        }
-                    }
-                } else if ( IsArray( ftype ) ) {
-                    fvalue = WriteArray( finfo.GetValue( value ) );
-                } else if ( ftype.IsEnum ) {
-                    var temp = finfo.GetValue( value );
-                    fvalue = temp == null ? "null" : string.Format( "\"{0}\"", temp.ToString().ToLower() );
-                } else if ( ftype.IsClass || ftype.IsValueType ) {
-                    var temp = finfo.GetValue( value );
-                    fvalue = temp == null ? "null" : SerializeObject( temp );
-                } else {
-                    // Not sure what would happen here
-                }
+                jvalue = WriteSimpleValue( fvalue, ftype );
 
                 if ( i < fields.Count - 1 ) {
-                    builder.AppendFormat( "\"{0}\":{1}, ", fname, fvalue );
+                    builder.AppendFormat( "\"{0}\":{1}, ", jname, jvalue );
                 } else {
-                    builder.AppendFormat( "\"{0}\":{1} ", fname, fvalue );
+                    builder.AppendFormat( "\"{0}\":{1} ", jname, jvalue );
                 }
             }
 
@@ -183,39 +161,17 @@ namespace TNRD.Editor.Json {
             for ( int i = 0; i < properties.Count; i++ ) {
                 var pinfo = properties[i];
                 var ptype = pinfo.PropertyType;
+                var pvalue = pinfo.GetValue( value, null );
 
-                string fname = pinfo.Name;
-                string fvalue = "";
+                string jname = pinfo.Name;
+                string jvalue = "";
 
-                // Do weird string check
-                if ( ptype.IsPrimitive || ptype.ToString() == "System.String" ) {
-                    var temp = pinfo.GetValue( value, null );
-                    fvalue = temp == null ? "null" : temp.ToString().ToLower();
+                jvalue = WriteSimpleValue( pvalue, ptype );
 
-                    if ( fvalue != "null" ) {
-                        switch ( ptype.ToString() ) {
-                            case "System.String":
-                            case "System.Char":
-                                fvalue = string.Format( "\"{0}\"", Regex.Escape( fvalue ) );
-                                break;
-                        }
-                    }
-                } else if ( IsArray( ptype ) ) {
-                    fvalue = WriteArray( pinfo.GetValue( value, null ) );
-                } else if ( ptype.IsEnum ) {
-                    var temp = pinfo.GetValue( value, null );
-                    fvalue = temp == null ? "null" : string.Format( "\"{0}\"", temp.ToString().ToLower() );
-                } else if ( ptype.IsClass || ptype.IsValueType ) {
-                    var temp = pinfo.GetValue( value, null );
-                    fvalue = temp == null ? "null" : SerializeObject( temp );
-                } else {
-                    // Not sure what would happen here
-                }
-                
                 if ( i < properties.Count - 1 ) {
-                    builder.AppendFormat( "\"{0}\":{1}, ", fname, fvalue );
+                    builder.AppendFormat( "\"{0}\":{1}, ", jname, jvalue );
                 } else {
-                    builder.AppendFormat( "\"{0}\":{1} ", fname, fvalue );
+                    builder.AppendFormat( "\"{0}\":{1} ", jname, jvalue );
                 }
             }
 
@@ -231,29 +187,10 @@ namespace TNRD.Editor.Json {
 
             for ( int i = 0; i < array.Count; i++ ) {
                 var item = array[i];
-                var itemValue = "";
                 var itemType = item.GetType();
+                var itemValue = "";
 
-                if ( itemType.IsPrimitive || itemType.ToString() == "System.String" ) {
-                    itemValue = item == null ? "null" : item.ToString().ToLower();
-
-                    if ( itemValue != "null" ) {
-                        switch ( itemType.ToString() ) {
-                            case "System.String":
-                            case "System.Char":
-                                itemValue = string.Format( "\"{0}\"", Regex.Escape( itemValue ) );
-                                break;
-                        }
-                    }
-                } else if ( IsArray( itemType ) ) {
-                    itemValue = WriteArray( item );
-                } else if ( itemType.IsEnum ) {
-                    itemValue = item == null ? "null" : string.Format( "\"{0}\"", item.ToString().ToLower() );
-                } else if ( itemType.IsClass || itemType.IsValueType ) {
-                    itemValue = item == null ? "null" : SerializeObject( item );
-                } else {
-                    // Not sure what would happen here
-                }
+                itemValue = WriteSimpleValue( item, itemType );
 
                 builder.Append( itemValue );
 
@@ -266,12 +203,102 @@ namespace TNRD.Editor.Json {
             return builder.ToString();
         }
 
+        private string WriteDictionary( object value ) {
+            if ( value == null ) return "{[],[]}";
+
+            var dict = value as IDictionary;
+
+            var keys = dict.Keys;
+            var kEnumerator = keys.GetEnumerator();
+            var kBuilder = new StringBuilder( "[" );
+
+            var values = dict.Values;
+            var vEnumerator = values.GetEnumerator();
+            var vBuilder = new StringBuilder( "[" );
+
+            var builder = new StringBuilder();
+            builder.Append( "{" );
+
+            kEnumerator.MoveNext();
+            vEnumerator.MoveNext();
+
+            for ( int i = 0; i < keys.Count; i++, kEnumerator.MoveNext(), vEnumerator.MoveNext() ) {
+                var kCurrent = kEnumerator.Current;
+                var kType = kCurrent.GetType();
+                var kValue = "";
+
+                var vCurrent = vEnumerator.Current;
+                var vType = vCurrent.GetType();
+                var vValue = "";
+
+                kValue = WriteSimpleValue( kCurrent, kType );
+                vValue = WriteSimpleValue( vCurrent, vType );
+
+                kBuilder.Append( kValue );
+                vBuilder.Append( vValue );
+
+                if ( i < keys.Count - 1 ) {
+                    kBuilder.Append( "," );
+                    vBuilder.Append( "," );
+                }
+            }
+
+            kBuilder.Append( "]" );
+            vBuilder.Append( "]" );
+
+            builder.AppendFormat( "\"keys\":{0}", kBuilder.ToString() );
+            builder.Append( "," );
+            builder.AppendFormat( "\"values\":{0}", vBuilder.ToString() );
+
+            builder.Append( "}" );
+            return builder.ToString();
+        }
+
+        private string WriteSimpleValue( object value, Type type ) {
+            if ( value == null ) return "null";
+
+            if ( type.IsPrimitive || type.ToString() == "System.String" ) {
+                var temp = value.ToString().ToLower();
+
+                switch ( type.ToString() ) {
+                    case "System.String":
+                    case "System.Char":
+                        temp = string.Format( "\"{0}\"", Regex.Escape( temp ) );
+                        break;
+                }
+
+                return temp;
+            } else if ( IsArray( type ) ) {
+                return WriteArray( value );
+            } else if ( IsDictionary( type ) ) {
+                return WriteDictionary( value );
+            } else if ( type.IsEnum ) {
+                return string.Format( "\"{0}\"", value.ToString().ToLower() );
+            } else if ( type.IsClass || type.IsValueType ) {
+                return SerializeObject( value );
+            } else {
+                // Not sure what would happen here
+                return "";
+            }
+        }
+
         private bool IsArray( Type type ) {
             if ( type.IsArray ) return true;
 
             var interfaces = type.GetInterfaces();
             foreach ( var item in interfaces ) {
                 if ( item.ToString() == "System.Collections.IList" ) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private bool IsDictionary( Type type ) {
+            var interfaces = type.GetInterfaces();
+            foreach ( var item in interfaces ) {
+                if ( item.ToString() == "System.Collections.IDictionary" ) {
                     return true;
                 }
             }
