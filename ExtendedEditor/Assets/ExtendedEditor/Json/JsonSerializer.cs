@@ -5,24 +5,28 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using UnityEngine;
 
 namespace TNRD.Editor.Json {
 
     public class JsonSerializer {
 
         public static string Serialize( object value ) {
+            if ( value == null ) throw new ArgumentNullException( "value" );
             var type = value.GetType();
-            if ( type.IsClass ) {
-                var serializer = new JsonSerializer();
+            var serializer = new JsonSerializer();
+
+            if ( type.IsPrimitive || type.ToString() == "System.String" || type.IsEnum ||
+                serializer.IsArray( type ) || serializer.IsDictionary( type ) ) {
+                throw new Exception( "Unable to serialize value since it is neither a Class or a Struct" );
+            } else if ( type.IsClass || type.IsValueType ) {
                 var json = serializer.SerializeObject( value );
                 var types = serializer.SerializeTypes( serializer.jsonTypes );
                 json = json.Insert( 1, string.Format( "\"$types\":{0},", types ) );
                 return json;
             } else {
-
+                throw new Exception( "Oops?" );
             }
-
-            return "";
         }
 
         private Type ignoreType;
@@ -208,20 +212,17 @@ namespace TNRD.Editor.Json {
             var keys = dict.Keys;
             var kEnumerator = keys.GetEnumerator();
             var kBuilder = new StringBuilder( "[" );
-            var kJsonType = new JsonType();
 
             var values = dict.Values;
             var vEnumerator = values.GetEnumerator();
             var vBuilder = new StringBuilder( "[" );
-            var vJsonType = new JsonType();
 
             var builder = new StringBuilder();
             builder.Append( "{" );
 
             kEnumerator.MoveNext();
             vEnumerator.MoveNext();
-
-
+            
             for ( int i = 0; i < keys.Count; i++, kEnumerator.MoveNext(), vEnumerator.MoveNext() ) {
                 var kCurrent = kEnumerator.Current;
                 var kType = kCurrent.GetType();
@@ -241,33 +242,10 @@ namespace TNRD.Editor.Json {
                     kBuilder.Append( "," );
                     vBuilder.Append( "," );
                 }
-
-                if ( i == 0 ) {
-                    kJsonType.Assembly = kType.Assembly.FullName;
-                    kJsonType.Typename = kType.FullName;
-
-                    vJsonType.Assembly = vType.Assembly.FullName;
-                    vJsonType.Typename = vType.FullName;
-                }
             }
 
             kBuilder.Append( "]" );
             vBuilder.Append( "]" );
-
-            var kTypeId = jsonTypes.IndexOf( kJsonType );
-            if ( kTypeId == -1 ) {
-                jsonTypes.Add( kJsonType );
-                kTypeId = jsonTypes.Count - 1;
-            }
-
-            var vTypeId = jsonTypes.IndexOf( vJsonType );
-            if ( vTypeId == -1 ) {
-                jsonTypes.Add( vJsonType );
-                vTypeId = jsonTypes.Count - 1;
-            }
-
-            builder.AppendFormat( "\"ktypeid\":{0},", kTypeId );
-            builder.AppendFormat( "\"vtypeid\":{0},", vTypeId );
 
             builder.AppendFormat( "\"keys\":{0}", kBuilder.ToString() );
             builder.Append( "," );
