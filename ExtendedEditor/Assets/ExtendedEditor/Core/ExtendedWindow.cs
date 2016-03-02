@@ -1,7 +1,7 @@
 ﻿#if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
-using TNRD.Json;
+using TNRD.Editor.Json;
 using UnityEditor;
 using UnityEngine;
 

@@ -1,6 +1,6 @@
 ﻿#if UNITY_EDITOR
 using TNRD.Editor.Core;
-using TNRD.Json;
+using TNRD.Editor.Json;
 using UnityEngine;
 
 namespace TNRD.Editor.Controls {

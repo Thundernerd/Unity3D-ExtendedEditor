@@ -2,7 +2,6 @@
 using System.IO;
 using TNRD.Editor.Controls;
 using TNRD.Editor.Core;
-using TNRD.Json;
 using UnityEditor;
 using UnityEngine;
 
@@ -42,33 +41,33 @@ public class NoteWindow : ExtendedWindow {
     }
 
     public void SaveNotes() {
-        var controls = controlList.GetAll<NoteControl>();
-        var notes = new List<NoteControl.Serializable>();
-        foreach ( var item in controls ) {
-            notes.Add( NoteControl.Serializable.FromNote( item ) );
-        }
+        //var controls = controlList.GetAll<NoteControl>();
+        //var notes = new List<NoteControl.Serializable>();
+        //foreach ( var item in controls ) {
+        //    notes.Add( NoteControl.Serializable.FromNote( item ) );
+        //}
 
-        var json = JsonConvert.SerializeObject( notes );
+        //var json = JsonConvert.SerializeObject( notes );
 
-        var path = GetNotePath();
-        if ( !string.IsNullOrEmpty( path ) ) {
-            File.WriteAllText( GetNotePath(), json );
-        }
+        //var path = GetNotePath();
+        //if ( !string.IsNullOrEmpty( path ) ) {
+        //    File.WriteAllText( GetNotePath(), json );
+        //}
     }
 
     private void ReloadNotes() {
-        controlList.Clear();
+        //controlList.Clear();
 
-        var path = GetNotePath();
-        if ( !string.IsNullOrEmpty( path ) && File.Exists( path ) ) {
-            var json = File.ReadAllText( GetNotePath() );
-            if ( !string.IsNullOrEmpty( json ) ) {
-                var notes = JsonConvert.DeserializeObject<List<NoteControl.Serializable>>( json );
-                foreach ( var item in notes ) {
-                    controlList.Add( NoteControl.Serializable.ToNote( item ) );
-                }
-            }
-        }
+        //var path = GetNotePath();
+        //if ( !string.IsNullOrEmpty( path ) && File.Exists( path ) ) {
+        //    var json = File.ReadAllText( GetNotePath() );
+        //    if ( !string.IsNullOrEmpty( json ) ) {
+        //        var notes = JsonConvert.DeserializeObject<List<NoteControl.Serializable>>( json );
+        //        foreach ( var item in notes ) {
+        //            controlList.Add( NoteControl.Serializable.ToNote( item ) );
+        //        }
+        //    }
+        //}
     }
 
     private string GetNotePath() {

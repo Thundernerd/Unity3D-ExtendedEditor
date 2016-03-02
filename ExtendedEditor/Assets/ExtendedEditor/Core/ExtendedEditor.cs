@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using TNRD.Json;
+using TNRD.Editor.Json;
 using UnityEditor;
 using UnityEngine;
 
@@ -16,7 +16,6 @@ namespace TNRD.Editor.Core {
         /// <summary>
         /// If true the editor will try to repaint every update
         /// </summary>
-        [JsonProperty]
         public bool RepaintOnUpdate = false;
 
         /// <summary>
@@ -28,7 +27,6 @@ namespace TNRD.Editor.Core {
         /// <summary>
         /// An asset manager that can be accessed from every window
         /// </summary>
-        [JsonProperty]
         public ExtendedAssets SharedAssets;
 
         /// <summary>
@@ -37,7 +35,6 @@ namespace TNRD.Editor.Core {
         [JsonProperty]
         protected List<ExtendedWindow> Windows = new List<ExtendedWindow>();
 
-        [JsonIgnore]
         private List<ExtendedWindow> windowsToProcess = new List<ExtendedWindow>();
 
         private List<ExtendedWindow> windowsToRemove = new List<ExtendedWindow>();
@@ -598,18 +595,20 @@ namespace TNRD.Editor.Core {
         /// <param name="item">The object to serialize</param>
         /// <returns>JSON</returns>
         public string Serialize( object item ) {
-            var settings = new JsonSerializerSettings();
-            settings.PreserveReferencesHandling = PreserveReferencesHandling.All;
-            settings.ReferenceLoopHandling = ReferenceLoopHandling.Serialize;
-            settings.TypeNameHandling = TypeNameHandling.Auto;
+            //var settings = new JsonSerializerSettings();
+            //settings.PreserveReferencesHandling = PreserveReferencesHandling.All;
+            //settings.ReferenceLoopHandling = ReferenceLoopHandling.Serialize;
+            //settings.TypeNameHandling = TypeNameHandling.Auto;
 
-            try {
-                var serialized = JsonConvert.SerializeObject( item, Formatting.Indented, settings );
-                return serialized;
-            } catch ( JsonSerializationException ex ) {
-                Debug.LogErrorFormat( "Error serializing: {0}", ex.Message );
-                return "";
-            }
+            //try {
+            //    var serialized = JsonConvert.SerializeObject( item, Formatting.Indented, settings );
+            //    return serialized;
+            //} catch ( JsonSerializationException ex ) {
+            //    Debug.LogErrorFormat( "Error serializing: {0}", ex.Message );
+            //    return "";
+            //}
+
+            return "";
         }
 
         /// <summary>
@@ -711,42 +710,42 @@ namespace TNRD.Editor.Core {
         /// </summary>
         /// <param name="value">A JSON string representing an ExtendedEditor</param>
         public void DeserializeEditor<T>( string value ) where T : ExtendedEditor {
-            var settings = new JsonSerializerSettings();
-            settings.TypeNameHandling = TypeNameHandling.Auto;
+            //var settings = new JsonSerializerSettings();
+            //settings.TypeNameHandling = TypeNameHandling.Auto;
 
-            ExtendedEditor deserialized = null;
+            //ExtendedEditor deserialized = null;
 
-            try {
-                deserialized = JsonConvert.DeserializeObject<T>( value, settings );
-            } catch ( JsonReaderException ex ) {
-                deserialized = null;
-                Debug.LogErrorFormat( "Error deserializing: {0}", ex.Message );
-            }
+            //try {
+            //    deserialized = JsonConvert.DeserializeObject<T>( value, settings );
+            //} catch ( JsonReaderException ex ) {
+            //    deserialized = null;
+            //    Debug.LogErrorFormat( "Error deserializing: {0}", ex.Message );
+            //}
 
-            if ( deserialized != null ) {
-                RepaintOnUpdate = deserialized.RepaintOnUpdate;
-                SharedObjects = deserialized.SharedObjects;
-                Windows = deserialized.Windows;
-                windowsDict = deserialized.windowsDict;
+            //if ( deserialized != null ) {
+            //    RepaintOnUpdate = deserialized.RepaintOnUpdate;
+            //    SharedObjects = deserialized.SharedObjects;
+            //    Windows = deserialized.Windows;
+            //    windowsDict = deserialized.windowsDict;
 
-                for ( int i = Windows.Count - 1; i >= 0; i-- ) {
-                    var w = Windows[i];
+            //    for ( int i = Windows.Count - 1; i >= 0; i-- ) {
+            //        var w = Windows[i];
 
-                    w.Editor = this;
+            //        w.Editor = this;
 
-                    var t = w.GetType();
+            //        var t = w.GetType();
 
-                    if ( !windowsDict.ContainsKey( t ) ) {
-                        windowsDict.Add( t, new List<ExtendedWindow>() );
-                    }
+            //        if ( !windowsDict.ContainsKey( t ) ) {
+            //            windowsDict.Add( t, new List<ExtendedWindow>() );
+            //        }
 
-                    if ( !windowsDict[t].Contains( w ) ) {
-                        windowsDict[t].Add( w );
-                    }
+            //        if ( !windowsDict[t].Contains( w ) ) {
+            //            windowsDict[t].Add( w );
+            //        }
 
-                    w.OnDeserialized();
-                }
-            }
+            //        w.OnDeserialized();
+            //    }
+            //}
         }
 
         /// <summary>
@@ -755,15 +754,17 @@ namespace TNRD.Editor.Core {
         /// <param name="value">The JSON string to deserialize</param>
         /// <returns>A deserialized object of type T</returns>
         public T Deserialize<T>( string value ) {
-            var settings = new JsonSerializerSettings();
-            settings.TypeNameHandling = TypeNameHandling.Auto;
+            //var settings = new JsonSerializerSettings();
+            //settings.TypeNameHandling = TypeNameHandling.Auto;
 
-            try {
-                return JsonConvert.DeserializeObject<T>( value, settings );
-            } catch ( JsonReaderException ex ) {
-                Debug.LogErrorFormat( "Error deserializing: {0}", ex.Message );
-                return default( T );
-            }
+            //try {
+            //    return JsonConvert.DeserializeObject<T>( value, settings );
+            //} catch ( JsonReaderException ex ) {
+            //    Debug.LogErrorFormat( "Error deserializing: {0}", ex.Message );
+            //    return default( T );
+            //}
+
+            return default( T );
         }
 
         /// <summary>
