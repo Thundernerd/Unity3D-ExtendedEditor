@@ -4,165 +4,201 @@ using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
-[Serializable]
-public class ExtendedEditor : EditorWindow {
-
+namespace TNRD.Editor.Core {
     [Serializable]
-    private class ReflectionData {
-        public MethodInfo Initialize;
-        public MethodInfo InitializeGUI;
-        public MethodInfo Destroy;
+    public class ExtendedEditor : EditorWindow, ISerializationCallbackReceiver {
 
-        public MethodInfo Focus;
-        public MethodInfo LostFocus;
+        [Serializable]
+        private class ReflectionData {
+            public MethodInfo Initialize;
+            public MethodInfo InitializeGUI;
+            public MethodInfo Destroy;
 
-        public MethodInfo Update;
-        public MethodInfo InspectorUpdate;
+            public MethodInfo Focus;
+            public MethodInfo LostFocus;
 
-        public MethodInfo GUI;
+            public MethodInfo Update;
+            public MethodInfo InspectorUpdate;
 
-        public ReflectionData() {
-            var type = typeof( ExtendedWindow );
+            public MethodInfo GUI;
 
-            Initialize = type.GetMethod( "InternalInitialize", BindingFlags.Instance | BindingFlags.NonPublic );
-            InitializeGUI = type.GetMethod( "InternalInitializeGUI", BindingFlags.Instance | BindingFlags.NonPublic );
-            Destroy = type.GetMethod( "InternalDestroy", BindingFlags.Instance | BindingFlags.NonPublic );
+            public ReflectionData() {
+                var type = typeof( ExtendedWindow );
 
-            Focus = type.GetMethod( "InternalFocus", BindingFlags.Instance | BindingFlags.NonPublic );
-            LostFocus = type.GetMethod( "InternalLostFocus", BindingFlags.Instance | BindingFlags.NonPublic );
+                Initialize = type.GetMethod( "InternalInitialize", BindingFlags.Instance | BindingFlags.NonPublic );
+                InitializeGUI = type.GetMethod( "InternalInitializeGUI", BindingFlags.Instance | BindingFlags.NonPublic );
+                Destroy = type.GetMethod( "InternalDestroy", BindingFlags.Instance | BindingFlags.NonPublic );
 
-            InspectorUpdate = type.GetMethod( "InternalInspectorUpdate", BindingFlags.Instance | BindingFlags.NonPublic );
-            Update = type.GetMethod( "InternalUpdate", BindingFlags.Instance | BindingFlags.NonPublic );
+                Focus = type.GetMethod( "InternalFocus", BindingFlags.Instance | BindingFlags.NonPublic );
+                LostFocus = type.GetMethod( "InternalLostFocus", BindingFlags.Instance | BindingFlags.NonPublic );
 
-            GUI = type.GetMethod( "InternalGUI", BindingFlags.Instance | BindingFlags.NonPublic );
-        }
-    }
+                InspectorUpdate = type.GetMethod( "InternalInspectorUpdate", BindingFlags.Instance | BindingFlags.NonPublic );
+                Update = type.GetMethod( "InternalUpdate", BindingFlags.Instance | BindingFlags.NonPublic );
 
-    public Vector2 Position {
-        get { return position.position; }
-        set {
-            var pos = position;
-            pos.position = value;
-            position = pos;
-        }
-    }
-    public Vector2 Size {
-        get { return position.size; }
-        set {
-            var pos = position;
-            pos.size = value;
-            position = pos;
-        }
-    }
-
-    private List<ExtendedWindow> windows = new List<ExtendedWindow>();
-
-    private bool isInitialized;
-    private bool isInitializedGUI;
-
-    private ReflectionData rData;
-
-    private void OnInitialize() {
-        rData = new ReflectionData();
-        isInitialized = true;
-    }
-
-    private void OnInitializeGUI() {
-        isInitializedGUI = true;
-    }
-
-    private void OnDestroy() {
-        for ( int i = windows.Count - 1; i >= 0; i-- ) {
-            rData.Destroy.Invoke( windows[i], null );
-            windows.RemoveAt( i );
-        }
-    }
-
-    private void OnFocus() {
-        for ( int i = windows.Count - 1; i >= 0; i-- ) {
-            rData.Focus.Invoke( windows[i], null );
-        }
-    }
-
-    private void OnLostFocus() {
-        for ( int i = windows.Count - 1; i >= 0; i-- ) {
-            rData.LostFocus.Invoke( windows[i], null );
-        }
-    }
-
-    private void OnGUI() {
-        if ( !isInitialized ) {
-            OnInitialize();
-            return;
+                GUI = type.GetMethod( "InternalGUI", BindingFlags.Instance | BindingFlags.NonPublic );
+            }
         }
 
-        if ( !isInitializedGUI ) {
-            OnInitializeGUI();
-            return;
+        public Vector2 Position {
+            get { return position.position; }
+            set {
+                var pos = position;
+                pos.position = value;
+                position = pos;
+            }
+        }
+        public Vector2 Size {
+            get { return position.size; }
+            set {
+                var pos = position;
+                pos.size = value;
+                position = pos;
+            }
         }
 
-        var windowsToProcess = new List<ExtendedWindow>( windows );
+        private List<ExtendedWindow> windows = new List<ExtendedWindow>();
 
-        BeginWindows();
-        for ( int i = windowsToProcess.Count - 1; i >= 0; i-- ) {
-            GUI.Window( i, windowsToProcess[i].WindowRect, WindowGUI, windowsToProcess[i].WindowContent );
-        }
-        EndWindows();
-    }
+        private bool isInitialized;
+        private bool isInitializedGUI;
 
-    private void OnInspectorUpdate() {
-        var windowsToProcess = new List<ExtendedWindow>( windows );
+        private ReflectionData rData;
 
-        for ( int i = 0; i < windowsToProcess.Count; i++ ) {
-            rData.InspectorUpdate.Invoke( windowsToProcess[i], null );
-        }
-    }
-
-    private void Update() {
-        var windowsToProcess = new List<ExtendedWindow>( windows );
-
-        for ( int i = 0; i < windowsToProcess.Count; i++ ) {
-            rData.Update.Invoke( windowsToProcess[i], null );
-        }
-    }
-
-    private void WindowGUI( int id ) {
-        if ( id < windows.Count ) {
-            rData.GUI.Invoke( windows[id], null );
-        }
-    }
-
-    public void AddWindow( ExtendedWindow window ) {
-        window.Editor = this;
-
-        rData.Initialize.Invoke( window, null );
-        windows.Add( window );
-    }
-
-    public void RemoveWindow( ExtendedWindow window ) {
-        rData.Destroy.Invoke( window, null );
-        windows.Remove( window );
-    }
-
-    public static ExtendedEditor CreateEditor( params ExtendedWindow[] windows ) {
-        var inst = GetWindow<ExtendedEditor>();
-
-        if ( windows.Length > 0 ) {
-            inst.rData = new ReflectionData();
+        private void OnInitialize() {
+            rData = new ReflectionData();
+            isInitialized = true;
         }
 
-        foreach ( var item in windows ) {
-            inst.AddWindow( item );
+        private void OnInitializeGUI() {
+            isInitializedGUI = true;
         }
 
-        return inst;
-    }
+        private void OnDestroy() {
+            for ( int i = windows.Count - 1; i >= 0; i-- ) {
+                rData.Destroy.Invoke( windows[i], null );
+                windows.RemoveAt( i );
+            }
+        }
 
-    public static ExtendedEditor CreateEditor( string title, params ExtendedWindow[] windows ) {
-        var inst = CreateEditor( windows );
+        private void OnFocus() {
+            for ( int i = windows.Count - 1; i >= 0; i-- ) {
+                rData.Focus.Invoke( windows[i], null );
+            }
+        }
 
-        inst.titleContent = new GUIContent( title );
+        private void OnLostFocus() {
+            for ( int i = windows.Count - 1; i >= 0; i-- ) {
+                rData.LostFocus.Invoke( windows[i], null );
+            }
+        }
 
-        return inst;
+        private void OnGUI() {
+            if ( !isInitialized ) {
+                OnInitialize();
+                return;
+            }
+
+            if ( !isInitializedGUI ) {
+                OnInitializeGUI();
+                return;
+            }
+
+            var windowsToProcess = new List<ExtendedWindow>( windows );
+
+            BeginWindows();
+            for ( int i = windowsToProcess.Count - 1; i >= 0; i-- ) {
+                GUI.Window( i, windowsToProcess[i].WindowRect, WindowGUI, windowsToProcess[i].WindowContent );
+            }
+            EndWindows();
+        }
+
+        private void OnInspectorUpdate() {
+            var windowsToProcess = new List<ExtendedWindow>( windows );
+
+            for ( int i = 0; i < windowsToProcess.Count; i++ ) {
+                rData.InspectorUpdate.Invoke( windowsToProcess[i], null );
+            }
+        }
+
+        private void Update() {
+            var windowsToProcess = new List<ExtendedWindow>( windows );
+
+            for ( int i = 0; i < windowsToProcess.Count; i++ ) {
+                rData.Update.Invoke( windowsToProcess[i], null );
+            }
+        }
+
+        private void WindowGUI( int id ) {
+            if ( id < windows.Count ) {
+                rData.GUI.Invoke( windows[id], null );
+            }
+        }
+
+        public void AddWindow( ExtendedWindow window ) {
+            window.Editor = this;
+
+            rData.Initialize.Invoke( window, null );
+            windows.Add( window );
+        }
+
+        public void RemoveWindow( ExtendedWindow window ) {
+            rData.Destroy.Invoke( window, null );
+            windows.Remove( window );
+        }
+
+        public static ExtendedEditor CreateEditor( params ExtendedWindow[] windows ) {
+            var inst = GetWindow<ExtendedEditor>();
+
+            if ( windows.Length > 0 ) {
+                inst.rData = new ReflectionData();
+            }
+
+            foreach ( var item in windows ) {
+                inst.AddWindow( item );
+            }
+
+            return inst;
+        }
+
+        public static ExtendedEditor CreateEditor( string title, params ExtendedWindow[] windows ) {
+            var inst = CreateEditor( windows );
+
+            inst.titleContent = new GUIContent( title );
+
+            return inst;
+        }
+
+        public void OnBeforeSerialize() {
+            var instanceId = GetInstanceID();
+            var windowTypes = "";
+
+            foreach ( var item in windows ) {
+                var wType = item.GetType();
+                windowTypes += string.Format( "{0}|{1};", wType.Assembly.FullName, wType.FullName );
+            }
+
+            if ( !string.IsNullOrEmpty( windowTypes ) ) {
+                EditorPrefs.SetString( string.Format( "ExtendedEditor {0}", instanceId ), windowTypes );
+            }
+        }
+
+        public void OnAfterDeserialize() {
+            var instanceId = string.Format( "ExtendedEditor {0}", GetInstanceID() );
+
+            if ( EditorPrefs.HasKey( instanceId ) ) {
+                windows.Clear();
+
+                var windowTypes = EditorPrefs.GetString( instanceId );
+                var splits = windowTypes.Split( new[] { ';' }, StringSplitOptions.RemoveEmptyEntries );
+                foreach ( var item in splits ) {
+                    var temp = item.Split( '|' );
+                    var assembly = Assembly.Load( temp[0] );
+                    var type = assembly.GetType( temp[1] );
+                    var instance = Activator.CreateInstance( type );
+                    AddWindow( (ExtendedWindow)instance );
+                }
+
+                EditorPrefs.DeleteKey( instanceId );
+            }
+        }
     }
 }
