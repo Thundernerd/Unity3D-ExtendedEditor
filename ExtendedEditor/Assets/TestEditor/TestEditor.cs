@@ -3,13 +3,13 @@ using TNRD.Editor.Core;
 using UnityEditor;
 
 [Serializable]
-class asdf : ExtendedWindow {
+class TestEditor : ExtendedWindow {
 
     private string texto = "";
 
-    [MenuItem( "Hello/Temptemp" )]
+    [MenuItem( "TNRD/Test Editor" )]
     private static void Init() {
-        CreateEditor( "TempTemp" );
+        CreateEditor( "Tester" );
     }
 
     protected override void OnDestroy() {
