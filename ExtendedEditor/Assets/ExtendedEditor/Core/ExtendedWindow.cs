@@ -1,4 +1,5 @@
 ﻿using System;
+using TNRD.Editor.Json;
 using UnityEngine;
 
 namespace TNRD.Editor.Core {
@@ -19,6 +20,7 @@ namespace TNRD.Editor.Core {
             set { WindowRect.size = value; }
         }
 
+        [JsonIgnore]
         public ExtendedEditor Editor;
 
         private bool initializedGUI = false;
@@ -96,19 +98,19 @@ namespace TNRD.Editor.Core {
 
         }
 
-        public static void CreateEditor() {
-            CreateEditor( "" );
+        public static ExtendedEditor CreateEditor() {
+            return CreateEditor( "" );
         }
 
-        public static void CreateEditor( string title ) {
+        public static ExtendedEditor CreateEditor( string title ) {
             var stack = new System.Diagnostics.StackTrace();
             if ( stack.FrameCount >= 1 ) {
                 var mBase = stack.GetFrame( 1 ).GetMethod();
                 var type = mBase.DeclaringType;
-                var instance = (ExtendedWindow)System.Activator.CreateInstance( type );
-                ExtendedEditor.CreateEditor( title, instance );
+                var instance = (ExtendedWindow)Activator.CreateInstance( type );
+                return ExtendedEditor.CreateEditor( title, instance );
             } else {
-                Debug.LogError( "Error creating editor" );
+                throw new Exception( "Unable to create editor" );
             }
         }
     }

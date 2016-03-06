@@ -2,6 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using TNRD.Editor.Core;
+using UnityEditor;
+using UnityEngine;
 
 namespace TNRD.Editor.Json {
 
@@ -24,6 +27,7 @@ namespace TNRD.Editor.Json {
         }
 
         private List<JsonType> jsonTypes = new List<JsonType>();
+        private List<Type> windowTypes = new List<Type>();
 
         private object DeserializeObject( string json, Type type ) {
             var index = 0;
@@ -31,10 +35,50 @@ namespace TNRD.Editor.Json {
             ReadJsonTypes( ref json );
             json = json.Remove( 0, 1 );
 
+            foreach ( var item in jsonTypes ) {
+                var jType = item.LoadType();
+                if ( jType.IsSubclassOf( typeof( ExtendedWindow ) ) ) {
+                    windowTypes.Add( jType );
+                }
+            }
+
             var jObj = (JsonObject)ReadObject( json, ref index );
             var obj = CreateObject( jObj );
 
             return Convert.ChangeType( obj, type );
+        }
+
+        private ExtendedEditor GetEditorInstance( Type editorType ) {
+            var windowsField = typeof( ExtendedEditor ).GetField( "serializedWindowTypes", BindingFlags.Instance | BindingFlags.NonPublic );
+
+            var objects = Resources.FindObjectsOfTypeAll<ExtendedEditor>();
+            if ( objects.Length > 0 ) {
+                foreach ( var editor in objects ) {
+                    var eWindows = (List<JsonType>)windowsField.GetValue( editor );
+                    var foundEditor = true;
+
+                    foreach ( var w1 in eWindows ) {
+                        var foundWindow = false;
+                        foreach ( var w2 in windowTypes ) {
+                            if ( w1.LoadType() == w2 ) {
+                                foundWindow = true;
+                                break;
+                            }
+                        }
+
+                        if ( !foundWindow ) {
+                            foundEditor = false;
+                            break;
+                        }
+                    }
+
+                    if ( foundEditor ) {
+                        return editor;
+                    }
+                }
+            }
+
+            return (ExtendedEditor)ScriptableObject.CreateInstance( editorType );
         }
 
         private object CreateObject( JsonObject obj ) {
@@ -42,8 +86,9 @@ namespace TNRD.Editor.Json {
             var type = jsonTypes[tid].LoadType();
             object instance = null;
 
-            if ( type.IsSubclassOf( typeof( UnityEditor.EditorWindow ) ) ) {
-                instance = UnityEditor.EditorWindow.GetWindow( type );
+            if ( type.IsSubclassOf( typeof( EditorWindow ) ) ) {
+                instance = GetEditorInstance( type );
+                //instance = EditorWindow.GetWindow( type );
             } else {
                 instance = Activator.CreateInstance( type );
             }

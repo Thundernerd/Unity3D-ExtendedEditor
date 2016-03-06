@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using TNRD.Editor.Json;
 using UnityEditor;
 using UnityEngine;
 
@@ -56,12 +57,20 @@ namespace TNRD.Editor.Core {
             }
         }
 
+        [JsonProperty]
         private List<ExtendedWindow> windows = new List<ExtendedWindow>();
-
+        [JsonProperty]
         private bool isInitialized;
+        [JsonProperty]
         private bool isInitializedGUI;
 
         private ReflectionData rData;
+
+        private string serializedEditor;
+        [SerializeField]
+        private List<JsonType> serializedWindowTypes;
+        [SerializeField]
+        private ScriptableObject dockArea;
 
         private void OnInitialize() {
             rData = new ReflectionData();
@@ -120,6 +129,34 @@ namespace TNRD.Editor.Core {
         }
 
         private void Update() {
+            if ( !string.IsNullOrEmpty( serializedEditor ) ) {
+                var tRect = new Rect( position );
+                var editor = (ExtendedEditor)JsonDeserializer.Deserialize( serializedEditor, typeof( ExtendedEditor ) );
+
+                foreach ( var item in editor.windows ) {
+                    item.Editor = editor;
+                }
+
+                tRect.y -= 5f;
+                editor.position = tRect;
+
+                serializedEditor = string.Empty;
+
+                var t = typeof( EditorWindow );
+                var f = t.GetField( "m_Parent", BindingFlags.Instance | BindingFlags.NonPublic );
+                var currentDock = (ScriptableObject)f.GetValue( editor );
+
+                var daType = dockArea.GetType();
+
+                var method = daType.GetMethod( "RemoveTab", new[] { typeof( EditorWindow ), typeof( bool ) } );
+                method.Invoke( currentDock, new object[] { this, currentDock != dockArea } );
+
+                method = daType.GetMethod( "AddTab", new[] { typeof( EditorWindow ) } );
+                method.Invoke( dockArea, new[] { this } );
+
+                Repaint();
+            }
+
             var windowsToProcess = new List<ExtendedWindow>( windows );
 
             for ( int i = 0; i < windowsToProcess.Count; i++ ) {
@@ -146,17 +183,47 @@ namespace TNRD.Editor.Core {
         }
 
         public static ExtendedEditor CreateEditor( params ExtendedWindow[] windows ) {
-            var inst = GetWindow<ExtendedEditor>();
+            var objects = Resources.FindObjectsOfTypeAll<ExtendedEditor>();
+            if ( objects.Length > 0 ) {
+                foreach ( var editor in objects ) {
+                    var eWindows = editor.windows;
+                    var foundEditor = true;
 
-            if ( windows.Length > 0 ) {
-                inst.rData = new ReflectionData();
+                    foreach ( var w1 in eWindows ) {
+                        var wType = w1.GetType();
+                        var foundWindow = false;
+                        foreach ( var w2 in windows ) {
+                            if ( wType == w2.GetType() ) {
+                                foundWindow = true;
+                                break;
+                            }
+                        }
+
+                        if ( !foundWindow ) {
+                            foundEditor = false;
+                            break;
+                        }
+                    }
+
+                    if ( foundEditor ) {
+                        editor.Show();
+                        //editor.Focus();
+                        return editor;
+                    }
+                }
+            }
+
+            var editorWindow = CreateInstance<ExtendedEditor>();
+
+            if ( editorWindow.rData == null ) {
+                editorWindow.rData = new ReflectionData();
             }
 
             foreach ( var item in windows ) {
-                inst.AddWindow( item );
+                editorWindow.AddWindow( item );
             }
 
-            return inst;
+            return editorWindow;
         }
 
         public static ExtendedEditor CreateEditor( string title, params ExtendedWindow[] windows ) {
@@ -169,34 +236,32 @@ namespace TNRD.Editor.Core {
 
         public void OnBeforeSerialize() {
             var instanceId = GetInstanceID();
-            var windowTypes = "";
+            var json = JsonSerializer.Serialize( this );
+            EditorPrefs.SetString( string.Format( "ExtendedEditor {0}", instanceId ), json );
+            System.IO.File.WriteAllText( @"D:\jsontest.txt", json );
 
+            if ( serializedWindowTypes == null ) {
+                serializedWindowTypes = new List<JsonType>();
+            }
+
+            serializedWindowTypes.Clear();
             foreach ( var item in windows ) {
-                var wType = item.GetType();
-                windowTypes += string.Format( "{0}|{1};", wType.Assembly.FullName, wType.FullName );
+                serializedWindowTypes.Add( new JsonType() {
+                    Assembly = item.GetType().Assembly.FullName,
+                    Typename = item.GetType().FullName
+                } );
             }
 
-            if ( !string.IsNullOrEmpty( windowTypes ) ) {
-                EditorPrefs.SetString( string.Format( "ExtendedEditor {0}", instanceId ), windowTypes );
-            }
+            var t = typeof( EditorWindow );
+            var f = t.GetField( "m_Parent", BindingFlags.Instance | BindingFlags.NonPublic );
+            dockArea = (ScriptableObject)f.GetValue( this );
         }
 
         public void OnAfterDeserialize() {
             var instanceId = string.Format( "ExtendedEditor {0}", GetInstanceID() );
 
             if ( EditorPrefs.HasKey( instanceId ) ) {
-                windows.Clear();
-
-                var windowTypes = EditorPrefs.GetString( instanceId );
-                var splits = windowTypes.Split( new[] { ';' }, StringSplitOptions.RemoveEmptyEntries );
-                foreach ( var item in splits ) {
-                    var temp = item.Split( '|' );
-                    var assembly = Assembly.Load( temp[0] );
-                    var type = assembly.GetType( temp[1] );
-                    var instance = Activator.CreateInstance( type );
-                    AddWindow( (ExtendedWindow)instance );
-                }
-
+                serializedEditor = EditorPrefs.GetString( instanceId );
                 EditorPrefs.DeleteKey( instanceId );
             }
         }

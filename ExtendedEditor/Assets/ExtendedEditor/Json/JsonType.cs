@@ -2,6 +2,7 @@
 
 namespace TNRD.Editor.Json {
 
+    [Serializable]
     public struct JsonType : IEquatable<JsonType> {
         public string Assembly;
         public string Typename;
