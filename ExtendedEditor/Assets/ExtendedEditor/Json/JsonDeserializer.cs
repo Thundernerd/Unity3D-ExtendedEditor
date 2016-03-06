@@ -15,8 +15,8 @@ namespace TNRD.Editor.Json {
             return obj;
         }
 
-        public static T Deserialize<T>( string json ) {
-            if ( string.IsNullOrEmpty( json ) ) return default( T );
+        public static T Deserialize<T>( string json ) where T : class {
+            if ( string.IsNullOrEmpty( json ) ) return null;
 
             var deserializer = new JsonDeserializer();
             var obj = deserializer.DeserializeObject( json, typeof( T ) );

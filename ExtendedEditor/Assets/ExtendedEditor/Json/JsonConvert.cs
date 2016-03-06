@@ -8,7 +8,7 @@ namespace TNRD.Editor.Json {
             return JsonDeserializer.Deserialize( json, type );
         }
 
-        public static T Deserialize<T>( string json ) {
+        public static T Deserialize<T>( string json ) where T : class {
             return JsonDeserializer.Deserialize<T>( json );
         }
 
