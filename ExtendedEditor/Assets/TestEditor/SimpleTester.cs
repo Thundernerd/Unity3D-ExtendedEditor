@@ -1,15 +1,23 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Reflection;
 using TNRD.Editor.Core;
+using TNRD.Editor.Json;
 using UnityEditor;
+using UnityEngine;
 
 [Serializable]
-class TestEditor : ExtendedWindow {
+class OtherEditor : ExtendedWindow {
 
+    [JsonProperty]
     private string texto = "";
+    [JsonProperty]
+    private float sliderV = 0.5f;
 
     [MenuItem( "TNRD/Test Editor" )]
     private static void Init() {
-        CreateEditor( "Tester" );
+        var jsonTester = CreateEditor( "Editor Tester" );
+        jsonTester.Show();
     }
 
     protected override void OnDestroy() {
@@ -41,6 +49,7 @@ class TestEditor : ExtendedWindow {
     }
 
     protected override void OnGUI() {
-
+        sliderV = EditorGUILayout.Slider( sliderV, 0, 2 );
+        texto = EditorGUILayout.TextField( texto );
     }
 }
