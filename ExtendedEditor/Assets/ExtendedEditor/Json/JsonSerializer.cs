@@ -259,13 +259,20 @@ namespace TNRD.Editor.Json {
             if ( value == null || value.ToString() == "null" ) return "null";
 
             if ( type.IsPrimitive || type.ToString() == "System.String" ) {
-                var temp = value.ToString().ToLower();
+                var temp = value.ToString();
 
                 switch ( type.ToString() ) {
                     case "System.String":
                     case "System.Char":
                         temp = string.Format( "\"{0}\"", Regex.Escape( temp ) );
                         break;
+                    default:
+                        temp = temp.ToLower();
+                        break;
+                }
+
+                while ( temp.Contains( "\\ " ) ) {
+                    temp = temp.Replace( "\\ ", " " );
                 }
 
                 return temp;
