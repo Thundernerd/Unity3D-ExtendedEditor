@@ -222,7 +222,7 @@ namespace TNRD.Editor.Json {
 
             kEnumerator.MoveNext();
             vEnumerator.MoveNext();
-            
+
             for ( int i = 0; i < keys.Count; i++, kEnumerator.MoveNext(), vEnumerator.MoveNext() ) {
                 var kCurrent = kEnumerator.Current;
                 var kType = kCurrent.GetType();
@@ -256,7 +256,7 @@ namespace TNRD.Editor.Json {
         }
 
         private string WriteSimpleValue( object value, Type type ) {
-            if ( value == null ) return "null";
+            if ( value == null || value.ToString() == "null" ) return "null";
 
             if ( type.IsPrimitive || type.ToString() == "System.String" ) {
                 var temp = value.ToString().ToLower();
