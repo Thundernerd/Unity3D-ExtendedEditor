@@ -95,13 +95,11 @@ namespace TNRD.Editor.Json {
         }
 
         private object CreateArray( JsonArray obj, Type itemType ) {
-            var index = 0;
-
             IList list = (IList)Activator.CreateInstance(
             typeof( List<> ).MakeGenericType( itemType ) );
 
             foreach ( var item in obj.KeyValues.Keys ) {
-                var value = obj.KeyValues[index.ToString()];
+                var value = obj.KeyValues[item];
 
                 if ( value == null ) {
                     list.Add( null );
@@ -136,9 +134,6 @@ namespace TNRD.Editor.Json {
                         list.Add( eval );
                     }
                 }
-
-
-                index++;
             }
 
             return list;
