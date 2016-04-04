@@ -65,6 +65,10 @@ namespace TNRD.Editor.Core {
         [JsonProperty]
         private bool isInitializedGUI;
 
+        // Windows that will be added and initialized _after_ creating and initializing the editor
+        // Otherwise some editor vars might not be initialized properly
+        private List<ExtendedWindow> windowsToAdd = new List<ExtendedWindow>();
+
         private ReflectionData rData;
 
         private string serializedEditor;
@@ -120,6 +124,15 @@ namespace TNRD.Editor.Core {
 
             if ( !isInitializedGUI ) {
                 OnInitializeGUI();
+                return;
+            }
+
+            if ( windowsToAdd.Count > 0 ) {
+                foreach ( var item in windowsToAdd ) {
+                    AddWindow( item );
+                }
+
+                windowsToAdd.Clear();
                 return;
             }
 
@@ -233,9 +246,7 @@ namespace TNRD.Editor.Core {
                 editorWindow.rData = new ReflectionData();
             }
 
-            foreach ( var item in windows ) {
-                editorWindow.AddWindow( item );
-            }
+            editorWindow.windowsToAdd = new List<ExtendedWindow>( windows );
 
             return editorWindow;
         }
