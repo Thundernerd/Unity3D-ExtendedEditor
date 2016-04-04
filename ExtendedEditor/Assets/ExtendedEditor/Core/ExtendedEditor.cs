@@ -91,6 +91,14 @@ namespace TNRD.Editor.Core {
                 EditorPrefs.DeleteKey( name );
                 serializedEditor = json;
             }
+
+            if ( windowsToAdd.Count > 0 ) {
+                foreach ( var item in windowsToAdd ) {
+                    AddWindow( item );
+                }
+
+                windowsToAdd.Clear();
+            }
         }
 
         private void OnInitializeGUI() {
@@ -124,15 +132,6 @@ namespace TNRD.Editor.Core {
 
             if ( !isInitializedGUI ) {
                 OnInitializeGUI();
-                return;
-            }
-
-            if ( windowsToAdd.Count > 0 ) {
-                foreach ( var item in windowsToAdd ) {
-                    AddWindow( item );
-                }
-
-                windowsToAdd.Clear();
                 return;
             }
 
