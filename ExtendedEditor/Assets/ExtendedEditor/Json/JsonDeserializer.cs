@@ -88,7 +88,6 @@ namespace TNRD.Editor.Json {
 
             if ( type.IsSubclassOf( typeof( EditorWindow ) ) ) {
                 instance = GetEditorInstance( type );
-                //instance = EditorWindow.GetWindow( type );
             } else {
                 instance = Activator.CreateInstance( type );
             }
@@ -235,6 +234,7 @@ namespace TNRD.Editor.Json {
 
             var inQuotes = false;
 
+            // Partially taken from SimpleJson
             while ( i < json.Length ) {
                 switch ( json[i] ) {
                     case '{':

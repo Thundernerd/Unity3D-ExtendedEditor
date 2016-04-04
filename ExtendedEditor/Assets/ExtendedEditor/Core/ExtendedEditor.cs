@@ -6,6 +6,7 @@ using UnityEditor;
 using UnityEngine;
 
 namespace TNRD.Editor.Core {
+
     [Serializable]
     public class ExtendedEditor : EditorWindow, ISerializationCallbackReceiver {
 
@@ -72,9 +73,17 @@ namespace TNRD.Editor.Core {
         [SerializeField]
         private ScriptableObject dockArea;
 
+        private bool gotCreated = false;
+
         private void OnInitialize() {
             rData = new ReflectionData();
             isInitialized = true;
+
+            if ( !gotCreated ) {
+                var json = EditorPrefs.GetString( name );
+                EditorPrefs.DeleteKey( name );
+                serializedEditor = json;
+            }
         }
 
         private void OnInitializeGUI() {
@@ -132,6 +141,7 @@ namespace TNRD.Editor.Core {
             if ( !string.IsNullOrEmpty( serializedEditor ) ) {
                 var tRect = new Rect( position );
                 var editor = (ExtendedEditor)JsonDeserializer.Deserialize( serializedEditor, typeof( ExtendedEditor ) );
+                editor.gotCreated = true;
 
                 foreach ( var item in editor.windows ) {
                     item.Editor = editor;
@@ -182,12 +192,14 @@ namespace TNRD.Editor.Core {
             windows.Remove( window );
         }
 
-        public static ExtendedEditor CreateEditor( params ExtendedWindow[] windows ) {
+        private static ExtendedEditor CreateEditor( params ExtendedWindow[] windows ) {
             var objects = Resources.FindObjectsOfTypeAll<ExtendedEditor>();
             if ( objects.Length > 0 ) {
                 foreach ( var editor in objects ) {
                     var eWindows = editor.windows;
                     var foundEditor = true;
+
+                    if ( eWindows.Count == 0 ) foundEditor = false;
 
                     foreach ( var w1 in eWindows ) {
                         var wType = w1.GetType();
@@ -207,7 +219,6 @@ namespace TNRD.Editor.Core {
 
                     if ( foundEditor ) {
                         editor.Show();
-                        //editor.Focus();
                         return editor;
                     }
                 }
@@ -231,14 +242,21 @@ namespace TNRD.Editor.Core {
 
             inst.titleContent = new GUIContent( title );
 
+            var index = 0;
+            var id = string.Format( "tnrd_editor_{0}_{1}", title, index );
+            while ( EditorPrefs.HasKey( id ) ) {
+                index++;
+                id = string.Format( "tnrd_editor_{0}_{1}", title, index );
+            }
+
+            inst.name = id;
+            inst.gotCreated = true;
+
             return inst;
         }
 
-        public void OnBeforeSerialize() {
-            var instanceId = GetInstanceID();
+        private string DoSerialize() {
             var json = JsonSerializer.Serialize( this );
-            EditorPrefs.SetString( string.Format( "ExtendedEditor {0}", instanceId ), json );
-            System.IO.File.WriteAllText( @"D:\jsontest.txt", json );
 
             if ( serializedWindowTypes == null ) {
                 serializedWindowTypes = new List<JsonType>();
@@ -255,14 +273,24 @@ namespace TNRD.Editor.Core {
             var t = typeof( EditorWindow );
             var f = t.GetField( "m_Parent", BindingFlags.Instance | BindingFlags.NonPublic );
             dockArea = (ScriptableObject)f.GetValue( this );
+
+            return json;
+        }
+
+        public void OnBeforeSerialize() {
+            var json = DoSerialize();
+            EditorPrefs.SetString( name, json );
         }
 
         public void OnAfterDeserialize() {
-            var instanceId = string.Format( "ExtendedEditor {0}", GetInstanceID() );
+            var instanceId = name;
 
             if ( EditorPrefs.HasKey( instanceId ) ) {
                 serializedEditor = EditorPrefs.GetString( instanceId );
-                EditorPrefs.DeleteKey( instanceId );
+
+                if ( isInitialized ) {
+                    EditorPrefs.DeleteKey( instanceId );
+                }
             }
         }
     }
