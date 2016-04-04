@@ -20,6 +20,8 @@ namespace TNRD.Editor.Core {
             set { WindowRect.size = value; }
         }
 
+        public ExtendedWindowSettings WindowSettings;
+
         [JsonIgnore]
         public ExtendedEditor Editor;
 
@@ -28,6 +30,10 @@ namespace TNRD.Editor.Core {
         private void InternalInitialize() {
             if ( Position == Vector2.zero && Size == Vector2.zero ) {
                 WindowRect = new Rect( Vector2.zero, Editor.Size );
+            }
+
+            if ( WindowSettings == null ) {
+                WindowSettings = new ExtendedWindowSettings();
             }
 
             OnInitialize();
@@ -61,6 +67,18 @@ namespace TNRD.Editor.Core {
         private void InternalGUI() {
             if ( !initializedGUI ) {
                 InternalInitializeGUI();
+            }
+
+            if ( WindowSettings.IsFullscreen ) {
+                var pos = WindowRect.position;
+                if ( pos.x != 0 || pos.y != 0 ) {
+                    WindowRect.position = new Vector2();
+                }
+
+                var size = WindowRect.size;
+                if ( size.x != Editor.Size.x || size.y != Size.y ) {
+                    WindowRect.size = Editor.Size;
+                }
             }
 
             OnGUI();
