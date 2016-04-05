@@ -30,6 +30,10 @@ namespace TNRD.Editor.Core {
 
         public EWindowStyle WindowStyle;
 
+        public ExtendedAssets Assets {
+            get { return Editor.Assets; }
+        }
+
         [JsonIgnore]
         public ExtendedEditor Editor;
 

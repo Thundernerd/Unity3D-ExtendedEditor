@@ -58,6 +58,8 @@ namespace TNRD.Editor.Core {
             }
         }
 
+        public ExtendedAssets Assets = new ExtendedAssets();
+
         [JsonProperty]
         private List<ExtendedWindow> windows = new List<ExtendedWindow>();
         [JsonProperty]
@@ -272,6 +274,7 @@ namespace TNRD.Editor.Core {
             var inst = CreateEditor( windows );
 
             inst.titleContent = new GUIContent( title );
+            inst.Assets.Initialize();
 
             var index = 0;
             var id = string.Format( "tnrd_editor_{0}_{1}", title, index );
