@@ -88,7 +88,7 @@ namespace TNRD.Editor.Core {
                 }
 
                 var size = WindowRect.size;
-                if ( size.x != Editor.Size.x || size.y != Size.y ) {
+                if ( size.x != Editor.Size.x || size.y != Editor.Size.y ) {
                     WindowRect.size = Editor.Size;
                 }
             }
