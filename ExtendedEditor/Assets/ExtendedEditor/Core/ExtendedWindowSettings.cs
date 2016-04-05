@@ -1,7 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class ExtendedWindowSettings {
+namespace TNRD.Editor.Core {
+    public class ExtendedWindowSettings {
 
-    public bool IsFullscreen = true;
+        public bool IsFullscreen = true;
+    }
 }
