@@ -12,12 +12,18 @@ namespace TNRD.Editor.Core {
 
         public Vector2 Position {
             get { return WindowRect.position; }
-            set { WindowRect.position = value; }
+            set {
+                WindowSettings.IsFullscreen = false;
+                WindowRect.position = value;
+            }
         }
 
         public Vector2 Size {
             get { return WindowRect.size; }
-            set { WindowRect.size = value; }
+            set {
+                WindowSettings.IsFullscreen = false;
+                WindowRect.size = value;
+            }
         }
 
         public ExtendedWindowSettings WindowSettings;
