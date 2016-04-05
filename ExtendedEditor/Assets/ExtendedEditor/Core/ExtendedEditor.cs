@@ -139,7 +139,7 @@ namespace TNRD.Editor.Core {
 
             BeginWindows();
             for ( int i = windowsToProcess.Count - 1; i >= 0; i-- ) {
-                GUI.Window( i, windowsToProcess[i].WindowRect, WindowGUI, windowsToProcess[i].WindowContent );
+                GUI.Window( i, windowsToProcess[i].WindowRect, WindowGUI, windowsToProcess[i].WindowContent, ExtendedGUI.DefaultWindowStyle );
             }
             EndWindows();
         }
