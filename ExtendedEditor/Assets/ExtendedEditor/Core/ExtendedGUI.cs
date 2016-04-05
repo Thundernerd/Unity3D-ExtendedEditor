@@ -1,6 +1,5 @@
-﻿using UnityEngine;
-using System.Collections;
-using System.Reflection;
+﻿using System.Reflection;
+using UnityEngine;
 
 public class ExtendedGUI {
 
