@@ -139,7 +139,25 @@ namespace TNRD.Editor.Core {
 
             BeginWindows();
             for ( int i = windowsToProcess.Count - 1; i >= 0; i-- ) {
-                GUI.Window( i, windowsToProcess[i].WindowRect, WindowGUI, windowsToProcess[i].WindowContent, ExtendedGUI.DefaultWindowStyle );
+                GUIStyle wStyle = null;
+
+                switch ( windowsToProcess[i].WindowStyle ) {
+                    case EWindowStyle.Default:
+                        wStyle = ExtendedGUI.DefaultWindowStyle;
+                        break;
+                    case EWindowStyle.NoToolbarDark:
+                        wStyle = ExtendedGUI.DarkNoneWindowStyle;
+                        break;
+                    case EWindowStyle.NoToolbarLight:
+                        wStyle = GUIStyle.none;
+                        break;
+                }
+
+                if ( wStyle == null ) {
+                    GUI.Window( i, windowsToProcess[i].WindowRect, WindowGUI, windowsToProcess[i].WindowContent );
+                } else {
+                    GUI.Window( i, windowsToProcess[i].WindowRect, WindowGUI, windowsToProcess[i].WindowContent, wStyle );
+                }
             }
             EndWindows();
         }

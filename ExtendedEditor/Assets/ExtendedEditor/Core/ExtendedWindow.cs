@@ -22,6 +22,8 @@ namespace TNRD.Editor.Core {
 
         public ExtendedWindowSettings WindowSettings;
 
+        public EWindowStyle WindowStyle;
+
         [JsonIgnore]
         public ExtendedEditor Editor;
 
