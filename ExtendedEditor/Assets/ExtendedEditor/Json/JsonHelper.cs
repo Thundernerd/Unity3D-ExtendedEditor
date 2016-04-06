@@ -1,8 +1,6 @@
-﻿using UnityEngine;
-using System.Collections;
-using System.Reflection;
-using System;
+﻿using System;
 using System.Linq;
+using System.Reflection;
 
 namespace TNRD.Editor.Json {
 
@@ -38,13 +36,21 @@ namespace TNRD.Editor.Json {
         public static FieldInfo[] GetFields( Type type, BindingFlags flags ) {
             if ( type == null ) return new FieldInfo[0];
 
-            return type.GetFields( flags ).Concat( GetFields( type.BaseType, flags ) ).ToArray();
+            return type.GetFields( flags )
+                .Concat( GetFields( type.BaseType, flags ) )
+                .GroupBy( f => f.ToString() )
+                .Select( g => g.First() )
+                .ToArray();
         }
 
         public static PropertyInfo[] GetProperties( Type type, BindingFlags flags ) {
             if ( type == null ) return new PropertyInfo[0];
 
-            return type.GetProperties( flags ).Concat( GetProperties( type.BaseType, flags ) ).ToArray();
+            return type.GetProperties( flags )
+                .Concat( GetProperties( type.BaseType, flags ) )
+                .GroupBy( p => p.ToString() )
+                .Select( g => g.First() )
+                .ToArray();
         }
     }
 }

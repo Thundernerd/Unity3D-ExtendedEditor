@@ -268,11 +268,7 @@ namespace TNRD.Editor.Json {
                         if ( inQuotes ) {
                             currentStringValue += json[i];
                         } else {
-                            // Only add when it doesn't have to prevent errors, no idea why this is happening though
-                            if ( !jObject.KeyValues.ContainsKey( currentName ) ) {
-                                jObject.KeyValues.Add( currentName, currentObjectValue == null ? currentStringValue : currentObjectValue );
-                            }
-
+                            jObject.KeyValues.Add( currentName, currentObjectValue == null ? currentStringValue : currentObjectValue );
                             currentName = "";
                             currentStringValue = "";
                             currentObjectValue = null;
@@ -280,11 +276,7 @@ namespace TNRD.Editor.Json {
                         break;
                     case '}':
                         if ( currentName != null ) {
-                            // Only add when it doesn't have to prevent errors, no idea why this is happening though
-                            if ( !jObject.KeyValues.ContainsKey( currentName ) ) {
-                                jObject.KeyValues.Add( currentName, string.IsNullOrEmpty( currentStringValue ) ? currentObjectValue : currentStringValue );
-                            }
-
+                            jObject.KeyValues.Add( currentName, string.IsNullOrEmpty( currentStringValue ) ? currentObjectValue : currentStringValue );
                             currentName = "";
                             currentStringValue = "";
                             currentObjectValue = null;
