@@ -1,10 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using TNRD.Editor.Json;
+using TNRD.Editor.Utilities;
 using UnityEngine;
 
 namespace TNRD.Editor.Core {
     [Serializable]
     public class ExtendedWindow {
+
+        private static ReflectionData rData = new ReflectionData( typeof( ExtendedControl ) );
 
         public GUIContent WindowContent = new GUIContent();
 
@@ -37,9 +41,16 @@ namespace TNRD.Editor.Core {
         [JsonIgnore]
         public ExtendedEditor Editor;
 
+        [JsonProperty]
+        private List<ExtendedControl> controls = new List<ExtendedControl>();
+
         private bool initializedGUI = false;
 
         private void InternalInitialize() {
+            if ( rData == null ) {
+                rData = new ReflectionData( typeof( ExtendedControl ) );
+            }
+
             if ( Position == Vector2.zero && Size == Vector2.zero ) {
                 WindowRect = new Rect( Vector2.zero, Editor.Size );
             }
@@ -62,18 +73,38 @@ namespace TNRD.Editor.Core {
 
         private void InternalFocus() {
             OnFocus();
+
+            var controlsToProcess = new List<ExtendedControl>( controls );
+            for ( int i = 0; i < controlsToProcess.Count; i++ ) {
+                rData.Focus.Invoke( controlsToProcess[i], null );
+            }
         }
 
         private void InternalLostFocus() {
             OnLostFocus();
+
+            var controlsToProcess = new List<ExtendedControl>( controls );
+            for ( int i = 0; i < controlsToProcess.Count; i++ ) {
+                rData.LostFocus.Invoke( controlsToProcess[i], null );
+            }
         }
 
         private void InternalInspectorUpdate() {
             OnInspectorUpdate();
+
+            var controlsToProcess = new List<ExtendedControl>( controls );
+            for ( int i = 0; i < controlsToProcess.Count; i++ ) {
+                rData.InspectorUpdate.Invoke( controlsToProcess[i], null );
+            }
         }
 
         private void InternalUpdate() {
             OnUpdate();
+
+            var controlsToProcess = new List<ExtendedControl>( controls );
+            for ( int i = 0; i < controlsToProcess.Count; i++ ) {
+                rData.Update.Invoke( controlsToProcess[i], null );
+            }
         }
 
         private void InternalGUI() {
@@ -91,6 +122,11 @@ namespace TNRD.Editor.Core {
                 if ( size.x != Editor.Size.x || size.y != Editor.Size.y ) {
                     WindowRect.size = Editor.Size;
                 }
+            }
+            
+            var controlsToProcess = new List<ExtendedControl>( controls );
+            for ( int i = 0; i < controlsToProcess.Count; i++ ) {
+                rData.GUI.Invoke( controlsToProcess[i], null );
             }
 
             OnGUI();
@@ -126,6 +162,18 @@ namespace TNRD.Editor.Core {
 
         protected virtual void OnUpdate() {
 
+        }
+
+        public void AddControl( ExtendedControl control ) {
+            control.Window = this;
+
+            rData.Initialize.Invoke( control, null );
+            controls.Add( control );
+        }
+
+        public void RemoveControl( ExtendedControl control ) {
+            rData.Destroy.Invoke( control, null );
+            controls.Remove( control );
         }
 
         public static ExtendedEditor CreateEditor() {

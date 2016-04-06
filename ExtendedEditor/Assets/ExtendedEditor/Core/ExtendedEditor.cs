@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using TNRD.Editor.Json;
+using TNRD.Editor.Utilities;
 using UnityEditor;
 using UnityEngine;
 
@@ -9,37 +10,6 @@ namespace TNRD.Editor.Core {
 
     [Serializable]
     public class ExtendedEditor : EditorWindow, ISerializationCallbackReceiver {
-
-        [Serializable]
-        private class ReflectionData {
-            public MethodInfo Initialize;
-            public MethodInfo InitializeGUI;
-            public MethodInfo Destroy;
-
-            public MethodInfo Focus;
-            public MethodInfo LostFocus;
-
-            public MethodInfo Update;
-            public MethodInfo InspectorUpdate;
-
-            public MethodInfo GUI;
-
-            public ReflectionData() {
-                var type = typeof( ExtendedWindow );
-
-                Initialize = type.GetMethod( "InternalInitialize", BindingFlags.Instance | BindingFlags.NonPublic );
-                InitializeGUI = type.GetMethod( "InternalInitializeGUI", BindingFlags.Instance | BindingFlags.NonPublic );
-                Destroy = type.GetMethod( "InternalDestroy", BindingFlags.Instance | BindingFlags.NonPublic );
-
-                Focus = type.GetMethod( "InternalFocus", BindingFlags.Instance | BindingFlags.NonPublic );
-                LostFocus = type.GetMethod( "InternalLostFocus", BindingFlags.Instance | BindingFlags.NonPublic );
-
-                InspectorUpdate = type.GetMethod( "InternalInspectorUpdate", BindingFlags.Instance | BindingFlags.NonPublic );
-                Update = type.GetMethod( "InternalUpdate", BindingFlags.Instance | BindingFlags.NonPublic );
-
-                GUI = type.GetMethod( "InternalGUI", BindingFlags.Instance | BindingFlags.NonPublic );
-            }
-        }
 
         public Vector2 Position {
             get { return position.position; }
@@ -71,7 +41,7 @@ namespace TNRD.Editor.Core {
         // Otherwise some editor vars might not be initialized properly
         private List<ExtendedWindow> windowsToAdd = new List<ExtendedWindow>();
 
-        private ReflectionData rData;
+        private static ReflectionData rData = new ReflectionData( typeof( ExtendedWindow ) );
 
         private string serializedEditor;
         [SerializeField]
@@ -85,7 +55,6 @@ namespace TNRD.Editor.Core {
         private bool gotCreated = false;
 
         private void OnInitialize() {
-            rData = new ReflectionData();
             isInitialized = true;
 
             if ( !gotCreated ) {
@@ -260,10 +229,6 @@ namespace TNRD.Editor.Core {
             }
 
             var editorWindow = CreateInstance<ExtendedEditor>();
-
-            if ( editorWindow.rData == null ) {
-                editorWindow.rData = new ReflectionData();
-            }
 
             editorWindow.windowsToAdd = new List<ExtendedWindow>( windows );
 
