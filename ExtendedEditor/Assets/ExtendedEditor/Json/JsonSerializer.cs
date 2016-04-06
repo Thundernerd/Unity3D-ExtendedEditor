@@ -89,8 +89,8 @@ namespace TNRD.Editor.Json {
 
             var publicFields = type.GetFields( BindingFlags.Instance | BindingFlags.Public ).Where( m =>
                    m.GetCustomAttributes( ignoreType, false ).Length == 0 ).OrderBy( m => m.Name ).ToList();
-            var privateFields = type.GetFields( BindingFlags.Instance | BindingFlags.NonPublic ).Where( m =>
-                   m.GetCustomAttributes( propertyType, false ).Length == 1 ).OrderBy( m => m.Name ).ToList();
+            var privateFields = JsonHelper.GetFields( type, BindingFlags.Instance | BindingFlags.NonPublic ).Where( m =>
+                m.GetCustomAttributes( propertyType, false ).Length == 1 ).OrderBy( m => m.Name ).ToList();
 
             var fields = new List<FieldInfo>();
             fields.AddRange( publicFields );
@@ -121,10 +121,9 @@ namespace TNRD.Editor.Json {
         private string WriteProperties( object value ) {
             var type = value.GetType();
 
-            var properties = type.GetProperties( BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic ).Where( p =>
-                p.GetCustomAttributes( ignoreType, false ).Length == 0 ).ToList();
+            var properties = JsonHelper.GetProperties( type, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic ).Where( p =>
+                  p.GetCustomAttributes( ignoreType, false ).Length == 0 ).ToList();
 
-            // Break fast
             if ( properties.Count == 0 ) return "";
 
             for ( int i = properties.Count - 1; i >= 0; i-- ) {

@@ -184,13 +184,13 @@ namespace TNRD.Editor.Json {
         }
 
         private void SetValue( Type type, object instance, string name, object value ) {
-            var field = type.GetField( name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic );
+            var field = JsonHelper.GetField( type, name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic );
             if ( field != null ) {
                 field.SetValue( instance, value );
                 return;
             }
 
-            var property = type.GetProperty( name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic );
+            var property = JsonHelper.GetProperty( type, name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic );
             if ( property != null ) {
                 if ( property.CanWrite ) {
                     property.SetValue( instance, value, null );
@@ -210,14 +210,14 @@ namespace TNRD.Editor.Json {
         }
 
         private Type GetMemberType( Type type, string name ) {
-            var members = type.GetMember( name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic );
+            var member = JsonHelper.GetMember( type, name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic );
 
-            if ( members.Length == 1 ) {
-                if ( members[0].MemberType == MemberTypes.Field ) {
-                    return ( members[0] as FieldInfo ).FieldType;
-                } else if ( members[0].MemberType == MemberTypes.Property ) {
-                    return ( members[0] as PropertyInfo ).PropertyType;
-                }
+            if ( member == null ) return null;
+
+            if ( member.MemberType == MemberTypes.Field ) {
+                return ( member as FieldInfo ).FieldType;
+            } else if ( member.MemberType == MemberTypes.Property ) {
+                return ( member as PropertyInfo ).PropertyType;
             }
 
             return null;
@@ -268,7 +268,11 @@ namespace TNRD.Editor.Json {
                         if ( inQuotes ) {
                             currentStringValue += json[i];
                         } else {
-                            jObject.KeyValues.Add( currentName, currentObjectValue == null ? currentStringValue : currentObjectValue );
+                            // Only add when it doesn't have to prevent errors, no idea why this is happening though
+                            if ( !jObject.KeyValues.ContainsKey( currentName ) ) {
+                                jObject.KeyValues.Add( currentName, currentObjectValue == null ? currentStringValue : currentObjectValue );
+                            }
+
                             currentName = "";
                             currentStringValue = "";
                             currentObjectValue = null;
@@ -276,7 +280,11 @@ namespace TNRD.Editor.Json {
                         break;
                     case '}':
                         if ( currentName != null ) {
-                            jObject.KeyValues.Add( currentName, string.IsNullOrEmpty( currentStringValue ) ? currentObjectValue : currentStringValue );
+                            // Only add when it doesn't have to prevent errors, no idea why this is happening though
+                            if ( !jObject.KeyValues.ContainsKey( currentName ) ) {
+                                jObject.KeyValues.Add( currentName, string.IsNullOrEmpty( currentStringValue ) ? currentObjectValue : currentStringValue );
+                            }
+
                             currentName = "";
                             currentStringValue = "";
                             currentObjectValue = null;
