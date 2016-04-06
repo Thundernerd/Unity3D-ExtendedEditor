@@ -2,10 +2,12 @@
 using System.Reflection;
 
 namespace TNRD.Editor.Utilities {
+
     [Serializable]
     public class ReflectionData {
         public MethodInfo Initialize;
         public MethodInfo InitializeGUI;
+        public MethodInfo Deserialized;
         public MethodInfo Destroy;
 
         public MethodInfo Focus;
@@ -17,17 +19,20 @@ namespace TNRD.Editor.Utilities {
         public MethodInfo GUI;
 
         public ReflectionData( Type type ) {
-            Initialize = type.GetMethod( "InternalInitialize", BindingFlags.Instance | BindingFlags.NonPublic );
-            InitializeGUI = type.GetMethod( "InternalInitializeGUI", BindingFlags.Instance | BindingFlags.NonPublic );
-            Destroy = type.GetMethod( "InternalDestroy", BindingFlags.Instance | BindingFlags.NonPublic );
+            var flags = BindingFlags.Instance | BindingFlags.NonPublic;
 
-            Focus = type.GetMethod( "InternalFocus", BindingFlags.Instance | BindingFlags.NonPublic );
-            LostFocus = type.GetMethod( "InternalLostFocus", BindingFlags.Instance | BindingFlags.NonPublic );
+            Initialize = type.GetMethod( "InternalInitialize", flags );
+            InitializeGUI = type.GetMethod( "InternalInitializeGUI", flags );
+            Deserialized = type.GetMethod( "InternalDeserialized", flags );
+            Destroy = type.GetMethod( "InternalDestroy", flags );
 
-            InspectorUpdate = type.GetMethod( "InternalInspectorUpdate", BindingFlags.Instance | BindingFlags.NonPublic );
-            Update = type.GetMethod( "InternalUpdate", BindingFlags.Instance | BindingFlags.NonPublic );
+            Focus = type.GetMethod( "InternalFocus", flags );
+            LostFocus = type.GetMethod( "InternalLostFocus", flags );
 
-            GUI = type.GetMethod( "InternalGUI", BindingFlags.Instance | BindingFlags.NonPublic );
+            InspectorUpdate = type.GetMethod( "InternalInspectorUpdate", flags );
+            Update = type.GetMethod( "InternalUpdate", flags );
+
+            GUI = type.GetMethod( "InternalGUI", flags );
         }
     }
 }

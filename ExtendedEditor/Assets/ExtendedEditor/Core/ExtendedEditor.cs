@@ -149,6 +149,7 @@ namespace TNRD.Editor.Core {
 
                 foreach ( var item in editor.windows ) {
                     item.Editor = editor;
+                    rData.Deserialized.Invoke( item, null );
                 }
 
                 tRect.y -= 5f;

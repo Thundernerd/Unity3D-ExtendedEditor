@@ -1,7 +1,6 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System;
 using TNRD.Editor.Json;
-using System;
+using UnityEngine;
 
 namespace TNRD.Editor.Core {
 
@@ -20,6 +19,7 @@ namespace TNRD.Editor.Core {
 
         public Vector2 Size;
 
+        [JsonProperty]
         private bool initializedGUI;
 
         private void InternalInitialize() {
@@ -28,6 +28,10 @@ namespace TNRD.Editor.Core {
 
         private void InternalInitializeGUI() {
             OnInitializeGUI();
+        }
+
+        private void InternalDeserialized() {
+            OnDeserialized();
         }
 
         private void InternalDestroy() {
@@ -62,6 +66,8 @@ namespace TNRD.Editor.Core {
         protected virtual void OnInitialize() { }
 
         protected virtual void OnInitializeGUI() { }
+
+        protected virtual void OnDeserialized() { }
 
         protected virtual void OnDestroy() { }
 

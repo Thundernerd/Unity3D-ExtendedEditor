@@ -5,6 +5,7 @@ using TNRD.Editor.Utilities;
 using UnityEngine;
 
 namespace TNRD.Editor.Core {
+
     [Serializable]
     public class ExtendedWindow {
 
@@ -44,6 +45,7 @@ namespace TNRD.Editor.Core {
         [JsonProperty]
         private List<ExtendedControl> controls = new List<ExtendedControl>();
 
+        [JsonProperty]
         private bool initializedGUI = false;
 
         private void InternalInitialize() {
@@ -65,6 +67,15 @@ namespace TNRD.Editor.Core {
         private void InternalInitializeGUI() {
             OnInitializeGUI();
             initializedGUI = true;
+        }
+
+        private void InternalDeserialize() {
+            foreach ( var item in controls ) {
+                item.Window = this;
+                rData.Deserialized.Invoke( item, null );
+            }
+
+            OnDeserialized();
         }
 
         private void InternalDestroy() {
@@ -123,7 +134,7 @@ namespace TNRD.Editor.Core {
                     WindowRect.size = Editor.Size;
                 }
             }
-            
+
             var controlsToProcess = new List<ExtendedControl>( controls );
             for ( int i = 0; i < controlsToProcess.Count; i++ ) {
                 rData.GUI.Invoke( controlsToProcess[i], null );
@@ -137,6 +148,10 @@ namespace TNRD.Editor.Core {
         }
 
         protected virtual void OnInitializeGUI() {
+
+        }
+
+        protected virtual void OnDeserialized() {
 
         }
 
