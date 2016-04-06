@@ -44,14 +44,10 @@ namespace TNRD.Editor.Core {
                 case EventType.MouseDrag:
                     break;
                 case EventType.KeyDown:
-                    if ( !EditorGUIUtility.editingTextField ) {
-                        keyStates[evt.keyCode].Update( true );
-                    }
+                    keyStates[evt.keyCode].Update( true );
                     break;
                 case EventType.KeyUp:
-                    if ( !EditorGUIUtility.editingTextField ) {
-                        keyStates[evt.keyCode].Update( false );
-                    }
+                    keyStates[evt.keyCode].Update( false );
                     break;
                 case EventType.ScrollWheel:
                     break;
@@ -61,7 +57,7 @@ namespace TNRD.Editor.Core {
                     break;
             }
         }
-        
+
         public bool ButtonUp( EMouseButton button ) {
             return mouseStates[button].IsUp();
         }

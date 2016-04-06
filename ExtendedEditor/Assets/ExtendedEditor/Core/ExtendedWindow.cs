@@ -18,7 +18,6 @@ namespace TNRD.Editor.Core {
         public Vector2 Position {
             get { return WindowRect.position; }
             set {
-                WindowSettings.IsFullscreen = false;
                 WindowRect.position = value;
             }
         }
@@ -26,7 +25,6 @@ namespace TNRD.Editor.Core {
         public Vector2 Size {
             get { return WindowRect.size; }
             set {
-                WindowSettings.IsFullscreen = false;
                 WindowRect.size = value;
             }
         }
