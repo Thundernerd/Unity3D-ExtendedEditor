@@ -69,7 +69,7 @@ namespace TNRD.Editor.Core {
             initializedGUI = true;
         }
 
-        private void InternalDeserialize() {
+        private void InternalDeserialized() {
             foreach ( var item in controls ) {
                 item.Window = this;
                 rData.Deserialized.Invoke( item, null );
