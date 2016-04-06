@@ -23,6 +23,10 @@ namespace TNRD.Editor.Core {
             get { return Window.Assets; }
         }
 
+        public ExtendedInput Input {
+            get { return Window.Input; }
+        }
+
         [JsonProperty]
         private bool initializedGUI;
 

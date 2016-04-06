@@ -1,15 +1,97 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System.Collections.Generic;
+using TNRD.Editor.Utilities;
+using UnityEditor;
+using UnityEngine;
 
-public class ExtendedInput : MonoBehaviour {
+namespace TNRD.Editor.Core {
 
-	// Use this for initialization
-	void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
+    public class ExtendedInput {
+
+        private Dictionary<KeyCode, State<bool>> keyStates = new Dictionary<KeyCode, State<bool>>();
+        private Dictionary<EMouseButton, State<bool>> mouseStates = new Dictionary<EMouseButton, State<bool>>();
+
+        public Vector2 MousePosition = new Vector2();
+
+        public ExtendedInput() {
+            var keycodes = System.Enum.GetValues( typeof( KeyCode ) );
+            for ( int i = 0; i < keycodes.Length; i++ ) {
+                var value = (KeyCode)keycodes.GetValue( i );
+                if ( keyStates.ContainsKey( value ) ) continue;
+                keyStates.Add( value, new State<bool>() );
+            }
+
+            var mousebuttons = System.Enum.GetValues( typeof( EMouseButton ) );
+            for ( int i = 0; i < mousebuttons.Length; i++ ) {
+                var value = (EMouseButton)mousebuttons.GetValue( i );
+                if ( mouseStates.ContainsKey( value ) ) continue;
+                mouseStates.Add( value, new State<bool>() );
+            }
+        }
+
+        public void OnGUI() {
+            var evt = Event.current;
+            MousePosition = evt.mousePosition;
+
+            switch ( evt.type ) {
+                case EventType.MouseDown:
+                    mouseStates[(EMouseButton)evt.button].Update( true );
+                    break;
+                case EventType.MouseUp:
+                    mouseStates[(EMouseButton)evt.button].Update( false );
+                    break;
+                case EventType.MouseMove:
+                    break;
+                case EventType.MouseDrag:
+                    break;
+                case EventType.KeyDown:
+                    if ( !EditorGUIUtility.editingTextField ) {
+                        keyStates[evt.keyCode].Update( true );
+                    }
+                    break;
+                case EventType.KeyUp:
+                    if ( !EditorGUIUtility.editingTextField ) {
+                        keyStates[evt.keyCode].Update( false );
+                    }
+                    break;
+                case EventType.ScrollWheel:
+                    break;
+                case EventType.Repaint:
+                    break;
+                case EventType.Layout:
+                    break;
+            }
+        }
+        
+        public bool ButtonUp( EMouseButton button ) {
+            return mouseStates[button].IsUp();
+        }
+
+        public bool ButtonDown( EMouseButton button ) {
+            return mouseStates[button].IsDown();
+        }
+
+        public bool ButtonPressed( EMouseButton button ) {
+            return mouseStates[button].IsPressed();
+        }
+
+        public bool ButtonReleased( EMouseButton button ) {
+            return mouseStates[button].IsReleased();
+        }
+
+        public bool KeyUp( KeyCode key ) {
+            return keyStates[key].IsUp();
+        }
+
+        public bool KeyDown( KeyCode key ) {
+            return keyStates[key].IsDown();
+        }
+
+        public bool KeyPressed( KeyCode key ) {
+            return keyStates[key].IsPressed();
+        }
+
+        public bool KeyReleased( KeyCode key ) {
+            return keyStates[key].IsReleased();
+        }
+    }
 }

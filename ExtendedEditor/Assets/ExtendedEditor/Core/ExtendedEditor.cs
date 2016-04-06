@@ -30,6 +30,9 @@ namespace TNRD.Editor.Core {
 
         public ExtendedAssets Assets = new ExtendedAssets();
 
+        [JsonIgnore]
+        public ExtendedInput Input = new ExtendedInput();
+
         [JsonProperty]
         private List<ExtendedWindow> windows = new List<ExtendedWindow>();
         [JsonProperty]
@@ -106,6 +109,8 @@ namespace TNRD.Editor.Core {
                 return;
             }
 
+            Input.OnGUI();
+
             var windowsToProcess = new List<ExtendedWindow>( windows );
 
             BeginWindows();
@@ -131,6 +136,9 @@ namespace TNRD.Editor.Core {
                 }
             }
             EndWindows();
+            
+            // Updating input once more to handle states better
+            Input.OnGUI();
         }
 
         private void OnInspectorUpdate() {
@@ -146,6 +154,8 @@ namespace TNRD.Editor.Core {
                 var tRect = new Rect( position );
                 var editor = (ExtendedEditor)JsonDeserializer.Deserialize( serializedEditor, typeof( ExtendedEditor ) );
                 editor.gotCreated = true;
+
+                Input = new ExtendedInput();
 
                 foreach ( var item in editor.windows ) {
                     item.Editor = editor;

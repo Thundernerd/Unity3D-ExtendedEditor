@@ -39,6 +39,12 @@ namespace TNRD.Editor.Core {
             get { return Editor.Assets; }
         }
 
+        public ExtendedInput Input {
+            get {
+                return Editor.Input;
+            }
+        }
+
         [JsonIgnore]
         public ExtendedEditor Editor;
 
