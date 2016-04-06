@@ -19,6 +19,10 @@ namespace TNRD.Editor.Core {
 
         public Vector2 Size;
 
+        public ExtendedAssets Assets {
+            get { return Window.Assets; }
+        }
+
         [JsonProperty]
         private bool initializedGUI;
 
