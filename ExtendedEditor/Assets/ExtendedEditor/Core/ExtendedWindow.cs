@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using TNRD.Editor.Json;
 using TNRD.Editor.Utilities;
+using UnityEditor;
 using UnityEngine;
 
 namespace TNRD.Editor.Core {
@@ -65,6 +66,9 @@ namespace TNRD.Editor.Core {
                 WindowSettings = new ExtendedWindowSettings();
             }
 
+            SceneView.onSceneGUIDelegate -= InternalSceneGUI;
+            SceneView.onSceneGUIDelegate += InternalSceneGUI;
+
             OnInitialize();
         }
 
@@ -83,6 +87,8 @@ namespace TNRD.Editor.Core {
         }
 
         private void InternalDestroy() {
+            SceneView.onSceneGUIDelegate -= InternalSceneGUI;
+
             OnDestroy();
         }
 
@@ -147,6 +153,16 @@ namespace TNRD.Editor.Core {
             OnGUI();
         }
 
+        private void InternalSceneGUI( SceneView view ) {
+            OnSceneGUI( view );
+
+            var controlsToProcess = new List<ExtendedControl>( controls );
+            var param = new object[] { view };
+            for ( int i = 0; i < controlsToProcess.Count; i++ ) {
+                rData.SceneGUI.Invoke( controlsToProcess[i], param );
+            }
+        }
+
         protected virtual void OnInitialize() {
 
         }
@@ -172,6 +188,10 @@ namespace TNRD.Editor.Core {
         }
 
         protected virtual void OnGUI() {
+
+        }
+
+        protected virtual void OnSceneGUI( SceneView view ) {
 
         }
 

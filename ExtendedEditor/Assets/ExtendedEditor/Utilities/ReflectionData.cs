@@ -17,6 +17,7 @@ namespace TNRD.Editor.Utilities {
         public MethodInfo InspectorUpdate;
 
         public MethodInfo GUI;
+        public MethodInfo SceneGUI;
 
         public ReflectionData( Type type ) {
             var flags = BindingFlags.Instance | BindingFlags.NonPublic;
@@ -33,6 +34,7 @@ namespace TNRD.Editor.Utilities {
             Update = type.GetMethod( "InternalUpdate", flags );
 
             GUI = type.GetMethod( "InternalGUI", flags );
+            SceneGUI = type.GetMethod( "InternalSceneGUI", flags );
         }
     }
 }

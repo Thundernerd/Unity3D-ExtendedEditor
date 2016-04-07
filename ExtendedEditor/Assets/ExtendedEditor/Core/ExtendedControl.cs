@@ -1,5 +1,6 @@
 ﻿using System;
 using TNRD.Editor.Json;
+using UnityEditor;
 using UnityEngine;
 
 namespace TNRD.Editor.Core {
@@ -96,6 +97,10 @@ namespace TNRD.Editor.Core {
             OnGUI();
         }
 
+        private void InternalSceneGUI( SceneView view ) {
+            OnSceneGUI( view );
+        }
+
         protected virtual void OnInitialize() { }
 
         protected virtual void OnInitializeGUI() { }
@@ -113,5 +118,7 @@ namespace TNRD.Editor.Core {
         protected virtual void OnUpdate() { }
 
         protected virtual void OnGUI() { }
+
+        protected virtual void OnSceneGUI( SceneView view ) { }
     }
 }
