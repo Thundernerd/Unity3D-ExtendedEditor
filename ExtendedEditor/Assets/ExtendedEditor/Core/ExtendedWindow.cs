@@ -16,6 +16,13 @@ namespace TNRD.Editor.Core {
 
         public Rect WindowRect = new Rect();
 
+        public int WindowID {
+            get { return windowID; }
+        }
+
+        [JsonProperty]
+        private int windowID = 0;
+
         public Vector2 Position {
             get { return WindowRect.position; }
             set {
@@ -53,7 +60,9 @@ namespace TNRD.Editor.Core {
         [JsonProperty]
         private bool initializedGUI = false;
 
-        private void InternalInitialize() {
+        private void InternalInitialize( int id ) {
+            windowID = id;
+
             if ( rData == null ) {
                 rData = new ReflectionData( typeof( ExtendedControl ) );
             }
@@ -201,6 +210,22 @@ namespace TNRD.Editor.Core {
 
         protected virtual void OnUpdate() {
 
+        }
+
+        public void ShowPopup( ExtendedPopup popup ) {
+            Editor.ShowPopup( popup );
+        }
+
+        public void RemovePopup() {
+            Editor.RemovePopup();
+        }
+
+        public void AddWindow( ExtendedWindow window ) {
+            Editor.AddWindow( window );
+        }
+
+        public void RemoveWindow( ExtendedWindow window ) {
+            Editor.RemoveWindow( window );
         }
 
         public void AddControl( ExtendedControl control ) {

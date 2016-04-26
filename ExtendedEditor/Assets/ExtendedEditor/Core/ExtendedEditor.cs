@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using TNRD.Editor.Json;
 using TNRD.Editor.Utilities;
@@ -40,17 +41,24 @@ namespace TNRD.Editor.Core {
         [JsonProperty]
         private bool isInitializedGUI;
 
+        private ExtendedPopup popup = null;
+
         // Windows that will be added and initialized _after_ creating and initializing the editor
         // Otherwise some editor vars might not be initialized properly
         private List<ExtendedWindow> windowsToAdd = new List<ExtendedWindow>();
 
         private static ReflectionData rData = new ReflectionData( typeof( ExtendedWindow ) );
+        private static ReflectionData pData = new ReflectionData( typeof( ExtendedPopup ) );
 
         private string serializedEditor;
         [SerializeField]
         private List<JsonType> serializedWindowTypes;
         [SerializeField]
         private ScriptableObject dockArea;
+
+        [JsonProperty]
+        [SerializeField]
+        private int windowIDs = 0;
 
         // Identifier if the current editor actually got created through user interaction or through Unity
         // Which helps me determine if I should load the editor from EditorPrefs
@@ -114,31 +122,39 @@ namespace TNRD.Editor.Core {
             var windowsToProcess = new List<ExtendedWindow>( windows );
 
             BeginWindows();
-            for ( int i = windowsToProcess.Count - 1; i >= 0; i-- ) {
-                GUIStyle wStyle = null;
+            if ( popup != null ) {
+                popup.WindowRect = GUI.Window( popup.WindowID, popup.WindowRect, PopupGUI, popup.WindowContent, ExtendedGUI.DefaultWindowStyle );
+            }
 
-                switch ( windowsToProcess[i].WindowStyle ) {
-                    case EWindowStyle.Default:
-                        wStyle = ExtendedGUI.DefaultWindowStyle;
-                        break;
-                    case EWindowStyle.NoToolbarDark:
-                        wStyle = ExtendedGUI.DarkNoneWindowStyle;
-                        break;
-                    case EWindowStyle.NoToolbarLight:
-                        wStyle = GUIStyle.none;
-                        break;
-                }
+            for ( int i = windowsToProcess.Count - 1; i >= 0; i-- ) {
+                var wnd = windowsToProcess[i];
+                GUIStyle wStyle = GetWindowStyle( wnd.WindowStyle );
 
                 if ( wStyle == null ) {
-                    GUI.Window( i, windowsToProcess[i].WindowRect, WindowGUI, windowsToProcess[i].WindowContent );
+                    wnd.WindowRect = GUI.Window( wnd.WindowID, wnd.WindowRect, WindowGUI, wnd.WindowContent );
                 } else {
-                    GUI.Window( i, windowsToProcess[i].WindowRect, WindowGUI, windowsToProcess[i].WindowContent, wStyle );
+                    wnd.WindowRect = GUI.Window( wnd.WindowID, wnd.WindowRect, WindowGUI, wnd.WindowContent, wStyle );
                 }
             }
             EndWindows();
-            
+
             // Updating input once more to handle states better
             Input.OnGUI();
+        }
+
+        private GUIStyle GetWindowStyle( EWindowStyle style ) {
+            switch ( style ) {
+                case EWindowStyle.Default:
+                    return ExtendedGUI.DefaultWindowStyle;
+                case EWindowStyle.DefaultUnity:
+                    return null;
+                case EWindowStyle.NoToolbarDark:
+                    return ExtendedGUI.DarkNoneWindowStyle;
+                case EWindowStyle.NoToolbarLight:
+                    return GUIStyle.none;
+            }
+
+            return null;
         }
 
         private void OnInspectorUpdate() {
@@ -182,6 +198,10 @@ namespace TNRD.Editor.Core {
                 Repaint();
             }
 
+            if ( popup != null ) {
+                pData.Update.Invoke( popup, null );
+            }
+
             var windowsToProcess = new List<ExtendedWindow>( windows );
 
             for ( int i = 0; i < windowsToProcess.Count; i++ ) {
@@ -189,16 +209,40 @@ namespace TNRD.Editor.Core {
             }
         }
 
-        private void WindowGUI( int id ) {
-            if ( id < windows.Count ) {
-                rData.GUI.Invoke( windows[id], null );
+        private void PopupGUI( int id ) {
+            if ( popup != null ) {
+                pData.GUI.Invoke( popup, null );
+                GUI.BringWindowToFront( id );
+                GUI.FocusWindow( id );
             }
+        }
+
+        private void WindowGUI( int id ) {
+            var wnd = windows.Where( w => w.WindowID == id ).FirstOrDefault();
+            if ( wnd != null ) {
+                rData.GUI.Invoke( wnd, null );
+            }
+        }
+
+        public void ShowPopup( ExtendedPopup popup ) {
+            RemovePopup();
+
+            popup.Editor = this;
+            pData.Initialize.Invoke( popup, new object[] { GenerateID() } );
+            this.popup = popup;
+        }
+
+        public void RemovePopup() {
+            if ( popup == null ) return;
+
+            pData.Destroy.Invoke( popup, null );
+            popup = null;
         }
 
         public void AddWindow( ExtendedWindow window ) {
             window.Editor = this;
 
-            rData.Initialize.Invoke( window, null );
+            rData.Initialize.Invoke( window, new object[] { GenerateID() } );
             windows.Add( window );
         }
 
@@ -302,6 +346,11 @@ namespace TNRD.Editor.Core {
                     EditorPrefs.DeleteKey( instanceId );
                 }
             }
+        }
+
+        private int GenerateID() {
+            windowIDs++;
+            return windowIDs;
         }
     }
 }
