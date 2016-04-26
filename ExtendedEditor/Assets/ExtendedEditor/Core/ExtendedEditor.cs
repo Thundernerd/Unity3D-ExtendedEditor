@@ -230,6 +230,8 @@ namespace TNRD.Editor.Core {
             popup.Editor = this;
             pData.Initialize.Invoke( popup, new object[] { GenerateID() } );
             this.popup = popup;
+
+            Repaint();
         }
 
         public void RemovePopup() {
@@ -237,6 +239,8 @@ namespace TNRD.Editor.Core {
 
             pData.Destroy.Invoke( popup, null );
             popup = null;
+
+            Repaint();
         }
 
         public void AddWindow( ExtendedWindow window ) {
@@ -244,11 +248,15 @@ namespace TNRD.Editor.Core {
 
             rData.Initialize.Invoke( window, new object[] { GenerateID() } );
             windows.Add( window );
+
+            Repaint();
         }
 
         public void RemoveWindow( ExtendedWindow window ) {
             rData.Destroy.Invoke( window, null );
             windows.Remove( window );
+
+            Repaint();
         }
 
         private static ExtendedEditor CreateEditor( params ExtendedWindow[] windows ) {
