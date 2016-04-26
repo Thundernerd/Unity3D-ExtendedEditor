@@ -66,7 +66,7 @@ namespace TNRD.Editor.Windows {
         }
 
         protected override void OnGUI() {
-            var rect = new Rect( 5, 20, Size.x - 10, Size.y - 60 );
+            var rect = new Rect( 20, 20, Size.x - 35, Size.y - 60 );
             EditorGUI.LabelField( rect, message, style );
 
             switch ( buttons ) {
