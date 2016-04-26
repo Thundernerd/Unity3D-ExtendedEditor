@@ -20,7 +20,10 @@ namespace TNRD.Editor.Core {
         public Vector2 Position {
             get { return WindowRect.position; }
             set {
-                WindowRect.position = value;
+                var temp = value;
+                temp.x = Mathf.Floor( temp.x );
+                temp.y = Mathf.Floor( temp.y );
+                WindowRect.position = temp;
             }
         }
 
@@ -101,7 +104,7 @@ namespace TNRD.Editor.Core {
 
         }
 
-        public void Close() {
+        public virtual void Close() {
             Editor.RemovePopup();
         }
     }
