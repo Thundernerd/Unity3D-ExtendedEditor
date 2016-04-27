@@ -10,7 +10,9 @@ namespace TNRD.Editor.Core {
         private Dictionary<KeyCode, State<bool>> keyStates = new Dictionary<KeyCode, State<bool>>();
         private Dictionary<EMouseButton, State<bool>> mouseStates = new Dictionary<EMouseButton, State<bool>>();
 
-        public Vector2 MousePosition = new Vector2();
+        public Vector2 MousePosition {
+            get { return Event.current.mousePosition; }
+        }
 
         public ExtendedInput() {
             var keycodes = System.Enum.GetValues( typeof( KeyCode ) );
@@ -30,7 +32,9 @@ namespace TNRD.Editor.Core {
 
         public void OnGUI() {
             var evt = Event.current;
-            MousePosition = evt.mousePosition;
+
+            keyStates[KeyCode.LeftShift].Update( evt.shift );
+            keyStates[KeyCode.RightShift].Update( evt.shift );
 
             switch ( evt.type ) {
                 case EventType.MouseDown:

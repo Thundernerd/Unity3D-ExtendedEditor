@@ -30,6 +30,7 @@ namespace TNRD.Editor.Core {
                 temp.x = Mathf.Floor( temp.x );
                 temp.y = Mathf.Floor( temp.y );
                 WindowRect.position = temp;
+                WindowSettings.IsFullscreen = false;
             }
         }
 
@@ -37,6 +38,7 @@ namespace TNRD.Editor.Core {
             get { return WindowRect.size; }
             set {
                 WindowRect.size = value;
+                WindowSettings.IsFullscreen = false;
             }
         }
 
