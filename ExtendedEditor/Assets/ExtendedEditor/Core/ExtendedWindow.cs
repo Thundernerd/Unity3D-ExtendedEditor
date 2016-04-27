@@ -163,6 +163,12 @@ namespace TNRD.Editor.Core {
             }
 
             OnGUI();
+
+            if ( WindowSettings.Draggable ) {
+                var rect = new Rect( 0, 0, Size.x, 17f );
+                GUI.DragWindow( rect );
+                EditorGUIUtility.AddCursorRect( rect, MouseCursor.Pan );
+            }
         }
 
         private void InternalSceneGUI( SceneView view ) {
