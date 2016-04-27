@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using TNRD.Editor.Utilities;
-using UnityEditor;
 using UnityEngine;
 
 namespace TNRD.Editor.Core {

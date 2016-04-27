@@ -1,4 +1,4 @@
-﻿namespace TNRD.Editor.Core {
+﻿namespace TNRD.Editor {
 
     public enum EMouseButton {
         None = -1,
