@@ -60,6 +60,8 @@ namespace TNRD.Editor.Core {
         [SerializeField]
         private int windowIDs = 0;
 
+        private int draggingID = -1;
+
         // Identifier if the current editor actually got created through user interaction or through Unity
         // Which helps me determine if I should load the editor from EditorPrefs
         // It's a weird construction, don't ask.
@@ -135,11 +137,30 @@ namespace TNRD.Editor.Core {
                 } else {
                     wnd.WindowRect = GUI.Window( wnd.WindowID, wnd.WindowRect, WindowGUI, wnd.WindowContent, wStyle );
                 }
+
+                if ( wnd.WindowSettings.Resizable ) {
+                    var r = new Rect(
+                        wnd.WindowRect.x + wnd.WindowRect.width - 7.5f,
+                        wnd.WindowRect.y + wnd.WindowRect.height - 7.5f,
+                        15, 15 );
+
+                    EditorGUIUtility.AddCursorRect( r, MouseCursor.ResizeUpLeft );
+                    if ( r.Contains( Event.current.mousePosition ) && Event.current.type == EventType.MouseDrag ) {
+                        draggingID = wnd.WindowID;
+                    }
+                }
             }
             EndWindows();
 
-            // Updating input once more to handle states better
-            Input.OnGUI();
+            if ( draggingID != -1 && Event.current.type == EventType.MouseDrag && Event.current.button == 0 ) {
+                var wnd = windowsToProcess.Where( w => w.WindowID == draggingID ).FirstOrDefault();
+                wnd.Size += Event.current.delta;
+                Repaint();
+            }
+
+            if ( Input.ButtonReleased( EMouseButton.Left ) ) {
+                draggingID = -1;
+            }
         }
 
         private GUIStyle GetWindowStyle( EWindowStyle style ) {

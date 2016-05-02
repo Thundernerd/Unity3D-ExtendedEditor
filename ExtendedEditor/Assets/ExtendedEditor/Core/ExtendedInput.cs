@@ -19,7 +19,8 @@ namespace TNRD.Editor.Core {
         private InputState current = new InputState();
 
         public Vector2 MouseDelta { get { return current.MouseDelta; } }
-        public Vector2 MousePosition { get { return current.MousePosition; } }
+        public Vector2 DragDelta { get { return current.DragDelta; } }
+        public Vector2 MousePosition { get { return Event.current.mousePosition; } }
         public Vector2 ScrollDelta { get { return current.ScrollDelta; } }
 
         public EventType Type { get { return Event.current.type; } }
@@ -88,6 +89,7 @@ namespace TNRD.Editor.Core {
 
             public Vector2 MousePosition = new Vector2();
             public Vector2 MouseDelta = new Vector2();
+            public Vector2 DragDelta = new Vector2();
             public Vector2 ScrollDelta = new Vector2();
 
             public void Update() {
@@ -106,8 +108,10 @@ namespace TNRD.Editor.Core {
                         mouseStates.AddOrReplace( (EMouseButton)evt.button, false );
                         break;
                     case EventType.MouseMove:
-                    case EventType.MouseDrag:
                         MouseDelta = evt.delta;
+                        break;
+                    case EventType.MouseDrag:
+                        DragDelta = evt.delta;
                         break;
                     case EventType.KeyDown:
                         if ( evt.keyCode == KeyCode.None ) {

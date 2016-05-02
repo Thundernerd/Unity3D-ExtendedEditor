@@ -56,5 +56,24 @@ namespace TNRD.Editor.Core {
             textures.Add( key, tex );
             return textures[key];
         }
+
+        public Texture2D Load( string key, string b64 ) {
+            if ( textures.ContainsKey( key ) ) {
+                return textures[key];
+            }
+
+            var tex = new Texture2D( 1, 1 );
+            tex.hideFlags = HideFlags.HideAndDontSave;
+
+            var bytes = System.Convert.FromBase64String( b64 );
+            tex.LoadImage( bytes );
+
+            textures.Add( key, tex );
+            return textures[key];
+        }
+
+        public bool HasKey( string key ) {
+            return textures.ContainsKey( key );
+        }
     }
 }

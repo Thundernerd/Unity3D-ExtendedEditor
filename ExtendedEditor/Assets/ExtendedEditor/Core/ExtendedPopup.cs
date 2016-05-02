@@ -82,31 +82,6 @@ namespace TNRD.Editor.Core {
             var rect = new Rect( 0, 0, Size.x, 17f );
             GUI.DragWindow( rect );
             EditorGUIUtility.AddCursorRect( rect, MouseCursor.Pan );
-
-            var evt = Event.current;
-            switch ( evt.type ) {
-                case EventType.MouseDown:
-                case EventType.MouseUp:
-                case EventType.MouseMove:
-                case EventType.MouseDrag:
-                case EventType.KeyDown:
-                case EventType.KeyUp:
-                case EventType.ScrollWheel:
-                case EventType.DragUpdated:
-                case EventType.DragPerform:
-                case EventType.DragExited:
-                case EventType.ContextClick:
-                    evt.Use();
-                    break;
-                case EventType.Repaint:
-                case EventType.Layout:
-                case EventType.Ignore:
-                case EventType.Used:
-                case EventType.ValidateCommand:
-                case EventType.ExecuteCommand:
-                default:
-                    break;
-            }
         }
 
         protected virtual void OnInitialize() {
