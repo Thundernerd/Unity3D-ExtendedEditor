@@ -41,7 +41,7 @@ namespace TNRD.Editor.Core {
 
         public bool KeyUp( KeyCode k ) {
             if ( !Event.current.isKey ) return false;
-            return current.GetValue( k );
+            return !current.GetValue( k );
         }
 
         public bool KeyPressed( KeyCode k ) {
@@ -65,7 +65,7 @@ namespace TNRD.Editor.Core {
 
         public bool ButtonUp( EMouseButton b ) {
             if ( !Event.current.isMouse ) return false;
-            return current.GetValue( b );
+            return !current.GetValue( b );
         }
 
         public bool ButtonPressed( EMouseButton b ) {
@@ -111,6 +111,7 @@ namespace TNRD.Editor.Core {
                         MouseDelta = evt.delta;
                         break;
                     case EventType.MouseDrag:
+                        mouseStates.AddOrReplace( (EMouseButton)evt.button, true );
                         DragDelta = evt.delta;
                         break;
                     case EventType.KeyDown:
