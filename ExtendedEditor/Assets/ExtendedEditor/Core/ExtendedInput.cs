@@ -36,16 +36,19 @@ namespace TNRD.Editor.Core {
 
         public bool KeyDown( KeyCode k ) {
             if ( !Event.current.isKey ) return false;
+            if ( current.Consumed ) return false;
             return current.GetValue( k );
         }
 
         public bool KeyUp( KeyCode k ) {
             if ( !Event.current.isKey ) return false;
+            if ( current.Consumed ) return false;
             return !current.GetValue( k );
         }
 
         public bool KeyPressed( KeyCode k ) {
             if ( !Event.current.isKey ) return false;
+            if ( current.Consumed ) return false;
             var cs = current.GetValue( k );
             var ps = previous.GetValue( k );
             return cs && !ps;
@@ -53,6 +56,7 @@ namespace TNRD.Editor.Core {
 
         public bool KeyReleased( KeyCode k ) {
             if ( !Event.current.isKey ) return false;
+            if ( current.Consumed ) return false;
             var cs = current.GetValue( k );
             var ps = previous.GetValue( k );
             return !cs && ps;
@@ -60,16 +64,19 @@ namespace TNRD.Editor.Core {
 
         public bool ButtonDown( EMouseButton b ) {
             if ( !Event.current.isMouse ) return false;
+            if ( current.Consumed ) return false;
             return current.GetValue( b );
         }
 
         public bool ButtonUp( EMouseButton b ) {
             if ( !Event.current.isMouse ) return false;
+            if ( current.Consumed ) return false;
             return !current.GetValue( b );
         }
 
         public bool ButtonPressed( EMouseButton b ) {
             if ( !Event.current.isMouse ) return false;
+            if ( current.Consumed ) return false;
             var cs = current.GetValue( b );
             var ps = previous.GetValue( b );
             return cs && !ps;
@@ -77,15 +84,22 @@ namespace TNRD.Editor.Core {
 
         public bool ButtonReleased( EMouseButton b ) {
             if ( !Event.current.isMouse ) return false;
+            if ( current.Consumed ) return false;
             var cs = current.GetValue( b );
             var ps = previous.GetValue( b );
             return !cs && ps;
+        }
+
+        public void Use() {
+            current.Consumed = true;
         }
 
         private class InputState {
 
             private Dictionary<EMouseButton, bool> mouseStates = new Dictionary<EMouseButton, bool>();
             private Dictionary<KeyCode, bool> keyStates = new Dictionary<KeyCode, bool>();
+
+            public bool Consumed = false;
 
             public Vector2 MousePosition = new Vector2();
             public Vector2 MouseDelta = new Vector2();
