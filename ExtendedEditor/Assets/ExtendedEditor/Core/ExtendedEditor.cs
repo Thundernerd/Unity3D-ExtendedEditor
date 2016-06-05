@@ -73,6 +73,17 @@ namespace TNRD.Editor.Core {
             isInitializedGUI = true;
         }
 
+        private void OnDeserialized() {
+            Input = new ExtendedInput();
+
+            foreach ( var item in windows ) {
+                item.Editor = this;
+                rData.Deserialized.Invoke( item, null );
+            }
+
+            Repaint();
+        }
+
         private void OnDestroy() {
             for ( int i = windows.Count - 1; i >= 0; i-- ) {
                 rData.Destroy.Invoke( windows[i], null );
@@ -291,16 +302,42 @@ namespace TNRD.Editor.Core {
         }
 
         public void OnBeforeSerialize() {
+            var sEditor = new SerializableEditor();
+            sEditor.IsInitialized = isInitialized;
+            sEditor.IsInitializedGUI = isInitializedGUI;
+            sEditor.WindowIDs = windowIDs;
+            sEditor.Windows = windows;
 
+            var b64 = Serializer.SerializeToB64( sEditor );
+            EditorPrefs.SetString( name, b64 );
         }
 
         public void OnAfterDeserialize() {
+            if ( EditorPrefs.HasKey( name ) ) {
+                var b64 = EditorPrefs.GetString( name );
+                EditorPrefs.DeleteKey( name );
 
+                var sEditor = Deserializer.Deserialize<SerializableEditor>( b64 );
+                isInitialized = sEditor.IsInitialized;
+                isInitializedGUI = sEditor.IsInitializedGUI;
+                windowIDs = sEditor.WindowIDs;
+                windows = sEditor.Windows;
+
+                OnDeserialized();
+            }
         }
 
         private int GenerateID() {
             windowIDs++;
             return windowIDs;
+        }
+
+
+        private struct SerializableEditor {
+            public bool IsInitialized;
+            public bool IsInitializedGUI;
+            public int WindowIDs;
+            public List<ExtendedWindow> Windows;
         }
     }
 }
