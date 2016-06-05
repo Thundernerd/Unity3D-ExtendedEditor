@@ -6,7 +6,7 @@ public class SerializableClass : Serializable {
 
     public Dictionary<string, Serializable> Values = new Dictionary<string, Serializable>();
 
-    public SerializableClass( int id ) : base( id ) {
+    public SerializableClass( int id, string type ) : base( id, type ) {
         Mode = ESerializableMode.Class;
     }
 

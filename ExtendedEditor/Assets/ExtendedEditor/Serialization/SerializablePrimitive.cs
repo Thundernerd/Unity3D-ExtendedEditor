@@ -2,7 +2,7 @@
 
     public object Value;
 
-    public SerializablePrimitive( int id, object value ) : base( id ) {
+    public SerializablePrimitive( int id, string type, object value ) : base( id, type ) {
         Mode = ESerializableMode.Primitive;
         Value = value;
     }

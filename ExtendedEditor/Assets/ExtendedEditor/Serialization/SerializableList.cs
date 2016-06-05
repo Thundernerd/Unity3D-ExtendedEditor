@@ -4,7 +4,7 @@ public class SerializableList : Serializable {
 
     public List<Serializable> Values = new List<Serializable>();
 
-    public SerializableList( int id ) : base( id ) {
+    public SerializableList( int id, string type ) : base( id, type ) {
         Mode = ESerializableMode.List;
     }
 
