@@ -179,8 +179,6 @@ namespace TNRD.Editor.Serialization {
         }
 
         #region Serializing
-        private List<SerializedBase> serializables = new List<SerializedBase>();
-
         private Dictionary<Type, List<CSerializable>> cSerializables = new Dictionary<Type, List<CSerializable>>();
 
         private int currentID = 0;

@@ -52,11 +52,6 @@ namespace TNRD.Editor.Core {
 
         private int draggingID = -1;
 
-        // Identifier if the current editor actually got created through user interaction or through Unity
-        // Which helps me determine if I should load the editor from EditorPrefs
-        // It's a weird construction, don't ask.
-        private bool gotCreated = false;
-
         private void OnInitialize() {
             isInitialized = true;
 
@@ -296,7 +291,6 @@ namespace TNRD.Editor.Core {
             }
 
             inst.name = id;
-            inst.gotCreated = true;
 
             return inst;
         }
@@ -331,7 +325,6 @@ namespace TNRD.Editor.Core {
             windowIDs++;
             return windowIDs;
         }
-
 
         private struct SerializableEditor {
             public bool IsInitialized;
