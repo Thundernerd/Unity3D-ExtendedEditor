@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using TNRD.Editor.Serialization;
 using TNRD.Editor.Utilities;
 using UnityEditor;
 using UnityEngine;
 
 namespace TNRD.Editor.Core {
 
-    [Serializable]
     public class ExtendedWindow {
 
         private static ReflectionData rData = new ReflectionData( typeof( ExtendedControl ) );

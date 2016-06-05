@@ -1,4 +1,4 @@
-﻿using TNRD.Editor.Json;
+﻿using TNRD.Editor.Serialization;
 using UnityEditor;
 using UnityEngine;
 
@@ -14,7 +14,7 @@ namespace TNRD.Editor.Core {
             get { return windowID; }
         }
 
-        [JsonProperty]
+        [RequireSerialization]
         private int windowID = 0;
 
         public Vector2 Position {
@@ -44,10 +44,10 @@ namespace TNRD.Editor.Core {
             }
         }
 
-        [JsonIgnore]
+        [IgnoreSerialization]
         public ExtendedEditor Editor;
 
-        [JsonProperty]
+        [RequireSerialization]
         private bool initializedGUI = false;
 
         private void InternalInitialize( int id ) {
