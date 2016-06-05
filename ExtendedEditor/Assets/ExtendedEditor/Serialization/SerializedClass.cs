@@ -1,16 +1,17 @@
-﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-public class SerializedClass : SerializedBase {
+namespace TNRD.Editor.Serialization {
 
-    public Dictionary<string, SerializedBase> Values = new Dictionary<string, SerializedBase>();
+    public class SerializedClass : SerializedBase {
 
-    public SerializedClass( int id, string type ) : base( id, type ) {
-        Mode = ESerializableMode.Class;
-    }
+        public Dictionary<string, SerializedBase> Values = new Dictionary<string, SerializedBase>();
 
-    public void Add( string name, SerializedBase value ) {
-        Values.Add( name, value );
+        public SerializedClass( int id, string type ) : base( id, type ) {
+            Mode = ESerializableMode.Class;
+        }
+
+        public void Add( string name, SerializedBase value ) {
+            Values.Add( name, value );
+        }
     }
 }

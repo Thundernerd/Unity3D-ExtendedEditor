@@ -1,14 +1,17 @@
 ﻿using System.Collections.Generic;
 
-public class SerializedList : SerializedBase {
+namespace TNRD.Editor.Serialization {
 
-    public List<SerializedBase> Values = new List<SerializedBase>();
+    public class SerializedList : SerializedBase {
 
-    public SerializedList( int id, string type ) : base( id, type ) {
-        Mode = ESerializableMode.List;
-    }
+        public List<SerializedBase> Values = new List<SerializedBase>();
 
-    public void Add( SerializedBase value ) {
-        Values.Add( value );
+        public SerializedList( int id, string type ) : base( id, type ) {
+            Mode = ESerializableMode.List;
+        }
+
+        public void Add( SerializedBase value ) {
+            Values.Add( value );
+        }
     }
 }

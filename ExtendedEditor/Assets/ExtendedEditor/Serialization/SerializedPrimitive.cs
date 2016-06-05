@@ -1,9 +1,12 @@
-﻿public class SerializedPrimitive : SerializedBase {
+﻿namespace TNRD.Editor.Serialization {
 
-    public object Value;
+    public class SerializedPrimitive : SerializedBase {
 
-    public SerializedPrimitive( int id, string type, object value ) : base( id, type ) {
-        Mode = ESerializableMode.Primitive;
-        Value = value;
+        public object Value;
+
+        public SerializedPrimitive( int id, string type, object value ) : base( id, type ) {
+            Mode = ESerializableMode.Primitive;
+            Value = value;
+        }
     }
 }

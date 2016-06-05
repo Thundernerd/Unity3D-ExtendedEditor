@@ -1,13 +1,16 @@
-﻿public class SerializedBase {
+﻿namespace TNRD.Editor.Serialization {
 
-    public int ID;
-    public bool IsNull = false;
-    public bool IsReference = false;
-    public ESerializableMode Mode;
-    public string Type;
+    public class SerializedBase {
 
-    public SerializedBase( int id, string type ) {
-        ID = id;
-        Type = type;
+        public int ID;
+        public bool IsNull = false;
+        public bool IsReference = false;
+        public ESerializableMode Mode;
+        public string Type;
+
+        public SerializedBase( int id, string type ) {
+            ID = id;
+            Type = type;
+        }
     }
 }
