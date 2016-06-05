@@ -8,7 +8,7 @@ using System.Reflection;
 public class Serializer {
 
     #region Writing
-    public static Serializable Serialize( object value ) {
+    public static SerializedBase Serialize( object value ) {
         if ( value == null ) return null;
 
         var serializer = new Serializer();
@@ -64,7 +64,7 @@ public class Serializer {
         return buffer;
     }
 
-    private static void WriteDefaults( BinaryWriter writer, Serializable obj ) {
+    private static void WriteDefaults( BinaryWriter writer, SerializedBase obj ) {
         writer.Write( obj.ID );
         writer.Write( obj.IsNull );
         writer.Write( obj.IsReference );
@@ -72,7 +72,7 @@ public class Serializer {
         writer.Write( obj.Type );
     }
 
-    private static void WriteClass( BinaryWriter writer, SerializableClass obj ) {
+    private static void WriteClass( BinaryWriter writer, SerializedClass obj ) {
         WriteDefaults( writer, obj );
         writer.Write( obj.Values.Count );
 
@@ -80,16 +80,16 @@ public class Serializer {
             writer.Write( item.Key );
             switch ( item.Value.Mode ) {
                 case ESerializableMode.Primitive:
-                    WritePrimitive( writer, (SerializablePrimitive)item.Value );
+                    WritePrimitive( writer, (SerializedPrimitive)item.Value );
                     break;
                 case ESerializableMode.Enum:
-                    WriteEnum( writer, (SerializableEnum)item.Value );
+                    WriteEnum( writer, (SerializedEnum)item.Value );
                     break;
                 case ESerializableMode.List:
-                    WriteList( writer, (SerializableList)item.Value );
+                    WriteList( writer, (SerializedList)item.Value );
                     break;
                 case ESerializableMode.Class:
-                    WriteClass( writer, (SerializableClass)item.Value );
+                    WriteClass( writer, (SerializedClass)item.Value );
                     break;
                 default:
                     break;
@@ -97,28 +97,28 @@ public class Serializer {
         }
     }
 
-    private static void WriteEnum( BinaryWriter writer, SerializableEnum obj ) {
+    private static void WriteEnum( BinaryWriter writer, SerializedEnum obj ) {
         WriteDefaults( writer, obj );
         writer.Write( (int)obj.Value );
     }
 
-    private static void WriteList( BinaryWriter writer, SerializableList obj ) {
+    private static void WriteList( BinaryWriter writer, SerializedList obj ) {
         WriteDefaults( writer, obj );
         writer.Write( obj.Values.Count );
 
         foreach ( var item in obj.Values ) {
             switch ( item.Mode ) {
                 case ESerializableMode.Primitive:
-                    WritePrimitive( writer, (SerializablePrimitive)item );
+                    WritePrimitive( writer, (SerializedPrimitive)item );
                     break;
                 case ESerializableMode.Enum:
-                    WriteEnum( writer, (SerializableEnum)item );
+                    WriteEnum( writer, (SerializedEnum)item );
                     break;
                 case ESerializableMode.List:
-                    WriteList( writer, (SerializableList)item );
+                    WriteList( writer, (SerializedList)item );
                     break;
                 case ESerializableMode.Class:
-                    WriteClass( writer, (SerializableClass)item );
+                    WriteClass( writer, (SerializedClass)item );
                     break;
                 default:
                     break;
@@ -126,7 +126,7 @@ public class Serializer {
         }
     }
 
-    private static void WritePrimitive( BinaryWriter writer, SerializablePrimitive obj ) {
+    private static void WritePrimitive( BinaryWriter writer, SerializedPrimitive obj ) {
         WriteDefaults( writer, obj );
 
         var type = Type.GetType( obj.Type );
@@ -165,17 +165,17 @@ public class Serializer {
     #endregion
     
     private struct CSerializable {
-        public Serializable Serializable;
+        public SerializedBase Serializable;
         public object Value;
 
-        public CSerializable( Serializable serializable, object value ) {
+        public CSerializable( SerializedBase serializable, object value ) {
             Value = value;
             Serializable = serializable;
         }
     }
 
     #region Serializing
-    private List<Serializable> serializables = new List<Serializable>();
+    private List<SerializedBase> serializables = new List<SerializedBase>();
 
     private Dictionary<Type, List<CSerializable>> cSerializables = new Dictionary<Type, List<CSerializable>>();
 
@@ -186,12 +186,12 @@ public class Serializer {
         return id;
     }
 
-    private SerializableClass SerializeClass( object value, Type valueType ) {
+    private SerializedClass SerializeClass( object value, Type valueType ) {
         if ( value == null ) {
-            return new SerializableClass( GetNextID(), valueType.FullName ) { IsNull = true };
+            return new SerializedClass( GetNextID(), valueType.FullName ) { IsNull = true };
         }
 
-        var obj = new SerializableClass( GetNextID(), valueType.FullName );
+        var obj = new SerializedClass( GetNextID(), valueType.FullName );
 
         if ( Compare( value, valueType, ref obj.ID ) ) {
             obj.IsReference = true;
@@ -271,20 +271,20 @@ public class Serializer {
         return obj;
     }
 
-    private SerializableEnum SerializeEnum( object value, Type valueType ) {
+    private SerializedEnum SerializeEnum( object value, Type valueType ) {
         if ( value == null ) {
-            return new SerializableEnum( GetNextID(), valueType.FullName, null ) { IsNull = true };
+            return new SerializedEnum( GetNextID(), valueType.FullName, null ) { IsNull = true };
         }
 
-        return new SerializableEnum( GetNextID(), valueType.FullName, value );
+        return new SerializedEnum( GetNextID(), valueType.FullName, value );
     }
 
-    private SerializableList SerializeList( object value, Type valueType ) {
+    private SerializedList SerializeList( object value, Type valueType ) {
         if ( value == null ) {
-            return new SerializableList( GetNextID(), valueType.FullName ) { IsNull = true };
+            return new SerializedList( GetNextID(), valueType.FullName ) { IsNull = true };
         }
 
-        var list = new SerializableList( GetNextID(), valueType.FullName );
+        var list = new SerializedList( GetNextID(), valueType.FullName );
 
         if ( Compare( value, valueType, ref list.ID ) ) {
             list.IsReference = true;
@@ -303,7 +303,7 @@ public class Serializer {
             vType = valueType.GetGenericArguments()[0];
         }
 
-        Func<object, Type, Serializable> method = null;
+        Func<object, Type, SerializedBase> method = null;
         bool isClass = false;
 
         if ( vType.IsArray ) {
@@ -346,11 +346,11 @@ public class Serializer {
         return list;
     }
 
-    private SerializablePrimitive SerializePrimitive( object value, Type valueType ) {
-        return new SerializablePrimitive( GetNextID(), valueType.FullName, value );
+    private SerializedPrimitive SerializePrimitive( object value, Type valueType ) {
+        return new SerializedPrimitive( GetNextID(), valueType.FullName, value );
     }
 
-    private void AddToComparables( Serializable serializable, object value, Type valueType ) {
+    private void AddToComparables( SerializedBase serializable, object value, Type valueType ) {
         if ( !cSerializables.ContainsKey( valueType ) ) {
             cSerializables.Add( valueType, new List<CSerializable>() );
         }

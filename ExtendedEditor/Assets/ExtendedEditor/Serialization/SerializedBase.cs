@@ -1,4 +1,4 @@
-﻿public class Serializable {
+﻿public class SerializedBase {
 
     public int ID;
     public bool IsNull = false;
@@ -6,7 +6,7 @@
     public ESerializableMode Mode;
     public string Type;
 
-    public Serializable( int id, string type ) {
+    public SerializedBase( int id, string type ) {
         ID = id;
         Type = type;
     }
