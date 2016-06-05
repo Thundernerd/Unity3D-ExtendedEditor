@@ -202,12 +202,12 @@ namespace TNRD.Editor.Serialization {
                 AddToComparables( obj, value, valueType );
             }
 
-            var fields = valueType.GetFields( BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic )
+            var fields = SerializationHelper.GetFields( valueType, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic )
                             .Where( f =>
                             ( f.IsPublic && f.GetCustomAttributes( typeof( IgnoreSerializationAttribute ), false ).Length == 0 ) ||
                             ( f.IsPrivate && f.GetCustomAttributes( typeof( RequireSerializationAttribute ), false ).Length == 1 ) ).ToList();
 
-            var properties = valueType.GetProperties( BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic )
+            var properties = SerializationHelper.GetProperties( valueType, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic )
                             .Where( p => p.CanRead && p.CanWrite )
                             .Where( p => p.GetCustomAttributes( typeof( IgnoreSerializationAttribute ), false ).Length == 0 ).ToList();
 

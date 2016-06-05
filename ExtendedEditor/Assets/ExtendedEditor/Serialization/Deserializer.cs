@@ -41,7 +41,7 @@ namespace TNRD.Editor.Serialization {
 
             return Convert.ChangeType( value, type );
         }
-        
+
         #region Reading
         private Dictionary<int, object> deserializedObjects = new Dictionary<int, object>();
 
@@ -59,12 +59,12 @@ namespace TNRD.Editor.Serialization {
                 deserializedObjects.Add( value.ID, instance );
             }
 
-            var fields = type.GetFields( BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic )
+            var fields = SerializationHelper.GetFields( type, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic )
                             .Where( f =>
                             ( f.IsPublic && f.GetCustomAttributes( typeof( IgnoreSerializationAttribute ), false ).Length == 0 ) ||
                             ( f.IsPrivate && f.GetCustomAttributes( typeof( RequireSerializationAttribute ), false ).Length == 1 ) ).ToList();
 
-            var properties = type.GetProperties( BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic )
+            var properties = SerializationHelper.GetProperties( type, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic )
                             .Where( p => p.CanRead && p.CanWrite )
                             .Where( p => p.GetCustomAttributes( typeof( IgnoreSerializationAttribute ), false ).Length == 0 ).ToList();
 
