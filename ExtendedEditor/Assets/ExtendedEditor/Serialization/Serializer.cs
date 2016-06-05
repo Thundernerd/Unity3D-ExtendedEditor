@@ -80,6 +80,7 @@ namespace TNRD.Editor.Serialization {
 
             foreach ( var item in obj.Values ) {
                 writer.Write( item.Key );
+                writer.Write( (int)item.Value.Mode );
                 switch ( item.Value.Mode ) {
                     case ESerializableMode.Primitive:
                         WritePrimitive( writer, (SerializedPrimitive)item.Value );
@@ -109,6 +110,7 @@ namespace TNRD.Editor.Serialization {
             writer.Write( obj.Values.Count );
 
             foreach ( var item in obj.Values ) {
+                writer.Write( (int)item.Mode );
                 switch ( item.Mode ) {
                     case ESerializableMode.Primitive:
                         WritePrimitive( writer, (SerializedPrimitive)item );

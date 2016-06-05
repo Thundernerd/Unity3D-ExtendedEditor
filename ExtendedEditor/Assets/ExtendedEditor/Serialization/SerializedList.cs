@@ -10,6 +10,12 @@ namespace TNRD.Editor.Serialization {
             Mode = ESerializableMode.List;
         }
 
+        public SerializedList( SerializedBase sBase ) : base( sBase.ID, sBase.Type ) {
+            IsNull = sBase.IsNull;
+            IsReference = sBase.IsReference;
+            Mode = sBase.Mode;
+        }
+
         public void Add( SerializedBase value ) {
             Values.Add( value );
         }

@@ -8,5 +8,11 @@
             Mode = ESerializableMode.Primitive;
             Value = value;
         }
+
+        public SerializedPrimitive( SerializedBase sBase ) : base( sBase.ID, sBase.Type ) {
+            IsNull = sBase.IsNull;
+            IsReference = sBase.IsReference;
+            Mode = sBase.Mode;
+        }
     }
 }
