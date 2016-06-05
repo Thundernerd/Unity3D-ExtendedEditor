@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using TNRD.Editor.Json;
 using TNRD.Editor.Utilities;
 using UnityEditor;
 using UnityEngine;
@@ -20,7 +19,7 @@ namespace TNRD.Editor.Core {
             get { return windowID; }
         }
 
-        [JsonProperty]
+        [RequireSerialization]
         private int windowID = 0;
 
         public Vector2 Position {
@@ -56,13 +55,13 @@ namespace TNRD.Editor.Core {
             }
         }
 
-        [JsonIgnore]
+        [IgnoreSerialization]
         public ExtendedEditor Editor;
 
-        [JsonProperty]
+        [RequireSerialization]
         private List<ExtendedControl> controls = new List<ExtendedControl>();
 
-        [JsonProperty]
+        [RequireSerialization]
         private bool initializedGUI = false;
 
         private GUIStyle maximizeButtonStyle;
