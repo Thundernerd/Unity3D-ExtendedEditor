@@ -1,10 +1,7 @@
 ﻿using System;
 
-namespace TNRD.Editor.Json {
+namespace TNRD.Editor.Serialization {
 
     [AttributeUsage( AttributeTargets.Field | AttributeTargets.Property, Inherited = false, AllowMultiple = false )]
-    sealed class JsonPropertyAttribute : Attribute {
-
-        public JsonPropertyAttribute() { }
-    }
+    sealed class RequireSerializationAttribute : Attribute { }
 }

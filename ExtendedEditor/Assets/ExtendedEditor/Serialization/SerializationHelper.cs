@@ -2,9 +2,9 @@
 using System.Linq;
 using System.Reflection;
 
-namespace TNRD.Editor.Json {
+namespace TNRD.Editor.Serialization {
 
-    public class JsonHelper {
+    public class SerializationHelper {
 
         public static PropertyInfo GetProperty( Type type, string name, BindingFlags flags ) {
             if ( type == null ) return null;

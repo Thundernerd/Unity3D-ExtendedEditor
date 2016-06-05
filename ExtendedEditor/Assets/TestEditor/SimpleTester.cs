@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using TNRD.Editor;
 using TNRD.Editor.Core;
-using TNRD.Editor.Json;
+using TNRD.Editor.Serialization;
 using TNRD.Editor.Windows;
 using UnityEditor;
 using UnityEngine;
@@ -10,9 +9,9 @@ using UnityEngine;
 [Serializable]
 class SimpleTester : ExtendedWindow {
 
-    [JsonProperty]
+    [RequireSerialization]
     private string texto = "";
-    [JsonProperty]
+    [RequireSerialization]
     private float sliderV = 0.5f;
 
     [MenuItem( "TNRD/Test Editor" )]
@@ -33,12 +32,12 @@ class SimpleTester : ExtendedWindow {
     }
 
     protected override void OnInitialize() {
-        //AddControl( new BoxControl() );
+        AddControl( new BoxControl() { Position = new Vector2( 250, 250 ) } );
 
         Editor.wantsMouseMove = true;
 
         WindowSettings.Draggable = true;
-        Size = new Vector2( 250, 250 );
+        Size = new Vector2( 500, 500 );
     }
 
     protected override void OnGUI() {
@@ -46,11 +45,11 @@ class SimpleTester : ExtendedWindow {
         sliderV = EditorGUILayout.Slider( sliderV, 0, 2 );
         texto = EditorGUILayout.TextField( texto );
 
-        if (Input.ButtonPressed(EMouseButton.Left)) {
+        if ( Input.ButtonPressed( EMouseButton.Left ) ) {
             Debug.Log( "Left Pressed" );
         }
 
-        if (Input.ButtonReleased(EMouseButton.Left)) {
+        if ( Input.ButtonReleased( EMouseButton.Left ) ) {
             Debug.Log( "Left Released" );
         }
 

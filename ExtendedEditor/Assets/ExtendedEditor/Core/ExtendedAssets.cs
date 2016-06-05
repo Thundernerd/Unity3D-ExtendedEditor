@@ -1,15 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using TNRD.Editor.Json;
+using TNRD.Editor.Serialization;
 using UnityEngine;
 
 namespace TNRD.Editor.Core {
 
     public class ExtendedAssets {
 
-        [JsonIgnore]
+        [IgnoreSerialization]
         private Dictionary<string, Texture2D> textures;
-        [JsonProperty]
+        [RequireSerialization]
         private string path;
 
         public Texture2D this[string key] {

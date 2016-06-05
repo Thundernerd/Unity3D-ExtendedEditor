@@ -1,15 +1,12 @@
-﻿using System;
-using TNRD.Editor.Json;
+﻿using TNRD.Editor.Serialization;
 using UnityEditor;
 using UnityEngine;
 
 namespace TNRD.Editor.Core {
 
-    [Serializable]
     public class ExtendedControl {
 
-        [JsonIgnore]
-        [NonSerialized]
+        [IgnoreSerialization]
         public ExtendedWindow Window;
 
         public Rect Rectangle {
@@ -53,7 +50,7 @@ namespace TNRD.Editor.Core {
 
         public EAnchor AnchorPoint = EAnchor.MiddleCenter;
 
-        [JsonProperty]
+        [RequireSerialization]
         private bool initializedGUI;
 
         private void InternalInitialize() {
