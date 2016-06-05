@@ -192,10 +192,10 @@ namespace TNRD.Editor.Serialization {
 
         private SerializedClass SerializeClass( object value, Type valueType ) {
             if ( value == null ) {
-                return new SerializedClass( GetNextID(), valueType.FullName ) { IsNull = true };
+                return new SerializedClass( GetNextID(), valueType.AssemblyQualifiedName ) { IsNull = true };
             }
 
-            var obj = new SerializedClass( GetNextID(), valueType.FullName );
+            var obj = new SerializedClass( GetNextID(), valueType.AssemblyQualifiedName );
 
             if ( Compare( value, valueType, ref obj.ID ) ) {
                 obj.IsReference = true;
@@ -277,18 +277,18 @@ namespace TNRD.Editor.Serialization {
 
         private SerializedEnum SerializeEnum( object value, Type valueType ) {
             if ( value == null ) {
-                return new SerializedEnum( GetNextID(), valueType.FullName, null ) { IsNull = true };
+                return new SerializedEnum( GetNextID(), valueType.AssemblyQualifiedName, null ) { IsNull = true };
             }
 
-            return new SerializedEnum( GetNextID(), valueType.FullName, value );
+            return new SerializedEnum( GetNextID(), valueType.AssemblyQualifiedName, value );
         }
 
         private SerializedList SerializeList( object value, Type valueType ) {
             if ( value == null ) {
-                return new SerializedList( GetNextID(), valueType.FullName ) { IsNull = true };
+                return new SerializedList( GetNextID(), valueType.AssemblyQualifiedName ) { IsNull = true };
             }
 
-            var list = new SerializedList( GetNextID(), valueType.FullName );
+            var list = new SerializedList( GetNextID(), valueType.AssemblyQualifiedName );
 
             if ( Compare( value, valueType, ref list.ID ) ) {
                 list.IsReference = true;
@@ -351,7 +351,7 @@ namespace TNRD.Editor.Serialization {
         }
 
         private SerializedPrimitive SerializePrimitive( object value, Type valueType ) {
-            return new SerializedPrimitive( GetNextID(), valueType.FullName, value );
+            return new SerializedPrimitive( GetNextID(), valueType.AssemblyQualifiedName, value );
         }
 
         private void AddToComparables( SerializedBase serializable, object value, Type valueType ) {
