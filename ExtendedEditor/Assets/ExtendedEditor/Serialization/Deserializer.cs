@@ -59,17 +59,19 @@ namespace TNRD.Editor.Serialization {
                 deserializedObjects.Add( value.ID, instance );
             }
 
-            var fields = SerializationHelper.GetFields( type, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic )
+            var fields = SerializationHelper.GetFields( type, BindingFlags.Instance | BindingFlags.FlattenHierarchy | BindingFlags.Public | BindingFlags.NonPublic )
                             .Where( f =>
                             ( f.IsPublic && f.GetCustomAttributes( typeof( IgnoreSerializationAttribute ), false ).Length == 0 ) ||
-                            ( f.IsPrivate && f.GetCustomAttributes( typeof( RequireSerializationAttribute ), false ).Length == 1 ) ).ToList();
+                            ( f.IsPrivate && f.GetCustomAttributes( typeof( RequireSerializationAttribute ), false ).Length == 1 ) )
+                            .OrderBy( f => f.Name ).ToList();
 
-            var properties = SerializationHelper.GetProperties( type, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic )
+            var properties = SerializationHelper.GetProperties( type, BindingFlags.Instance | BindingFlags.FlattenHierarchy | BindingFlags.Public | BindingFlags.NonPublic )
                             .Where( p => p.CanRead && p.CanWrite )
-                            .Where( p => p.GetCustomAttributes( typeof( IgnoreSerializationAttribute ), false ).Length == 0 ).ToList();
+                            .Where( p => p.GetCustomAttributes( typeof( IgnoreSerializationAttribute ), false ).Length == 0 )
+                            .OrderBy( p => p.Name ).ToList();
 
             foreach ( var item in value.Values ) {
-                var name = item.Key;
+                var name = item.Key.Substring( 0, item.Key.IndexOf( '|' ) );
                 object tValue = null;
 
                 var s = item.Value;
@@ -92,12 +94,14 @@ namespace TNRD.Editor.Serialization {
 
                 var field = fields.Where( f => f.Name == name ).FirstOrDefault();
                 if ( field != null ) {
+                    fields.Remove( field );
                     field.SetValue( instance, tValue );
                     continue;
                 }
 
                 var property = properties.Where( p => p.Name == name ).FirstOrDefault();
                 if ( property != null ) {
+                    properties.Remove( property );
                     property.SetValue( instance, tValue, null );
                     continue;
                 }
