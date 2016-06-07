@@ -61,6 +61,8 @@ namespace TNRD.Editor.Core {
         [RequireSerialization]
         private List<ExtendedControl> controls = new List<ExtendedControl>();
 
+        private List<Action> guiActions = new List<Action>();
+
         [RequireSerialization]
         private bool initializedGUI = false;
 
@@ -170,6 +172,16 @@ namespace TNRD.Editor.Core {
                 }
             }
 
+            if ( guiActions.Count > 0 ) {
+                var gActions = new List<Action>( guiActions );
+                gActions.Reverse();
+                guiActions.Clear();
+
+                for ( int i = gActions.Count - 1; i >= 0; i-- ) {
+                    gActions[i].Invoke();
+                }
+            }
+
             var controlsToProcess = new List<ExtendedControl>( controls );
             for ( int i = 0; i < controlsToProcess.Count; i++ ) {
                 rData.GUI.Invoke( controlsToProcess[i], null );
@@ -272,6 +284,15 @@ namespace TNRD.Editor.Core {
         public void RemoveControl( ExtendedControl control ) {
             rData.Destroy.Invoke( control, null );
             controls.Remove( control );
+        }
+
+        public void RunOnGUIThread( Action action ) {
+            guiActions.Add( action );
+        }
+
+        public void RunOnGUIThreadImmediate( Action action ) {
+            guiActions.Add( action );
+            Editor.Repaint();
         }
 
         public static ExtendedEditor CreateEditor() {

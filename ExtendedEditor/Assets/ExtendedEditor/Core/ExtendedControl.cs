@@ -1,4 +1,6 @@
-﻿using TNRD.Editor.Serialization;
+﻿using System;
+using System.Collections.Generic;
+using TNRD.Editor.Serialization;
 using UnityEditor;
 using UnityEngine;
 
@@ -53,6 +55,8 @@ namespace TNRD.Editor.Core {
         [RequireSerialization]
         private bool initializedGUI;
 
+        private List<Action> guiActions = new List<Action>();
+
         private void InternalInitialize() {
             OnInitialize();
         }
@@ -95,6 +99,16 @@ namespace TNRD.Editor.Core {
                 initializedGUI = true;
             }
 
+            if ( guiActions.Count > 0 ) {
+                var gActions = new List<Action>( guiActions );
+                gActions.Reverse();
+                guiActions.Clear();
+
+                for ( int i = gActions.Count - 1; i >= 0; i-- ) {
+                    gActions[i].Invoke();
+                }
+            }
+
             OnGUI();
         }
 
@@ -123,5 +137,14 @@ namespace TNRD.Editor.Core {
         protected virtual void OnGUI() { }
 
         protected virtual void OnSceneGUI( SceneView view ) { }
+
+        public void RunOnGUIThread( Action action ) {
+            guiActions.Add( action );
+        }
+
+        public void RunOnGUIThreadImmediate( Action action ) {
+            guiActions.Add( action );
+            Window.Editor.Repaint();
+        }
     }
 }
