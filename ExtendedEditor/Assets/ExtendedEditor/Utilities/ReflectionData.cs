@@ -7,8 +7,10 @@ namespace TNRD.Editor.Utilities {
     public class ReflectionData {
         public MethodInfo Initialize;
         public MethodInfo InitializeGUI;
-        public MethodInfo Deserialized;
         public MethodInfo Destroy;
+        
+        public MethodInfo BeforeSerialize;
+        public MethodInfo AfterDeserialize;
 
         public MethodInfo Focus;
         public MethodInfo LostFocus;
@@ -24,8 +26,10 @@ namespace TNRD.Editor.Utilities {
 
             Initialize = type.GetMethod( "InternalInitialize", flags );
             InitializeGUI = type.GetMethod( "InternalInitializeGUI", flags );
-            Deserialized = type.GetMethod( "InternalDeserialized", flags );
             Destroy = type.GetMethod( "InternalDestroy", flags );
+
+            BeforeSerialize = type.GetMethod( "InternalBeforeSerialize", flags );
+            AfterDeserialize = type.GetMethod( "InternalAfterDeserialize", flags );
 
             Focus = type.GetMethod( "InternalFocus", flags );
             LostFocus = type.GetMethod( "InternalLostFocus", flags );

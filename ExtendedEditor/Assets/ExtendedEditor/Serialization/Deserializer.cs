@@ -49,15 +49,23 @@ namespace TNRD.Editor.Serialization {
             if ( value.IsNull ) return null;
 
             var type = Type.GetType( value.Type );
-            var instance = Activator.CreateInstance( type );
+            object instance = null;
 
             if ( value.IsReference ) {
                 if ( deserializedObjects.ContainsKey( value.ID ) ) {
                     return deserializedObjects[value.ID];
                 }
-            } else {
-                deserializedObjects.Add( value.ID, instance );
             }
+
+            try {
+                instance = Activator.CreateInstance( type, true );
+            } catch ( MissingMethodException ) {
+                // No constructor
+                deserializedObjects.Add( value.ID, null );
+                return null;
+            }
+
+            deserializedObjects.Add( value.ID, instance );
 
             var fields = SerializationHelper.GetFields( type, BindingFlags.Instance | BindingFlags.FlattenHierarchy | BindingFlags.Public | BindingFlags.NonPublic )
                             .Where( f =>
@@ -95,14 +103,25 @@ namespace TNRD.Editor.Serialization {
                 var field = fields.Where( f => f.Name == name ).FirstOrDefault();
                 if ( field != null ) {
                     fields.Remove( field );
-                    field.SetValue( instance, tValue );
+
+                    try {
+                        field.SetValue( instance, tValue );
+                    } catch ( Exception e ) {
+                        Debug.LogException( e );
+                    }
+
                     continue;
                 }
 
                 var property = properties.Where( p => p.Name == name ).FirstOrDefault();
                 if ( property != null ) {
                     properties.Remove( property );
-                    property.SetValue( instance, tValue, null );
+                    try {
+                        property.SetValue( instance, tValue, null );
+                    } catch ( Exception e ) {
+                        Debug.LogException( e );
+                    }
+
                     continue;
                 }
             }
@@ -116,25 +135,52 @@ namespace TNRD.Editor.Serialization {
 
         private object ReadList( SerializedList value ) {
             var type = Type.GetType( value.Type );
-            var instance = (IList)Activator.CreateInstance( type );
+            IList instance = null;
 
-            foreach ( var item in value.Values ) {
-                var mode = item.Mode;
-                switch ( mode ) {
-                    case ESerializableMode.Primitive:
-                        instance.Add( ReadPrimitive( (SerializedPrimitive)item ) );
-                        break;
-                    case ESerializableMode.Enum:
-                        instance.Add( ReadEnum( (SerializedEnum)item ) );
-                        break;
-                    case ESerializableMode.List:
-                        instance.Add( ReadList( (SerializedList)item ) );
-                        break;
-                    case ESerializableMode.Class:
-                        instance.Add( ReadClass( (SerializedClass)item ) );
-                        break;
-                    default:
-                        break;
+            if ( type.IsArray ) {
+                instance = Array.CreateInstance( type.GetElementType(), value.Values.Count );
+
+                for ( int i = 0; i < value.Values.Count; i++ ) {
+                    var item = value.Values[i];
+                    var mode = item.Mode;
+                    switch ( mode ) {
+                        case ESerializableMode.Primitive:
+                            instance[i] = ReadPrimitive( (SerializedPrimitive)item );
+                            break;
+                        case ESerializableMode.Enum:
+                            instance[i] = ReadEnum( (SerializedEnum)item );
+                            break;
+                        case ESerializableMode.List:
+                            instance[i] = ReadList( (SerializedList)item );
+                            break;
+                        case ESerializableMode.Class:
+                            instance[i] = ReadClass( (SerializedClass)item );
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            } else {
+                instance = (IList)Activator.CreateInstance( type );
+
+                foreach ( var item in value.Values ) {
+                    var mode = item.Mode;
+                    switch ( mode ) {
+                        case ESerializableMode.Primitive:
+                            instance.Add( ReadPrimitive( (SerializedPrimitive)item ) );
+                            break;
+                        case ESerializableMode.Enum:
+                            instance.Add( ReadEnum( (SerializedEnum)item ) );
+                            break;
+                        case ESerializableMode.List:
+                            instance.Add( ReadList( (SerializedList)item ) );
+                            break;
+                        case ESerializableMode.Class:
+                            instance.Add( ReadClass( (SerializedClass)item ) );
+                            break;
+                        default:
+                            break;
+                    }
                 }
             }
 

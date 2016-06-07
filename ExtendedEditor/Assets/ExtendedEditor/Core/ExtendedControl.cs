@@ -61,8 +61,12 @@ namespace TNRD.Editor.Core {
             OnInitializeGUI();
         }
 
-        private void InternalDeserialized() {
-            OnDeserialized();
+        private void InternalBeforeSerialize() {
+            OnBeforeSerialize();
+        }
+
+        private void InternalAfterDeserialize() {
+            OnAfterSerialize();
         }
 
         private void InternalDestroy() {
@@ -102,7 +106,9 @@ namespace TNRD.Editor.Core {
 
         protected virtual void OnInitializeGUI() { }
 
-        protected virtual void OnDeserialized() { }
+        protected virtual void OnBeforeSerialize() { }
+
+        protected virtual void OnAfterSerialize() { }
 
         protected virtual void OnDestroy() { }
 

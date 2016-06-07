@@ -155,7 +155,7 @@ namespace TNRD.Editor.Serialization {
             } else if ( type == typeof( short ) ) {
                 writer.Write( (short)obj.Value );
             } else if ( type == typeof( string ) ) {
-                writer.Write( (string)obj.Value );
+                writer.Write( obj.IsNull ? "" : (string)obj.Value );
             } else if ( type == typeof( uint ) ) {
                 writer.Write( (uint)obj.Value );
             } else if ( type == typeof( ulong ) ) {
@@ -190,6 +190,13 @@ namespace TNRD.Editor.Serialization {
 
         private SerializedClass SerializeClass( object value, Type valueType ) {
             if ( value == null ) {
+                return new SerializedClass( GetNextID(), valueType.AssemblyQualifiedName ) { IsNull = true };
+            }
+
+            if ( valueType == typeof( UnityEngine.Texture2D )
+                || valueType == typeof( UnityEngine.GUIStyle )
+                || valueType == typeof( UnityEngine.GUISkin )
+                || valueType == typeof( UnityEngine.GameObject ) ) {
                 return new SerializedClass( GetNextID(), valueType.AssemblyQualifiedName ) { IsNull = true };
             }
 
@@ -353,6 +360,10 @@ namespace TNRD.Editor.Serialization {
         }
 
         private SerializedPrimitive SerializePrimitive( object value, Type valueType ) {
+            if ( value == null ) {
+                return new SerializedPrimitive( GetNextID(), valueType.AssemblyQualifiedName, null ) { IsNull = true };
+            }
+
             return new SerializedPrimitive( GetNextID(), valueType.AssemblyQualifiedName, value );
         }
 

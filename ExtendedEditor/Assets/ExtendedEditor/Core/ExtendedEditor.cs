@@ -68,16 +68,16 @@ namespace TNRD.Editor.Core {
             isInitializedGUI = true;
         }
 
-        private void OnDeserialized() {
-            Input = new ExtendedInput();
+        //private void OnDeserialized() {
+        //    Input = new ExtendedInput();
 
-            foreach ( var item in windows ) {
-                item.Editor = this;
-                rData.Deserialized.Invoke( item, null );
-            }
+        //    foreach ( var item in windows ) {
+        //        item.Editor = this;
+        //        rData.Deserialized.Invoke( item, null );
+        //    }
 
-            Repaint();
-        }
+        //    Repaint();
+        //}
 
         private void OnDestroy() {
             for ( int i = windows.Count - 1; i >= 0; i-- ) {
@@ -296,6 +296,10 @@ namespace TNRD.Editor.Core {
         }
 
         public void OnBeforeSerialize() {
+            foreach ( var item in windows ) {
+                rData.BeforeSerialize.Invoke( item, null );
+            }
+
             var sEditor = new SerializableEditor();
             sEditor.IsInitialized = isInitialized;
             sEditor.IsInitializedGUI = isInitializedGUI;
@@ -311,13 +315,18 @@ namespace TNRD.Editor.Core {
                 var b64 = EditorPrefs.GetString( name );
                 EditorPrefs.DeleteKey( name );
 
+                Input = new ExtendedInput();
+
                 var sEditor = Deserializer.Deserialize<SerializableEditor>( b64 );
                 isInitialized = sEditor.IsInitialized;
                 isInitializedGUI = sEditor.IsInitializedGUI;
                 windowIDs = sEditor.WindowIDs;
                 windows = sEditor.Windows;
 
-                OnDeserialized();
+                foreach ( var item in windows ) {
+                    item.Editor = this;
+                    rData.AfterDeserialize.Invoke( item, null );
+                }
             }
         }
 

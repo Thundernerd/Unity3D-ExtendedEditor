@@ -93,13 +93,22 @@ namespace TNRD.Editor.Core {
             initializedGUI = true;
         }
 
-        private void InternalDeserialized() {
+        private void InternalBeforeSerialize() {
             foreach ( var item in controls ) {
                 item.Window = this;
-                rData.Deserialized.Invoke( item, null );
+                rData.BeforeSerialize.Invoke( item, null );
             }
 
-            OnDeserialized();
+            OnBeforeSerialize();
+        }
+
+        private void InternalAfterDeserialize() {
+            foreach ( var item in controls ) {
+                item.Window = this;
+                rData.AfterDeserialize.Invoke( item, null );
+            }
+
+            OnAfterSerialized();
         }
 
         private void InternalDestroy() {
@@ -215,45 +224,27 @@ namespace TNRD.Editor.Core {
             }
         }
 
-        protected virtual void OnInitialize() {
+        protected virtual void OnInitialize() { }
 
-        }
+        protected virtual void OnInitializeGUI() { }
 
-        protected virtual void OnInitializeGUI() {
+        protected virtual void OnBeforeSerialize() { }
 
-        }
+        protected virtual void OnAfterSerialized() { }
 
-        protected virtual void OnDeserialized() {
+        protected virtual void OnDestroy() { }
 
-        }
+        protected virtual void OnFocus() { }
 
-        protected virtual void OnDestroy() {
+        protected virtual void OnLostFocus() { }
 
-        }
+        protected virtual void OnGUI() { }
 
-        protected virtual void OnFocus() {
+        protected virtual void OnSceneGUI( SceneView view ) { }
 
-        }
+        protected virtual void OnInspectorUpdate() { }
 
-        protected virtual void OnLostFocus() {
-
-        }
-
-        protected virtual void OnGUI() {
-
-        }
-
-        protected virtual void OnSceneGUI( SceneView view ) {
-
-        }
-
-        protected virtual void OnInspectorUpdate() {
-
-        }
-
-        protected virtual void OnUpdate() {
-
-        }
+        protected virtual void OnUpdate() { }
 
         public void ShowPopup( ExtendedPopup popup ) {
             Editor.ShowPopup( popup );
