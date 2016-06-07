@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using TNRD.Editor;
 using TNRD.Editor.Core;
 using TNRD.Editor.Serialization;
@@ -13,6 +14,9 @@ class SimpleTester : ExtendedWindow {
     private string texto = "";
     [RequireSerialization]
     private float sliderV = 0.5f;
+
+    public GUIStyle gStyle;
+    public Texture2D tex;
 
     [MenuItem( "TNRD/Test Editor" )]
     private static void Init() {
@@ -38,10 +42,15 @@ class SimpleTester : ExtendedWindow {
 
         WindowSettings.Draggable = true;
         Size = new Vector2( 500, 500 );
+
+        tex = Assets["arrowup"];
+    }
+
+    protected override void OnInitializeGUI() {
+        gStyle = new GUIStyle( EditorStyles.whiteLabel );
     }
 
     protected override void OnGUI() {
-
         sliderV = EditorGUILayout.Slider( sliderV, 0, 2 );
         texto = EditorGUILayout.TextField( texto );
 
@@ -91,6 +100,23 @@ class SimpleTester : ExtendedWindow {
 
         if ( GUILayout.Button( "Toggle Resizable" ) ) {
             WindowSettings.Resizable = !WindowSettings.Resizable;
+        }
+
+        if ( GUILayout.Button( "Serialize" ) ) {
+            Editor.OnBeforeSerialize();
+        }
+
+        if ( GUILayout.Button( "Deserialize" ) ) {
+            Editor.OnAfterDeserialize();
+        }
+
+        if ( GUILayout.Button( "Test" ) ) {
+            var b64 = Serializer.SerializeToB64( this );
+            var t = Deserializer.Deserialize<SimpleTester>( b64 );
+        }
+
+        if ( gStyle != null ) {
+            EditorGUILayout.LabelField( "HelloWorld", gStyle );
         }
     }
 

@@ -14,10 +14,6 @@ public class SimpleControl : ExtendedControl {
         Logger.LogMethod();
     }
 
-    protected override void OnDeserialized() {
-        Logger.LogMethod();
-    }
-
     protected override void OnDestroy() {
         Logger.LogMethod();
     }
