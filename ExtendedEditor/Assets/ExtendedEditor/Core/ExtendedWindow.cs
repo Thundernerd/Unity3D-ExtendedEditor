@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using TNRD.Editor.Serialization;
 using TNRD.Editor.Utilities;
 using UnityEditor;
@@ -61,6 +62,8 @@ namespace TNRD.Editor.Core {
         [RequireSerialization]
         private List<ExtendedControl> controls = new List<ExtendedControl>();
 
+        private Dictionary<Type, List<ExtendedControl>> controlsGrouped = new Dictionary<Type, List<ExtendedControl>>();
+
         private List<Action> guiActions = new List<Action>();
 
         [RequireSerialization]
@@ -105,6 +108,10 @@ namespace TNRD.Editor.Core {
         }
 
         private void InternalAfterDeserialize() {
+            foreach ( var item in controls ) {
+                AddControlGrouped( item );
+            }
+
             foreach ( var item in controls ) {
                 item.Window = this;
                 rData.AfterDeserialize.Invoke( item, null );
@@ -274,6 +281,22 @@ namespace TNRD.Editor.Core {
             Editor.RemoveWindow( window );
         }
 
+        public ExtendedWindow GetWindow( Type type ) {
+            return Editor.GetWindowByType( type );
+        }
+
+        public T GetWindow<T>() where T : ExtendedWindow {
+            return Editor.GetWindowByType<T>();
+        }
+
+        public List<ExtendedWindow> GetWindows( Type type ) {
+            return Editor.GetWindowsByType( type );
+        }
+
+        public List<T> GetWindows<T>() where T : ExtendedWindow {
+            return Editor.GetWindowsByType<T>();
+        }
+
         public void AddControl( ExtendedControl control ) {
             control.Window = this;
 
@@ -284,6 +307,84 @@ namespace TNRD.Editor.Core {
         public void RemoveControl( ExtendedControl control ) {
             rData.Destroy.Invoke( control, null );
             controls.Remove( control );
+        }
+
+        private void AddControlGrouped( ExtendedControl control, Type wType = null ) {
+            if ( control == null ) return;
+
+            if ( wType == null ) {
+                wType = control.GetType();
+            }
+
+            if ( !controlsGrouped.ContainsKey( wType ) ) {
+                controlsGrouped.Add( wType, new List<ExtendedControl>() );
+            }
+
+            controlsGrouped[wType].Add( control );
+
+            if ( wType.BaseType != null ) {
+                AddControlGrouped( control, wType.BaseType );
+            }
+        }
+
+        private void RemoveControlGrouped( ExtendedControl control, Type wType = null ) {
+            if ( control == null ) return;
+
+            if ( wType == null ) {
+                wType = control.GetType();
+            }
+
+            if ( !controlsGrouped.ContainsKey( wType ) ) {
+                return;
+            }
+
+            controlsGrouped[wType].Remove( control );
+
+            if ( wType.BaseType != null ) {
+                RemoveControlGrouped( control, wType.BaseType );
+            }
+        }
+
+        public ExtendedControl GetControl( Type type ) {
+            if ( controlsGrouped.ContainsKey( type ) ) {
+                return controlsGrouped[type].FirstOrDefault();
+            } else {
+                return null;
+            }
+        }
+
+        public T GetControl<T>() where T : ExtendedControl {
+            var type = typeof( T );
+            if ( controlsGrouped.ContainsKey( type ) ) {
+                return (T)controlsGrouped[type].FirstOrDefault();
+            } else {
+                return null;
+            }
+        }
+
+        public List<ExtendedControl> GetControls( Type type ) {
+            if ( controlsGrouped.ContainsKey( type ) ) {
+                return controlsGrouped[type];
+            } else {
+                return new List<ExtendedControl>();
+            }
+        }
+
+        public List<T> GetControls<T>() where T : ExtendedControl {
+            var type = typeof( T );
+            if ( controlsGrouped.ContainsKey( type ) ) {
+                return controlsGrouped[type].Cast<T>().ToList();
+            } else {
+                return new List<T>();
+            }
+        }
+
+        public void Repaint() {
+            Editor.Repaint();
+        }
+
+        public void Remove() {
+            Editor.RemoveWindow( this );
         }
 
         public void RunOnGUIThread( Action action ) {

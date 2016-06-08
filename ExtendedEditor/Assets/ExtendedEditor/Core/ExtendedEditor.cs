@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using TNRD.Editor.Serialization;
 using TNRD.Editor.Utilities;
@@ -38,6 +39,8 @@ namespace TNRD.Editor.Core {
         [RequireSerialization]
         private bool isInitializedGUI;
 
+        private Dictionary<Type, List<ExtendedWindow>> windowsGrouped = new Dictionary<Type, List<ExtendedWindow>>();
+
         private ExtendedPopup popup = null;
 
         // Windows that will be added and initialized _after_ creating and initializing the editor
@@ -67,17 +70,6 @@ namespace TNRD.Editor.Core {
         private void OnInitializeGUI() {
             isInitializedGUI = true;
         }
-
-        //private void OnDeserialized() {
-        //    Input = new ExtendedInput();
-
-        //    foreach ( var item in windows ) {
-        //        item.Editor = this;
-        //        rData.Deserialized.Invoke( item, null );
-        //    }
-
-        //    Repaint();
-        //}
 
         private void OnDestroy() {
             for ( int i = windows.Count - 1; i >= 0; i-- ) {
@@ -223,6 +215,8 @@ namespace TNRD.Editor.Core {
         }
 
         public void AddWindow( ExtendedWindow window ) {
+            if ( window == null ) return;
+
             window.Editor = this;
 
             rData.Initialize.Invoke( window, new object[] { GenerateID() } );
@@ -232,10 +226,82 @@ namespace TNRD.Editor.Core {
         }
 
         public void RemoveWindow( ExtendedWindow window ) {
+            if ( window == null ) return;
+
             rData.Destroy.Invoke( window, null );
             windows.Remove( window );
 
             Repaint();
+        }
+
+        private void AddWindowGrouped( ExtendedWindow window, Type wType = null ) {
+            if ( window == null ) return;
+
+            if ( wType == null ) {
+                wType = window.GetType();
+            }
+
+            if ( !windowsGrouped.ContainsKey( wType ) ) {
+                windowsGrouped.Add( wType, new List<ExtendedWindow>() );
+            }
+
+            windowsGrouped[wType].Add( window );
+
+            if ( wType.BaseType != null ) {
+                AddWindowGrouped( window, wType.BaseType );
+            }
+        }
+
+        private void RemoveWindowGrouped( ExtendedWindow window, Type wType = null ) {
+            if ( window == null ) return;
+
+            if ( wType == null ) {
+                wType = window.GetType();
+            }
+
+            if ( !windowsGrouped.ContainsKey( wType ) ) {
+                return;
+            }
+
+            windowsGrouped[wType].Remove( window );
+
+            if ( wType.BaseType != null ) {
+                RemoveWindowGrouped( window, wType.BaseType );
+            }
+        }
+
+        public ExtendedWindow GetWindowByType( Type type ) {
+            if ( windowsGrouped.ContainsKey( type ) ) {
+                return windowsGrouped[type].FirstOrDefault();
+            } else {
+                return null;
+            }
+        }
+
+        public T GetWindowByType<T>() where T : ExtendedWindow {
+            var type = typeof( T );
+            if ( windowsGrouped.ContainsKey( type ) ) {
+                return (T)windowsGrouped[type].FirstOrDefault();
+            } else {
+                return null;
+            }
+        }
+
+        public List<ExtendedWindow> GetWindowsByType( Type type ) {
+            if ( windowsGrouped.ContainsKey( type ) ) {
+                return windowsGrouped[type];
+            } else {
+                return new List<ExtendedWindow>();
+            }
+        }
+
+        public List<T> GetWindowsByType<T>() where T : ExtendedWindow {
+            var type = typeof( T );
+            if ( windowsGrouped.ContainsKey( type ) ) {
+                return windowsGrouped[type].Cast<T>().ToList();
+            } else {
+                return new List<T>();
+            }
         }
 
         private static ExtendedEditor CreateEditor( params ExtendedWindow[] windows ) {
@@ -322,6 +388,10 @@ namespace TNRD.Editor.Core {
                 isInitializedGUI = sEditor.IsInitializedGUI;
                 windowIDs = sEditor.WindowIDs;
                 windows = sEditor.Windows;
+
+                foreach ( var item in windows ) {
+                    AddWindowGrouped( item );
+                }
 
                 foreach ( var item in windows ) {
                     item.Editor = this;

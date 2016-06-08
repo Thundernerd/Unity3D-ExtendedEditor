@@ -138,6 +138,14 @@ namespace TNRD.Editor.Core {
 
         protected virtual void OnSceneGUI( SceneView view ) { }
 
+        public void Repaint() {
+            Window.Repaint();
+        }
+
+        public void Remove() {
+            Window.RemoveControl( this );
+        }
+
         public void RunOnGUIThread( Action action ) {
             guiActions.Add( action );
         }
