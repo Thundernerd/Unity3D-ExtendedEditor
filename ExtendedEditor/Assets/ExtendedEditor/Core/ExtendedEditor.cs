@@ -367,6 +367,7 @@ namespace TNRD.Editor.Core {
             }
 
             var sEditor = new SerializableEditor();
+            sEditor.AssetPath = Assets.Path;
             sEditor.IsInitialized = isInitialized;
             sEditor.IsInitializedGUI = isInitializedGUI;
             sEditor.WindowIDs = windowIDs;
@@ -389,6 +390,8 @@ namespace TNRD.Editor.Core {
                 windowIDs = sEditor.WindowIDs;
                 windows = sEditor.Windows;
 
+                Assets.Path = sEditor.AssetPath;
+
                 foreach ( var item in windows ) {
                     AddWindowGrouped( item );
                 }
@@ -406,6 +409,7 @@ namespace TNRD.Editor.Core {
         }
 
         private struct SerializableEditor {
+            public string AssetPath;
             public bool IsInitialized;
             public bool IsInitializedGUI;
             public int WindowIDs;

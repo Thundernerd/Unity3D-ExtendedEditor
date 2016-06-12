@@ -22,6 +22,8 @@ namespace TNRD.Editor.Core {
 
         [RequireSerialization]
         private int windowID = 0;
+        [RequireSerialization]
+        private int controlID = 0;
 
         public Vector2 Position {
             get { return WindowRect.position; }
@@ -345,6 +347,14 @@ namespace TNRD.Editor.Core {
             }
         }
 
+        public ExtendedControl GetControl( string id ) {
+            return controls.Where( c => c.ID == id ).FirstOrDefault();
+        }
+
+        public T GetControl<T>( string id ) where T : ExtendedControl {
+            return (T)controls.Where( c => c.ID == id ).FirstOrDefault();
+        }
+
         public ExtendedControl GetControl( Type type ) {
             if ( controlsGrouped.ContainsKey( type ) ) {
                 return controlsGrouped[type].FirstOrDefault();
@@ -377,6 +387,10 @@ namespace TNRD.Editor.Core {
             } else {
                 return new List<T>();
             }
+        }
+
+        public int GetControlID() {
+            return controlID++;
         }
 
         public void Repaint() {

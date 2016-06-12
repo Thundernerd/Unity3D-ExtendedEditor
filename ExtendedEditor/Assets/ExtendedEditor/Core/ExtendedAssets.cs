@@ -9,8 +9,8 @@ namespace TNRD.Editor.Core {
 
         [IgnoreSerialization]
         private Dictionary<string, Texture2D> textures;
-        [RequireSerialization]
-        private string path;
+
+        public string Path;
 
         public Texture2D this[string key] {
             get {
@@ -30,10 +30,10 @@ namespace TNRD.Editor.Core {
             var stack = new System.Diagnostics.StackTrace( true );
             if ( stack.FrameCount > 0 ) {
                 var frame = stack.GetFrame( stack.FrameCount - 1 );
-                var fname = Path.GetFileName( frame.GetFileName() );
+                var fname = System.IO.Path.GetFileName( frame.GetFileName() );
 
-                path = frame.GetFileName().Replace( '\\', '/' );
-                path = path.Replace( fname, "Assets/" );
+                Path = frame.GetFileName().Replace( '\\', '/' );
+                Path = Path.Replace( fname, "Assets/" );
             }
         }
 
@@ -42,7 +42,7 @@ namespace TNRD.Editor.Core {
                 return textures[key];
             }
 
-            var fpath = string.Format( "{0}{1}.png", path, key );
+            var fpath = string.Format( "{0}{1}.png", Path, key );
             if ( !File.Exists( fpath ) ) {
                 return null;
             }

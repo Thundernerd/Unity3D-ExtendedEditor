@@ -52,12 +52,18 @@ namespace TNRD.Editor.Core {
 
         public EAnchor AnchorPoint = EAnchor.MiddleCenter;
 
+        public string ID {
+            get; private set;
+        }
+
         [RequireSerialization]
         private bool initializedGUI;
 
         private List<Action> guiActions = new List<Action>();
 
         private void InternalInitialize() {
+            ID = string.Format( "{0}_{1}", GetType().Name, Window.GetControlID() );
+
             OnInitialize();
         }
 
