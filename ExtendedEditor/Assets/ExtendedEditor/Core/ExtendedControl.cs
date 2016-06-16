@@ -57,6 +57,18 @@ namespace TNRD.Editor.Core {
         }
 
         [RequireSerialization]
+        private int sortingOrder = 0;
+        [IgnoreSerialization]
+        public int SortingOrder {
+            get {
+                return sortingOrder;
+            }
+            set {
+                sortingOrder = value;
+            }
+        }
+
+        [RequireSerialization]
         private bool initializedGUI;
 
         private List<Action> guiActions = new List<Action>();

@@ -58,6 +58,12 @@ namespace TNRD.Editor.Core {
             }
         }
 
+        /// <summary>
+        /// Setting this to true will sort the controls based on their SortingOrder in the next OnGUI run
+        /// </summary>
+        [IgnoreSerialization]
+        public bool ShouldSortControls = false;
+
         [IgnoreSerialization]
         public ExtendedEditor Editor;
 
@@ -167,6 +173,11 @@ namespace TNRD.Editor.Core {
         private void InternalGUI() {
             if ( !initializedGUI ) {
                 InternalInitializeGUI();
+            }
+
+            if ( ShouldSortControls && Event.current.type == EventType.Layout ) {
+                ShouldSortControls = false;
+                controls = controls.OrderBy( c => c.SortingOrder ).ToList();
             }
 
             if ( WindowSettings.IsFullscreen ) {
@@ -304,6 +315,7 @@ namespace TNRD.Editor.Core {
 
             rData.Initialize.Invoke( control, null );
             controls.Add( control );
+            ShouldSortControls = true;
         }
 
         public void RemoveControl( ExtendedControl control ) {
