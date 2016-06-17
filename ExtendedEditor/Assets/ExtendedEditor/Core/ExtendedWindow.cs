@@ -122,10 +122,14 @@ namespace TNRD.Editor.Core {
 
             foreach ( var item in controls ) {
                 item.Window = this;
-                rData.AfterDeserialize.Invoke( item, null );
             }
 
             OnAfterSerialized();
+
+            var ctrls = new List<ExtendedControl>( controls );
+            foreach ( var item in ctrls ) {
+                rData.AfterDeserialize.Invoke( item, null );
+            }
         }
 
         private void InternalDestroy() {
