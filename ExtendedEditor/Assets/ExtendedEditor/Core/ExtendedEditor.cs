@@ -373,6 +373,10 @@ namespace TNRD.Editor.Core {
             sEditor.WindowIDs = windowIDs;
             sEditor.Windows = windows;
 
+            foreach ( var item in sEditor.Windows ) {
+                item.SortControls();
+            }
+
             var b64 = Serializer.SerializeToB64( sEditor );
             EditorPrefs.SetString( name, b64 );
         }
@@ -399,6 +403,10 @@ namespace TNRD.Editor.Core {
                 foreach ( var item in windows ) {
                     item.Editor = this;
                     rData.AfterDeserialize.Invoke( item, null );
+                }
+
+                foreach ( var item in windows ) {
+                    item.SortControls();
                 }
             }
         }

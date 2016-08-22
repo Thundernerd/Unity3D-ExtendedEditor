@@ -65,6 +65,7 @@ namespace TNRD.Editor.Core {
             }
             set {
                 sortingOrder = value;
+                Window.ShouldSortControls = true;
             }
         }
 

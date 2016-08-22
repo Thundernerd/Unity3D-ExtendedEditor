@@ -181,7 +181,7 @@ namespace TNRD.Editor.Core {
 
             if ( ShouldSortControls && Event.current.type == EventType.Layout ) {
                 ShouldSortControls = false;
-                controls = controls.OrderBy( c => c.SortingOrder ).ToList();
+                SortControls();
             }
 
             if ( WindowSettings.IsFullscreen ) {
@@ -319,12 +319,14 @@ namespace TNRD.Editor.Core {
 
             rData.Initialize.Invoke( control, null );
             controls.Add( control );
+            AddControlGrouped( control );
             ShouldSortControls = true;
         }
 
         public void RemoveControl( ExtendedControl control ) {
             rData.Destroy.Invoke( control, null );
             controls.Remove( control );
+            RemoveControlGrouped( control );
         }
 
         private void AddControlGrouped( ExtendedControl control, Type wType = null ) {
@@ -440,6 +442,10 @@ namespace TNRD.Editor.Core {
             } else {
                 throw new Exception( "Unable to create editor" );
             }
+        }
+
+        public void SortControls() {
+            controls = controls.OrderBy( c => c.SortingOrder ).ToList();
         }
     }
 }
