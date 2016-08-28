@@ -182,6 +182,7 @@ namespace TNRD.Editor.Core {
             if ( ShouldSortControls && Event.current.type == EventType.Layout ) {
                 ShouldSortControls = false;
                 SortControls();
+                Repaint();
             }
 
             if ( WindowSettings.IsFullscreen ) {

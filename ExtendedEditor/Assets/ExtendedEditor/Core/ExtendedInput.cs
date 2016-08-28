@@ -24,14 +24,17 @@ namespace TNRD.Editor.Core {
         public Vector2 ScrollDelta { get { return current.ScrollDelta; } }
 
         public EventType Type { get { return Event.current.type; } }
+        private EventType previousType;
 
         public void OnGUI() {
-            if ( Event.current.type == EventType.Layout ) {
+            if ( Event.current.type == EventType.Layout && previousType != EventType.Repaint ) {
                 previous = current;
                 current = new InputState();
             } else {
                 current.Update();
             }
+
+            previousType = Type;
         }
 
         public bool KeyDown( KeyCode k ) {
