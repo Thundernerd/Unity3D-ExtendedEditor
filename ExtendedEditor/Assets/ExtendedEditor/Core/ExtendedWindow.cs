@@ -6,7 +6,7 @@ using TNRD.Editor.Utilities;
 using UnityEditor;
 using UnityEngine;
 
-namespace TNRD.Editor.Core {
+namespace TNRD.Editor {
 
     public class ExtendedWindow {
 

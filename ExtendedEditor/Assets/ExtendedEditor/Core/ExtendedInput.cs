@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace TNRD.Editor.Core {
+namespace TNRD.Editor {
 
     public static class DictionaryExtension {
         public static void AddOrReplace<T, T1>( this Dictionary<T, T1> dict, T key, T1 value ) {

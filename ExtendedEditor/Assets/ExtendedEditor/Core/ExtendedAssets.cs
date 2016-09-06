@@ -3,7 +3,7 @@ using System.IO;
 using TNRD.Editor.Serialization;
 using UnityEngine;
 
-namespace TNRD.Editor.Core {
+namespace TNRD.Editor {
 
     public class ExtendedAssets {
 

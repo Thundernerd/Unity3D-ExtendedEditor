@@ -2,7 +2,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace TNRD.Editor.Core {
+namespace TNRD.Editor {
 
     public class ExtendedGUI {
 

@@ -1,7 +1,5 @@
-﻿using System;
+﻿namespace TNRD.Editor {
 
-namespace TNRD.Editor.Core {
-    
     public class ExtendedWindowSettings {
 
         public bool Draggable = false;

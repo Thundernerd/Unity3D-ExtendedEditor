@@ -4,7 +4,7 @@ using TNRD.Editor.Serialization;
 using UnityEditor;
 using UnityEngine;
 
-namespace TNRD.Editor.Core {
+namespace TNRD.Editor {
 
     public class ExtendedControl {
 
