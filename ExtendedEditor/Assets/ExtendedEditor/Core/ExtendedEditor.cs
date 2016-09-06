@@ -32,6 +32,9 @@ namespace TNRD.Editor.Core {
         [IgnoreSerialization]
         public ExtendedInput Input = new ExtendedInput();
 
+        [IgnoreSerialization]
+        public float DeltaTime = 0;
+
         [RequireSerialization]
         private List<ExtendedWindow> windows = new List<ExtendedWindow>();
         [RequireSerialization]
@@ -54,6 +57,8 @@ namespace TNRD.Editor.Core {
         private int windowIDs = 0;
 
         private int draggingID = -1;
+
+        private float previousTime = 0;
 
         private void OnInitialize() {
             isInitialized = true;
@@ -178,6 +183,11 @@ namespace TNRD.Editor.Core {
             for ( int i = 0; i < windowsToProcess.Count; i++ ) {
                 rData.Update.Invoke( windowsToProcess[i], null );
             }
+
+            var time = Time.realtimeSinceStartup;
+            // Min-Maxing this to make sure it's between 0 and 1/60
+            DeltaTime = Mathf.Min( Mathf.Max( 0, time - previousTime ), 0.016f );
+            previousTime = time;
         }
 
         private void PopupGUI( int id ) {

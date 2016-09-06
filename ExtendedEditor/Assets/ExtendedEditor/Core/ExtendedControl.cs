@@ -56,6 +56,10 @@ namespace TNRD.Editor.Core {
             get; private set;
         }
 
+        public float DeltaTime {
+            get { return Window.DeltaTime; }
+        }
+
         [RequireSerialization]
         private int sortingOrder = 0;
         [IgnoreSerialization]

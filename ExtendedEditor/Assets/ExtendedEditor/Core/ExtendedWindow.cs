@@ -58,6 +58,12 @@ namespace TNRD.Editor.Core {
             }
         }
 
+        public float DeltaTime {
+            get {
+                return Editor.DeltaTime;
+            }
+        }
+
         /// <summary>
         /// Setting this to true will sort the controls based on their SortingOrder in the next OnGUI run
         /// </summary>
