@@ -186,6 +186,8 @@ namespace TNRD.Editor {
             private KeyCode[] MapCharacterToKeyCodes( char kchar ) {
                 kchar = char.ToLower( kchar );
                 switch ( kchar ) {
+                    case ' ':
+                        return new[] { KeyCode.Space };
                     case '1':
                         return new[] { KeyCode.Alpha1, KeyCode.Keypad1 };
                     case '2':
