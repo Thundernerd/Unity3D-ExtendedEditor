@@ -41,7 +41,7 @@ class SimpleTester : ExtendedWindow {
         WindowSettings.Draggable = true;
         Size = new Vector2( 500, 500 );
 
-        tex = Assets["arrowup"];
+        tex = Assets.Texture( "arrowup" );
     }
 
     protected override void OnInitializeGUI() {
