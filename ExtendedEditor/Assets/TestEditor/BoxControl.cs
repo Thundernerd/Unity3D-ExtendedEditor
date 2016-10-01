@@ -1,4 +1,4 @@
-﻿using TNRD.Editor.Core;
+﻿using TNRD.Editor;
 using UnityEngine;
 
 public class BoxControl : ExtendedControl {

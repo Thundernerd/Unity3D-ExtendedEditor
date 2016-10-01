@@ -1,5 +1,4 @@
 ﻿using TNRD.Editor;
-using TNRD.Editor.Core;
 using UnityEngine;
 
 public class SimpleControl : ExtendedControl {
