@@ -13,11 +13,6 @@ namespace TNRD.Editor {
 
     public class ExtendedAssets {
 
-        public enum EAssetType {
-            Text,
-            Texture
-        }
-
         [IgnoreSerialization]
         private Dictionary<string, Texture2D> textures;
         [IgnoreSerialization]
@@ -26,16 +21,6 @@ namespace TNRD.Editor {
         private string[] resources;
 
         public string Path;
-
-        public Texture2D this[string key] {
-            get {
-                if ( textures.ContainsKey( key ) ) {
-                    return textures[key];
-                } else {
-                    return Texture( key );
-                }
-            }
-        }
 
         public ExtendedAssets() {
             textures = new Dictionary<string, Texture2D>();
@@ -66,40 +51,37 @@ namespace TNRD.Editor {
 #endif
         }
 
-        private string GetExtension( EAssetType type ) {
-            switch ( type ) {
-                case EAssetType.Text:
-                    return ".txt";
-                case EAssetType.Texture:
-                    return ".png";
-            }
-
-            return "";
-        }
-
-        private string GetPath( string key, EAssetType type ) {
+        private string GetPath( string key, string ext ) {
 #if IS_LIBRARY
             var separator = ".";
 #else
             var separator = "/";
 #endif
 
+            if ( !ext.StartsWith( "." ) ) {
+                ext = "." + ext;
+            }
+
             if ( EditorGUIUtility.isProSkin ) {
-                var v = resources.Where( r => r.EndsWith( string.Format( "pro{0}{1}{2}", separator, key, GetExtension( type ) ) ) ).FirstOrDefault();
+                var v = resources.Where( r => r.EndsWith( string.Format( "pro{0}{1}{2}", separator, key, ext ) ) ).FirstOrDefault();
                 if ( v != null ) {
                     return v;
                 }
             }
 
-            return resources.Where( r => !r.Contains( "pro" + separator ) && r.EndsWith( key + GetExtension( type ) ) ).FirstOrDefault();
+            return resources.Where( r => !r.Contains( "pro" + separator ) && r.EndsWith( key + ext ) ).FirstOrDefault();
         }
 
         public Texture2D Texture( string key ) {
+            return Texture( key, "png" );
+        }
+
+        public Texture2D Texture( string key, string ext ) {
             if ( textures.ContainsKey( key ) ) {
                 return textures[key];
             }
 
-            var path = GetPath( key, EAssetType.Texture );
+            var path = GetPath( key, ext );
             if ( string.IsNullOrEmpty( path ) )
                 return null;
 
@@ -128,11 +110,15 @@ namespace TNRD.Editor {
         }
 
         public string Text( string key ) {
+            return Text( key, "txt" );
+        }
+
+        public string Text( string key, string ext ) {
             if ( texts.ContainsKey( key ) ) {
                 return texts[key];
             }
 
-            var path = GetPath( key, EAssetType.Text );
+            var path = GetPath( key, ext );
             if ( string.IsNullOrEmpty( path ) )
                 return "";
 
@@ -150,22 +136,7 @@ namespace TNRD.Editor {
         }
 
         public byte[] Blob( string key, string ext ) {
-#if IS_LIBRARY
-            var separator = ".";
-#else
-            var separator = "/";
-#endif
-
-            var path = "";
-
-            if ( EditorGUIUtility.isProSkin ) {
-                path = resources.Where( r => r.EndsWith( string.Format( "pro{0}{1}{2}", separator, key, ext ) ) ).FirstOrDefault();
-            }
-
-            if ( string.IsNullOrEmpty( path ) ) {
-                path = resources.Where( r => !r.Contains( "pro" + separator ) && r.EndsWith( key + ext ) ).FirstOrDefault();
-            }
-
+            var path = GetPath( key, ext );
             if ( string.IsNullOrEmpty( path ) )
                 return null;
 
@@ -178,25 +149,6 @@ namespace TNRD.Editor {
             var bytes = File.ReadAllBytes( path );
             return bytes;
 #endif
-        }
-
-        public Texture2D B64( string key, string b64 ) {
-            if ( textures.ContainsKey( key ) ) {
-                return textures[key];
-            }
-
-            var tex = new Texture2D( 1, 1 );
-            tex.hideFlags = HideFlags.HideAndDontSave;
-
-            var bytes = System.Convert.FromBase64String( b64 );
-            tex.LoadImage( bytes );
-
-            textures.Add( key, tex );
-            return textures[key];
-        }
-
-        public bool HasKey( string key ) {
-            return textures.ContainsKey( key );
         }
     }
 }
