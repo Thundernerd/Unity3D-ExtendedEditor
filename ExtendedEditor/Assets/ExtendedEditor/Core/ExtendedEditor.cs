@@ -28,13 +28,14 @@ namespace TNRD.Editor {
             }
         }
 
+        public string EditorName;
+
+        public string AssetPath;
+
         public ExtendedAssets Assets = new ExtendedAssets();
 
         [IgnoreSerialization]
         public ExtendedInput Input = new ExtendedInput();
-
-        [IgnoreSerialization]
-        public float DeltaTime = 0;
 
         [RequireSerialization]
         private List<ExtendedWindow> windows = new List<ExtendedWindow>();
@@ -53,13 +54,17 @@ namespace TNRD.Editor {
 
         private static ReflectionData rData = new ReflectionData( typeof( ExtendedWindow ) );
         private static ReflectionData pData = new ReflectionData( typeof( ExtendedPopup ) );
+        
+        [IgnoreSerialization]
+        public float DeltaTime = 0;
+        private float previousTime = 0;
+
+        private bool afterDeserialize = false;
 
         [RequireSerialization]
         private int windowIDs = 0;
 
         private int draggingID = -1;
-
-        private float previousTime = 0;
 
         private void OnInitialize() {
             isInitialized = true;
@@ -358,7 +363,6 @@ namespace TNRD.Editor {
             var inst = CreateEditor( windows );
 
             inst.titleContent = new GUIContent( title );
-            inst.Assets.Initialize();
 
             var index = 0;
             var id = string.Format( "tnrd_editor_{0}_{1}", title, index );
@@ -367,9 +371,19 @@ namespace TNRD.Editor {
                 id = string.Format( "tnrd_editor_{0}_{1}", title, index );
             }
 
-            inst.name = id;
+            inst.EditorName = id;
 
             return inst;
+        }
+
+        new public void Show() {
+            Assets.Initialize( AssetPath );
+            base.Show();
+        }
+
+        new public void Show(bool immediateDisplay) {
+            Assets.Initialize( AssetPath );
+            base.Show( immediateDisplay );
         }
 
         public void OnBeforeSerialize() {
@@ -389,24 +403,25 @@ namespace TNRD.Editor {
             }
 
             var b64 = Serializer.SerializeToB64( sEditor );
-            EditorPrefs.SetString( name, b64 );
+            EditorPrefs.SetString( EditorName, b64 );
         }
 
-        public void OnAfterDeserialize() {
-            if ( EditorPrefs.HasKey( name ) ) {
-                var b64 = EditorPrefs.GetString( name );
-                EditorPrefs.DeleteKey( name );
+        public void OnEnable() {
+            if ( afterDeserialize && EditorPrefs.HasKey( EditorName ) ) {
+                var b64 = EditorPrefs.GetString( EditorName );
+                EditorPrefs.DeleteKey( EditorName );
 
                 Input = new ExtendedInput();
-
+                
                 var sEditor = Deserializer.Deserialize<SerializableEditor>( b64 );
                 isInitialized = sEditor.IsInitialized;
                 isInitializedGUI = sEditor.IsInitializedGUI;
                 windowIDs = sEditor.WindowIDs;
                 windows = sEditor.Windows;
 
-                Assets.Path = sEditor.AssetPath;
-
+                Assets.Initialize( sEditor.AssetPath );
+                
+                windowsGrouped.Clear();
                 foreach ( var item in windows ) {
                     AddWindowGrouped( item );
                 }
@@ -419,7 +434,14 @@ namespace TNRD.Editor {
                 foreach ( var item in windows ) {
                     item.SortControls();
                 }
+
             }
+
+            afterDeserialize = false;
+        }
+
+        public void OnAfterDeserialize() {
+            afterDeserialize = true;
         }
 
         private int GenerateID() {
