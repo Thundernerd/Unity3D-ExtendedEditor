@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace TNRD.Editor {
 
-    public class ExtendedControl {
+    public class ExtendedControl : IEquatable<ExtendedControl> {
 
         [IgnoreSerialization]
         public ExtendedWindow Window;
@@ -54,7 +54,7 @@ namespace TNRD.Editor {
         public EAnchor AnchorPoint = EAnchor.MiddleCenter;
 
         public string ID {
-            get; private set;
+            get; set;
         }
 
         public float DeltaTime {
@@ -177,6 +177,24 @@ namespace TNRD.Editor {
         public void RunOnGUIThreadImmediate( Action action ) {
             guiActions.Add( action );
             Window.Editor.Repaint();
+        }
+        
+        public bool Equals( ExtendedControl other ) {
+            if ( (object)other == null ) return false;
+            return ID == other.ID;
+        }
+
+        public override bool Equals( object obj ) {
+            if ( obj == null ) return false;
+            if ( obj is ExtendedControl ) {
+                return Equals( obj as ExtendedControl );
+            } else {
+                return false;
+            }
+        }
+
+        public override int GetHashCode() {
+            return ID.GetHashCode();
         }
     }
 }
