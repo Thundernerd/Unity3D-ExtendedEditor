@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 ﻿namespace TNRD.Editor.Utilities {
 
     public class State<T> {
@@ -54,3 +55,4 @@
         }
     }
 }
+#endif

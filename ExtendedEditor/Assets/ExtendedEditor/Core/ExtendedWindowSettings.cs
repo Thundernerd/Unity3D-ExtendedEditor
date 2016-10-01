@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 ﻿namespace TNRD.Editor {
 
     public class ExtendedWindowSettings {
@@ -11,3 +12,4 @@
         public bool Resizable = false;
     }
 }
+#endif

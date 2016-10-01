@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 ﻿namespace TNRD.Editor.Serialization {
 
     public class SerializedEnum : SerializedPrimitive {
@@ -13,3 +14,4 @@
         }
     }
 }
+#endif

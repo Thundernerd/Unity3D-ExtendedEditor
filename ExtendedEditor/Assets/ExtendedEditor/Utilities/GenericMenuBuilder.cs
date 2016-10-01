@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 ﻿using UnityEditor;
 using UnityEngine;
 
@@ -150,3 +151,4 @@ namespace TNRD.Editor.Utilities {
         }
     }
 }
+#endif

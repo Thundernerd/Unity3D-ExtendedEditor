@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 ﻿using System;
 using System.Collections.Generic;
 using TNRD.Editor.Serialization;
@@ -179,3 +180,4 @@ namespace TNRD.Editor {
         }
     }
 }
+#endif

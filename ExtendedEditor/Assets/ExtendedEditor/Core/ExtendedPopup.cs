@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 ﻿using TNRD.Editor.Serialization;
 using UnityEditor;
 using UnityEngine;
@@ -109,3 +110,4 @@ namespace TNRD.Editor {
         }
     }
 }
+#endif

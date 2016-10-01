@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 ﻿namespace TNRD.Editor {
 
     public enum EAnchor {
@@ -12,3 +13,4 @@
         BottomRight
     }
 }
+#endif

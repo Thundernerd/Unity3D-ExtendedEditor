@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 ﻿namespace TNRD.Editor.Serialization {
 
     public class SerializedPrimitive : SerializedBase {
@@ -16,3 +17,4 @@
         }
     }
 }
+#endif

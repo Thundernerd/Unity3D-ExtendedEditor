@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 ﻿namespace TNRD.Editor {
 
     public enum EMouseButton {
@@ -7,3 +8,4 @@
         Middle = 2
     }
 }
+#endif

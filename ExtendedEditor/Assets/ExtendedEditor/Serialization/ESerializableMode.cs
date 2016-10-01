@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 ﻿namespace TNRD.Editor.Serialization {
 
     public enum ESerializableMode {
@@ -7,3 +8,4 @@
         Class
     }
 }
+#endif
