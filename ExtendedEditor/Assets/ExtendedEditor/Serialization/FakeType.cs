@@ -1,6 +1,4 @@
 ﻿#if UNITY_EDITOR
-using UnityEngine;
-using System.Collections;
 using System;
 
 namespace TNRD.Editor.Serialization {
