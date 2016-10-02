@@ -109,8 +109,8 @@ class SimpleTester : ExtendedWindow {
         }
 
         if ( GUILayout.Button( "Test" ) ) {
-            var b64 = Serializer.SerializeToB64( this );
-            var t = Deserializer.Deserialize<SimpleTester>( b64 );
+            var b64 = Serializer.ToB64( this );
+            var t = Deserializer.FromB64<SimpleTester>( b64 );
         }
 
         if ( gStyle != null ) {
