@@ -79,6 +79,8 @@ namespace TNRD.Editor {
 
         private Dictionary<Type, List<ExtendedControl>> controlsGrouped = new Dictionary<Type, List<ExtendedControl>>();
 
+        private List<KeyboardShortcut> shortcuts = new List<KeyboardShortcut>();
+
         private List<Action> guiActions = new List<Action>();
 
         [RequireSerialization]
@@ -244,6 +246,41 @@ namespace TNRD.Editor {
                     }
                 }
             }
+
+            var cuts = new List<KeyboardShortcut>( shortcuts );
+            foreach ( var item in cuts ) {
+                if ( item.Alt && ( Input.KeyUp( KeyCode.LeftAlt ) && Input.KeyUp( KeyCode.RightAlt ) ) )
+                    continue;
+
+                if ( item.Control && ( Input.KeyUp( KeyCode.LeftControl ) && Input.KeyUp( KeyCode.RightControl ) ) )
+                    continue;
+
+                if ( item.Shift && ( Input.KeyUp( KeyCode.LeftShift ) && Input.KeyUp( KeyCode.RightShift ) ) )
+                    continue;
+
+                var onePressed = false;
+                foreach ( var k in item.KeyCodes ) {
+                    if ( Input.KeyPressed( k ) ) {
+                        onePressed = true;
+                        break;
+                    }
+                }
+
+                if ( !onePressed )
+                    continue;
+
+                var execute = true;
+                foreach ( var k in item.KeyCodes ) {
+                    if ( Input.KeyUp( k ) ) {
+                        execute = false;
+                        break;
+                    }
+                }
+
+                if ( execute ) {
+                    item.Callback();
+                }
+            }
         }
 
         private void InternalSceneGUI( SceneView view ) {
@@ -278,6 +315,57 @@ namespace TNRD.Editor {
 
         protected virtual void OnUpdate() { }
 
+        #region Shortcuts
+        public KeyboardShortcut AddShortcut( Action callback, KeyCode key ) {
+            var s = new KeyboardShortcut() {
+                ID = GetControlID(),
+                Callback = callback,
+                KeyCodes = new KeyCode[] { key }
+            };
+
+            shortcuts.Add( s );
+
+            return s;
+        }
+
+        public KeyboardShortcut AddShortcut( Action callback, KeyCode key, bool control, bool alt, bool shift ) {
+            var s = new KeyboardShortcut() {
+                ID = GetControlID(),
+                Callback = callback,
+                KeyCodes = new KeyCode[] { key },
+                Control = control,
+                Alt = alt,
+                Shift = shift
+            };
+
+            shortcuts.Add( s );
+
+            return s;
+        }
+
+        public KeyboardShortcut AddShortcut( Action callback, params KeyCode[] keys ) {
+            var s = new KeyboardShortcut() {
+                ID = GetControlID(),
+                Callback = callback,
+                KeyCodes = keys
+            };
+
+            shortcuts.Add( s );
+
+            return s;
+        }
+
+        public void RemoveShortcut( int id ) {
+            var s = shortcuts.Where( r => r.ID == id ).FirstOrDefault();
+            shortcuts.Remove( s );
+        }
+
+        public void RemoveShortcut( KeyboardShortcut shortcut ) {
+            shortcuts.Remove( shortcut );
+        }
+        #endregion
+
+        #region Notifications
         public void ShowNotification( string text ) {
             AddControl( new ExtendedNotification( text, Color.white, ENotificationLocation.TopRight, 1.25f ) );
         }
@@ -301,6 +389,7 @@ namespace TNRD.Editor {
         public void ShowNotificationError( string text, ENotificationLocation location, float duration ) {
             AddControl( new ExtendedNotification( text, Color.red, location, duration ) );
         }
+        #endregion
 
         public void ShowPopup( ExtendedPopup popup ) {
             Editor.ShowPopup( popup );
@@ -310,6 +399,7 @@ namespace TNRD.Editor {
             Editor.RemovePopup();
         }
 
+        #region Windows
         public void AddWindow( ExtendedWindow window ) {
             Editor.AddWindow( window );
         }
@@ -333,7 +423,9 @@ namespace TNRD.Editor {
         public List<T> GetWindows<T>() where T : ExtendedWindow {
             return Editor.GetWindowsByType<T>();
         }
+        #endregion
 
+        #region Controls
         public void AddControl( ExtendedControl control ) {
             control.Window = this;
 
@@ -426,6 +518,7 @@ namespace TNRD.Editor {
                 return new List<T>();
             }
         }
+        #endregion
 
         public int GetControlID() {
             return controlID++;

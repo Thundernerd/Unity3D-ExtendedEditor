@@ -16,22 +16,22 @@ namespace TNRD.Editor {
 
     public class ExtendedInput {
 
-        private InputState previous = new InputState();
-        private InputState current = new InputState();
+        private InputState state = new InputState();
 
-        public Vector2 MouseDelta { get { return current.MouseDelta; } }
-        public Vector2 DragDelta { get { return current.DragDelta; } }
+        public Vector2 MouseDelta { get { return state.MouseDelta; } }
+        public Vector2 DragDelta { get { return state.DragDelta; } }
         public Vector2 MousePosition { get { return Event.current.mousePosition; } }
-        public Vector2 ScrollDelta { get { return current.ScrollDelta; } }
+        public Vector2 ScrollDelta { get { return state.ScrollDelta; } }
 
         public EventType Type { get { return Event.current.type; } }
         private EventType previousType;
 
         public void OnGUI() {
             if ( Event.current.type == EventType.Layout && previousType != EventType.Repaint ) {
-                previous = current;
+                state.kPressedStates.Clear();
+                state.mPressedStates.Clear();
             } else {
-                current.Update();
+                state.Update();
             }
 
             previousType = Type;
@@ -39,68 +39,63 @@ namespace TNRD.Editor {
 
         public bool KeyDown( KeyCode k ) {
             if ( !Event.current.isKey ) return false;
-            if ( current.Consumed ) return false;
-            return current.GetValue( k );
+            if ( state.Consumed ) return false;
+            return state.GetValue( k );
         }
 
         public bool KeyUp( KeyCode k ) {
             if ( !Event.current.isKey ) return false;
-            if ( current.Consumed ) return false;
-            return !current.GetValue( k );
+            if ( state.Consumed ) return false;
+            return !state.GetValue( k );
         }
 
         public bool KeyPressed( KeyCode k ) {
             if ( !Event.current.isKey ) return false;
-            if ( current.Consumed ) return false;
-            var cs = current.GetValue( k );
-            var ps = previous.GetValue( k );
-            return cs && !ps;
+            if ( state.Consumed ) return false;
+            return state.kPressedStates.ContainsKey( k ) && state.kPressedStates[k];
         }
 
         public bool KeyReleased( KeyCode k ) {
             if ( !Event.current.isKey ) return false;
-            if ( current.Consumed ) return false;
-            var cs = current.GetValue( k );
-            var ps = previous.GetValue( k );
-            return !cs && ps;
+            if ( state.Consumed ) return false;
+            return state.kPressedStates.ContainsKey( k ) && !state.kPressedStates[k];
         }
 
         public bool ButtonDown( EMouseButton b ) {
             if ( !Event.current.isMouse ) return false;
-            if ( current.Consumed ) return false;
-            return current.GetValue( b );
+            if ( state.Consumed ) return false;
+            return state.GetValue( b );
         }
 
         public bool ButtonUp( EMouseButton b ) {
             if ( !Event.current.isMouse ) return false;
-            if ( current.Consumed ) return false;
-            return !current.GetValue( b );
+            if ( state.Consumed ) return false;
+            return !state.GetValue( b );
         }
 
         public bool ButtonPressed( EMouseButton b ) {
             if ( !Event.current.isMouse ) return false;
-            if ( current.Consumed ) return false;
-            var cs = current.GetValue( b );
-            var ps = previous.GetValue( b );
-            return cs && !ps;
+            if ( state.Consumed ) return false;
+            return state.mPressedStates.ContainsKey( b ) && state.mPressedStates[b];
         }
 
         public bool ButtonReleased( EMouseButton b ) {
             if ( !Event.current.isMouse ) return false;
-            if ( current.Consumed ) return false;
-            var cs = current.GetValue( b );
-            var ps = previous.GetValue( b );
-            return !cs && ps;
+            if ( state.Consumed ) return false;
+            return state.mPressedStates.ContainsKey( b ) && !state.mPressedStates[b];
         }
 
         public void Use() {
-            current.Consumed = true;
+            state.Consumed = true;
         }
 
         private class InputState {
 
-            private Dictionary<EMouseButton, bool> mouseStates = new Dictionary<EMouseButton, bool>();
-            private Dictionary<KeyCode, bool> keyStates = new Dictionary<KeyCode, bool>();
+            public Dictionary<EMouseButton, bool> mouseStates = new Dictionary<EMouseButton, bool>();
+            public Dictionary<KeyCode, bool> keyStates = new Dictionary<KeyCode, bool>();
+
+            public Dictionary<EMouseButton, bool> mPressedStates = new Dictionary<EMouseButton, bool>();
+            public Dictionary<KeyCode, bool> kPressedStates = new Dictionary<KeyCode, bool>();
 
             public bool Consumed = false;
 
@@ -119,9 +114,17 @@ namespace TNRD.Editor {
 
                 switch ( evt.type ) {
                     case EventType.MouseDown:
+                        if ( !mouseStates.ContainsKey( (EMouseButton)evt.button ) || !mouseStates[(EMouseButton)evt.button] ) {
+                            mPressedStates.AddOrReplace( (EMouseButton)evt.button, true );
+                        }
                         mouseStates.AddOrReplace( (EMouseButton)evt.button, true );
                         break;
                     case EventType.MouseUp:
+                        if ( mouseStates.ContainsKey( (EMouseButton)evt.button ) ) {
+                            if ( mouseStates[(EMouseButton)evt.button] ) {
+                                mPressedStates.AddOrReplace( (EMouseButton)evt.button, false );
+                            }
+                        }
                         mouseStates.AddOrReplace( (EMouseButton)evt.button, false );
                         break;
                     case EventType.MouseMove:
@@ -132,23 +135,27 @@ namespace TNRD.Editor {
                         DragDelta = evt.delta;
                         break;
                     case EventType.KeyDown:
-                        if ( evt.keyCode == KeyCode.None ) {
-                            var kcodes = MapCharacterToKeyCodes( evt.character );
-                            foreach ( var item in kcodes ) {
-                                keyStates.AddOrReplace( item, true );
-                            }
-                        } else {
-                            keyStates.AddOrReplace( evt.keyCode, true );
+                        if ( !keyStates.ContainsKey( evt.keyCode ) || !keyStates[evt.keyCode] ) {
+                            kPressedStates.AddOrReplace( evt.keyCode, true );
+                        }
+                        keyStates.AddOrReplace( evt.keyCode, true );
+
+                        if ( evt.shift ) {
+                            keyStates.AddOrReplace( KeyCode.LeftShift, true );
+                            keyStates.AddOrReplace( KeyCode.RightShift, true );
                         }
                         break;
                     case EventType.KeyUp:
-                        if ( evt.keyCode == KeyCode.None ) {
-                            var kcodes = MapCharacterToKeyCodes( evt.character );
-                            foreach ( var item in kcodes ) {
-                                keyStates.AddOrReplace( item, false );
+                        if ( keyStates.ContainsKey( evt.keyCode ) ) {
+                            if ( keyStates[evt.keyCode] ) {
+                                kPressedStates.AddOrReplace( evt.keyCode, false );
                             }
-                        } else {
-                            keyStates.AddOrReplace( evt.keyCode, false );
+                        }
+                        keyStates.AddOrReplace( evt.keyCode, false );
+
+                        if ( !evt.shift ) {
+                            keyStates.AddOrReplace( KeyCode.LeftShift, false );
+                            keyStates.AddOrReplace( KeyCode.RightShift, false );
                         }
                         break;
                     case EventType.ScrollWheel:
