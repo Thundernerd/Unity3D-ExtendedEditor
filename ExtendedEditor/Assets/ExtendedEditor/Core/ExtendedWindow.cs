@@ -1,5 +1,5 @@
 #if UNITY_EDITOR
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using TNRD.Editor.Serialization;
@@ -220,6 +220,11 @@ namespace TNRD.Editor {
 
             OnGUI();
 
+            var notifications = GetControls<ExtendedNotification>();
+            foreach ( var item in notifications ) {
+                item.NotificationGUI();
+            }
+
             if ( WindowSettings.Draggable ) {
                 var rect = new Rect( 0, 0, Size.x - 30, 17f );
                 GUI.DragWindow( rect );
@@ -274,11 +279,27 @@ namespace TNRD.Editor {
         protected virtual void OnUpdate() { }
 
         public void ShowNotification( string text ) {
-            AddControl( new ExtendedNotification( text, false ) );
+            AddControl( new ExtendedNotification( text, Color.white, ENotificationLocation.TopRight, 1.25f ) );
+        }
+
+        public void ShowNotification( string text, ENotificationLocation location ) {
+            AddControl( new ExtendedNotification( text, Color.white, location, 1.25f ) );
+        }
+
+        public void ShowNotification( string text, ENotificationLocation location, float duration ) {
+            AddControl( new ExtendedNotification( text, Color.white, location, duration ) );
         }
 
         public void ShowNotificationError( string text ) {
-            AddControl( new ExtendedNotification( text, true ) );
+            AddControl( new ExtendedNotification( text, Color.red, ENotificationLocation.TopRight, 1.25f ) );
+        }
+
+        public void ShowNotificationError( string text, ENotificationLocation location ) {
+            AddControl( new ExtendedNotification( text, Color.red, location, 1.25f ) );
+        }
+
+        public void ShowNotificationError( string text, ENotificationLocation location, float duration ) {
+            AddControl( new ExtendedNotification( text, Color.red, location, duration ) );
         }
 
         public void ShowPopup( ExtendedPopup popup ) {
