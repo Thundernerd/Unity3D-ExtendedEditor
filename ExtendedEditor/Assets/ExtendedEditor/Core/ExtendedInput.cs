@@ -1,5 +1,5 @@
 #if UNITY_EDITOR
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace TNRD.Editor {
@@ -30,7 +30,6 @@ namespace TNRD.Editor {
         public void OnGUI() {
             if ( Event.current.type == EventType.Layout && previousType != EventType.Repaint ) {
                 previous = current;
-                current = new InputState();
             } else {
                 current.Update();
             }
