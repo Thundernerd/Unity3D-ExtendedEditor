@@ -1,5 +1,5 @@
 #if UNITY_EDITOR
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,34 +11,26 @@ namespace TNRD.Editor.Serialization {
 
     public class Deserializer {
 
-        public static T Deserialize<T>( string b64 ) {
+        public static T FromB64<T>( string b64 ) {
             var buffer = Convert.FromBase64String( b64 );
-            return Deserialize<T>( buffer );
+            return FromBytes<T>( buffer );
         }
 
-        public static T Deserialize<T>( byte[] buffer ) {
-            var stream = new MemoryStream( buffer );
-            var reader = new BinaryReader( stream );
-
-            var deserializer = new Deserializer();
-            var deserializedObject = deserializer.DeserializeClass( reader );
-            var value = deserializer.ReadClass( deserializedObject );
+        public static T FromBytes<T>( byte[] bytes ) {
+            var deserializedObj = ByteDeserializer.Deserialize( bytes );
+            var value = new Deserializer().ReadClass( deserializedObj );
 
             return (T)value;
         }
 
-        public static object Deserialize( string b64, Type type ) {
+        public static object FromB64( string b64, Type type ) {
             var buffer = Convert.FromBase64String( b64 );
-            return Deserialize( buffer, type );
+            return FromBytes( buffer, type );
         }
 
-        public static object Deserialize( byte[] buffer, Type type ) {
-            var stream = new MemoryStream( buffer );
-            var reader = new BinaryReader( stream );
-
-            var deserializer = new Deserializer();
-            var deserializedObject = deserializer.DeserializeClass( reader );
-            var value = deserializer.ReadClass( deserializedObject );
+        public static object FromBytes( byte[] bytes, Type type ) {
+            var deserializedObj = ByteDeserializer.Deserialize( bytes );
+            var value = new Deserializer().ReadClass( deserializedObj );
 
             return Convert.ChangeType( value, type );
         }
@@ -165,119 +157,130 @@ namespace TNRD.Editor.Serialization {
         }
         #endregion
 
-        #region Deserializing
-        private SerializedBase DeserializeDefaults( BinaryReader reader ) {
-            var s = new SerializedBase( 0, "" );
+        private class ByteDeserializer {
 
-            s.ID = reader.ReadInt32();
-            s.IsNull = reader.ReadBoolean();
-            s.IsReference = reader.ReadBoolean();
-            s.Mode = (ESerializableMode)reader.ReadInt32();
-            s.Type = reader.ReadString();
+            public static SerializedClass Deserialize( byte[] bytes ) {
+                var d = new ByteDeserializer();
 
-            return s;
-        }
+                var stream = new MemoryStream( bytes );
+                var reader = new BinaryReader( stream );
 
-        private SerializedClass DeserializeClass( BinaryReader reader ) {
-            var value = new SerializedClass( DeserializeDefaults( reader ) );
-            var count = reader.ReadInt32();
-
-            for ( int i = 0; i < count; i++ ) {
-                var name = reader.ReadString();
-                var mode = (ESerializableMode)reader.ReadInt32();
-                switch ( mode ) {
-                    case ESerializableMode.Primitive:
-                        value.Add( name, DeserializePrimitive( reader ) );
-                        break;
-                    case ESerializableMode.Enum:
-                        value.Add( name, DeserializeEnum( reader ) );
-                        break;
-                    case ESerializableMode.List:
-                        value.Add( name, DeserializeList( reader ) );
-                        break;
-                    case ESerializableMode.Class:
-                        value.Add( name, DeserializeClass( reader ) );
-                        break;
-                    default:
-                        break;
-                }
+                var obj = d.DeserializeClass( reader );
+                return obj;
             }
 
-            return value;
-        }
+            private SerializedBase DeserializeDefaults( BinaryReader reader ) {
+                var s = new SerializedBase( 0, "" );
 
-        private SerializedEnum DeserializeEnum( BinaryReader reader ) {
-            var value = new SerializedEnum( DeserializeDefaults( reader ) );
-            value.Value = reader.ReadInt32();
-            return value;
-        }
+                s.ID = reader.ReadInt32();
+                s.IsNull = reader.ReadBoolean();
+                s.IsReference = reader.ReadBoolean();
+                s.Mode = (ESerializableMode)reader.ReadInt32();
+                s.Type = reader.ReadString();
 
-        private SerializedList DeserializeList( BinaryReader reader ) {
-            var value = new SerializedList( DeserializeDefaults( reader ) );
-            var count = reader.ReadInt32();
-
-            for ( int i = 0; i < count; i++ ) {
-                var mode = (ESerializableMode)reader.ReadInt32();
-                switch ( mode ) {
-                    case ESerializableMode.Primitive:
-                        value.Add( DeserializePrimitive( reader ) );
-                        break;
-                    case ESerializableMode.Enum:
-                        value.Add( DeserializeEnum( reader ) );
-                        break;
-                    case ESerializableMode.List:
-                        value.Add( DeserializeList( reader ) );
-                        break;
-                    case ESerializableMode.Class:
-                        value.Add( DeserializeClass( reader ) );
-                        break;
-                    default:
-                        break;
-                }
+                return s;
             }
 
-            return value;
-        }
+            private SerializedClass DeserializeClass( BinaryReader reader ) {
+                var value = new SerializedClass( DeserializeDefaults( reader ) );
+                var count = reader.ReadInt32();
 
-        private SerializedPrimitive DeserializePrimitive( BinaryReader reader ) {
-            var value = new SerializedPrimitive( DeserializeDefaults( reader ) );
-            var type = Type.GetType( value.Type );
+                for ( int i = 0; i < count; i++ ) {
+                    var name = reader.ReadString();
+                    var mode = (ESerializableMode)reader.ReadInt32();
+                    switch ( mode ) {
+                        case ESerializableMode.Primitive:
+                            value.Add( name, DeserializePrimitive( reader ) );
+                            break;
+                        case ESerializableMode.Enum:
+                            value.Add( name, DeserializeEnum( reader ) );
+                            break;
+                        case ESerializableMode.List:
+                            value.Add( name, DeserializeList( reader ) );
+                            break;
+                        case ESerializableMode.Class:
+                            value.Add( name, DeserializeClass( reader ) );
+                            break;
+                        default:
+                            break;
+                    }
+                }
 
-            if ( type == typeof( bool ) ) {
-                value.Value = reader.ReadBoolean();
-            } else if ( type == typeof( byte ) ) {
-                value.Value = reader.ReadByte();
-            } else if ( type == typeof( char ) ) {
-                value.Value = reader.ReadChar();
-            } else if ( type == typeof( decimal ) ) {
-                value.Value = reader.ReadDecimal();
-            } else if ( type == typeof( double ) ) {
-                value.Value = reader.ReadDouble();
-            } else if ( type == typeof( float ) ) {
-                value.Value = reader.ReadSingle();
-            } else if ( type == typeof( int ) ) {
+                return value;
+            }
+
+            private SerializedEnum DeserializeEnum( BinaryReader reader ) {
+                var value = new SerializedEnum( DeserializeDefaults( reader ) );
                 value.Value = reader.ReadInt32();
-            } else if ( type == typeof( long ) ) {
-                value.Value = reader.ReadInt64();
-            } else if ( type == typeof( sbyte ) ) {
-                value.Value = reader.ReadSByte();
-            } else if ( type == typeof( short ) ) {
-                value.Value = reader.ReadInt16();
-            } else if ( type == typeof( string ) ) {
-                value.Value = reader.ReadString();
-            } else if ( type == typeof( uint ) ) {
-                value.Value = reader.ReadUInt32();
-            } else if ( type == typeof( ulong ) ) {
-                value.Value = reader.ReadUInt64();
-            } else if ( type == typeof( ushort ) ) {
-                value.Value = reader.ReadUInt16();
-            } else {
-                Debug.LogErrorFormat( "Found an unknown primitive: {0}", type.Name );
+                return value;
             }
 
-            return value;
+            private SerializedList DeserializeList( BinaryReader reader ) {
+                var value = new SerializedList( DeserializeDefaults( reader ) );
+                var count = reader.ReadInt32();
+
+                for ( int i = 0; i < count; i++ ) {
+                    var mode = (ESerializableMode)reader.ReadInt32();
+                    switch ( mode ) {
+                        case ESerializableMode.Primitive:
+                            value.Add( DeserializePrimitive( reader ) );
+                            break;
+                        case ESerializableMode.Enum:
+                            value.Add( DeserializeEnum( reader ) );
+                            break;
+                        case ESerializableMode.List:
+                            value.Add( DeserializeList( reader ) );
+                            break;
+                        case ESerializableMode.Class:
+                            value.Add( DeserializeClass( reader ) );
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                return value;
+            }
+
+            private SerializedPrimitive DeserializePrimitive( BinaryReader reader ) {
+                var value = new SerializedPrimitive( DeserializeDefaults( reader ) );
+                var type = Type.GetType( value.Type );
+
+                if ( type == typeof( bool ) ) {
+                    value.Value = reader.ReadBoolean();
+                } else if ( type == typeof( byte ) ) {
+                    value.Value = reader.ReadByte();
+                } else if ( type == typeof( char ) ) {
+                    value.Value = reader.ReadChar();
+                } else if ( type == typeof( decimal ) ) {
+                    value.Value = reader.ReadDecimal();
+                } else if ( type == typeof( double ) ) {
+                    value.Value = reader.ReadDouble();
+                } else if ( type == typeof( float ) ) {
+                    value.Value = reader.ReadSingle();
+                } else if ( type == typeof( int ) ) {
+                    value.Value = reader.ReadInt32();
+                } else if ( type == typeof( long ) ) {
+                    value.Value = reader.ReadInt64();
+                } else if ( type == typeof( sbyte ) ) {
+                    value.Value = reader.ReadSByte();
+                } else if ( type == typeof( short ) ) {
+                    value.Value = reader.ReadInt16();
+                } else if ( type == typeof( string ) ) {
+                    value.Value = reader.ReadString();
+                } else if ( type == typeof( uint ) ) {
+                    value.Value = reader.ReadUInt32();
+                } else if ( type == typeof( ulong ) ) {
+                    value.Value = reader.ReadUInt64();
+                } else if ( type == typeof( ushort ) ) {
+                    value.Value = reader.ReadUInt16();
+                } else {
+                    Debug.LogErrorFormat( "Found an unknown primitive: {0}", type.Name );
+                }
+
+                return value;
+            }
         }
-        #endregion
     }
 }
 #endif

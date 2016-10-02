@@ -1,5 +1,5 @@
 #if UNITY_EDITOR
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -10,7 +10,6 @@ namespace TNRD.Editor.Serialization {
 
     public class Serializer {
 
-        #region Writing
         public static SerializedBase Serialize( object value ) {
             if ( value == null ) return null;
 
@@ -42,14 +41,14 @@ namespace TNRD.Editor.Serialization {
             return null;
         }
 
-        public static string SerializeToB64( object value ) {
-            var buffer = SerializeToBytes( value );
+        public static string ToB64( object value ) {
+            var buffer = ToBytes( value );
             var b64 = Convert.ToBase64String( buffer );
 
             return b64;
         }
 
-        public static byte[] SerializeToBytes( object value ) {
+        public static byte[] ToBytes( object value ) {
             if ( value == null ) {
                 return new byte[0];
             }
@@ -57,118 +56,11 @@ namespace TNRD.Editor.Serialization {
             var serializer = new Serializer();
             var serializedObject = serializer.SerializeClass( value, value.GetType() );
 
-            var stream = new MemoryStream();
-            var writer = new BinaryWriter( stream );
-            WriteClass( writer, serializedObject );
-            writer.Flush();
-            writer.Close();
-
-            var buffer = stream.GetBuffer();
-            return buffer;
+            var bytes = ByteSerializer.Serialize( serializedObject );
+            return bytes;
         }
 
-        private static void WriteDefaults( BinaryWriter writer, SerializedBase obj ) {
-            writer.Write( obj.ID );
-            writer.Write( obj.IsNull );
-            writer.Write( obj.IsReference );
-            writer.Write( (int)obj.Mode );
-            writer.Write( obj.Type );
-        }
-
-        private static void WriteClass( BinaryWriter writer, SerializedClass obj ) {
-            WriteDefaults( writer, obj );
-            writer.Write( obj.Values.Count );
-
-            foreach ( var item in obj.Values ) {
-                writer.Write( item.Key );
-                writer.Write( (int)item.Value.Mode );
-                switch ( item.Value.Mode ) {
-                    case ESerializableMode.Primitive:
-                        WritePrimitive( writer, (SerializedPrimitive)item.Value );
-                        break;
-                    case ESerializableMode.Enum:
-                        WriteEnum( writer, (SerializedEnum)item.Value );
-                        break;
-                    case ESerializableMode.List:
-                        WriteList( writer, (SerializedList)item.Value );
-                        break;
-                    case ESerializableMode.Class:
-                        WriteClass( writer, (SerializedClass)item.Value );
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-
-        private static void WriteEnum( BinaryWriter writer, SerializedEnum obj ) {
-            WriteDefaults( writer, obj );
-            writer.Write( (int)obj.Value );
-        }
-
-        private static void WriteList( BinaryWriter writer, SerializedList obj ) {
-            WriteDefaults( writer, obj );
-            writer.Write( obj.Values.Count );
-
-            foreach ( var item in obj.Values ) {
-                writer.Write( (int)item.Mode );
-                switch ( item.Mode ) {
-                    case ESerializableMode.Primitive:
-                        WritePrimitive( writer, (SerializedPrimitive)item );
-                        break;
-                    case ESerializableMode.Enum:
-                        WriteEnum( writer, (SerializedEnum)item );
-                        break;
-                    case ESerializableMode.List:
-                        WriteList( writer, (SerializedList)item );
-                        break;
-                    case ESerializableMode.Class:
-                        WriteClass( writer, (SerializedClass)item );
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-
-        private static void WritePrimitive( BinaryWriter writer, SerializedPrimitive obj ) {
-            WriteDefaults( writer, obj );
-
-            var type = Type.GetType( obj.Type );
-            if ( type == typeof( bool ) ) {
-                writer.Write( (bool)obj.Value );
-            } else if ( type == typeof( byte ) ) {
-                writer.Write( (byte)obj.Value );
-            } else if ( type == typeof( char ) ) {
-                writer.Write( (char)obj.Value );
-            } else if ( type == typeof( decimal ) ) {
-                writer.Write( (decimal)obj.Value );
-            } else if ( type == typeof( double ) ) {
-                writer.Write( (double)obj.Value );
-            } else if ( type == typeof( float ) ) {
-                writer.Write( (float)obj.Value );
-            } else if ( type == typeof( int ) ) {
-                writer.Write( (int)obj.Value );
-            } else if ( type == typeof( long ) ) {
-                writer.Write( (long)obj.Value );
-            } else if ( type == typeof( sbyte ) ) {
-                writer.Write( (sbyte)obj.Value );
-            } else if ( type == typeof( short ) ) {
-                writer.Write( (short)obj.Value );
-            } else if ( type == typeof( string ) ) {
-                writer.Write( obj.IsNull ? "" : (string)obj.Value );
-            } else if ( type == typeof( uint ) ) {
-                writer.Write( (uint)obj.Value );
-            } else if ( type == typeof( ulong ) ) {
-                writer.Write( (ulong)obj.Value );
-            } else if ( type == typeof( ushort ) ) {
-                writer.Write( (ushort)obj.Value );
-            } else {
-                UnityEngine.Debug.LogErrorFormat( "Found an unknown primitive: {0}", type.Name );
-            }
-        }
-        #endregion
-
+        #region Writing
         private struct CSerializable {
             public SerializedBase Serializable;
             public object Value;
@@ -179,7 +71,6 @@ namespace TNRD.Editor.Serialization {
             }
         }
 
-        #region Serializing
         private Dictionary<Type, List<CSerializable>> cSerializables = new Dictionary<Type, List<CSerializable>>();
 
         private int currentID = 0;
@@ -430,6 +321,125 @@ namespace TNRD.Editor.Serialization {
             return false;
         }
         #endregion
+
+        private class ByteSerializer {
+
+            public static byte[] Serialize( SerializedClass obj ) {
+                var s = new ByteSerializer();
+
+                var stream = new MemoryStream();
+                var writer = new BinaryWriter( stream );
+
+                s.WriteClass( writer, obj );
+
+                writer.Flush();
+                writer.Close();
+
+                var buffer = stream.GetBuffer();
+                return buffer;
+            }
+
+            private void WriteDefaults( BinaryWriter writer, SerializedBase obj ) {
+                writer.Write( obj.ID );
+                writer.Write( obj.IsNull );
+                writer.Write( obj.IsReference );
+                writer.Write( (int)obj.Mode );
+                writer.Write( obj.Type );
+            }
+
+            private void WriteClass( BinaryWriter writer, SerializedClass obj ) {
+                WriteDefaults( writer, obj );
+                writer.Write( obj.Values.Count );
+
+                foreach ( var item in obj.Values ) {
+                    writer.Write( item.Key );
+                    writer.Write( (int)item.Value.Mode );
+                    switch ( item.Value.Mode ) {
+                        case ESerializableMode.Primitive:
+                            WritePrimitive( writer, (SerializedPrimitive)item.Value );
+                            break;
+                        case ESerializableMode.Enum:
+                            WriteEnum( writer, (SerializedEnum)item.Value );
+                            break;
+                        case ESerializableMode.List:
+                            WriteList( writer, (SerializedList)item.Value );
+                            break;
+                        case ESerializableMode.Class:
+                            WriteClass( writer, (SerializedClass)item.Value );
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+
+            private void WriteEnum( BinaryWriter writer, SerializedEnum obj ) {
+                WriteDefaults( writer, obj );
+                writer.Write( (int)obj.Value );
+            }
+
+            private void WriteList( BinaryWriter writer, SerializedList obj ) {
+                WriteDefaults( writer, obj );
+                writer.Write( obj.Values.Count );
+
+                foreach ( var item in obj.Values ) {
+                    writer.Write( (int)item.Mode );
+                    switch ( item.Mode ) {
+                        case ESerializableMode.Primitive:
+                            WritePrimitive( writer, (SerializedPrimitive)item );
+                            break;
+                        case ESerializableMode.Enum:
+                            WriteEnum( writer, (SerializedEnum)item );
+                            break;
+                        case ESerializableMode.List:
+                            WriteList( writer, (SerializedList)item );
+                            break;
+                        case ESerializableMode.Class:
+                            WriteClass( writer, (SerializedClass)item );
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+
+            private void WritePrimitive( BinaryWriter writer, SerializedPrimitive obj ) {
+                WriteDefaults( writer, obj );
+
+                var type = Type.GetType( obj.Type );
+                if ( type == typeof( bool ) ) {
+                    writer.Write( (bool)obj.Value );
+                } else if ( type == typeof( byte ) ) {
+                    writer.Write( (byte)obj.Value );
+                } else if ( type == typeof( char ) ) {
+                    writer.Write( (char)obj.Value );
+                } else if ( type == typeof( decimal ) ) {
+                    writer.Write( (decimal)obj.Value );
+                } else if ( type == typeof( double ) ) {
+                    writer.Write( (double)obj.Value );
+                } else if ( type == typeof( float ) ) {
+                    writer.Write( (float)obj.Value );
+                } else if ( type == typeof( int ) ) {
+                    writer.Write( (int)obj.Value );
+                } else if ( type == typeof( long ) ) {
+                    writer.Write( (long)obj.Value );
+                } else if ( type == typeof( sbyte ) ) {
+                    writer.Write( (sbyte)obj.Value );
+                } else if ( type == typeof( short ) ) {
+                    writer.Write( (short)obj.Value );
+                } else if ( type == typeof( string ) ) {
+                    writer.Write( obj.IsNull ? "" : (string)obj.Value );
+                } else if ( type == typeof( uint ) ) {
+                    writer.Write( (uint)obj.Value );
+                } else if ( type == typeof( ulong ) ) {
+                    writer.Write( (ulong)obj.Value );
+                } else if ( type == typeof( ushort ) ) {
+                    writer.Write( (ushort)obj.Value );
+                } else {
+                    UnityEngine.Debug.LogErrorFormat( "Found an unknown primitive: {0}", type.Name );
+                }
+            }
+        }
     }
 }
 #endif

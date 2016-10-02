@@ -402,7 +402,7 @@ namespace TNRD.Editor {
                 item.SortControls();
             }
 
-            var b64 = Serializer.SerializeToB64( sEditor );
+            var b64 = Serializer.ToB64( sEditor );
             EditorPrefs.SetString( EditorName, b64 );
         }
 
@@ -413,7 +413,7 @@ namespace TNRD.Editor {
 
                 Input = new ExtendedInput();
                 
-                var sEditor = Deserializer.Deserialize<SerializableEditor>( b64 );
+                var sEditor = Deserializer.FromB64<SerializableEditor>( b64 );
                 isInitialized = sEditor.IsInitialized;
                 isInitializedGUI = sEditor.IsInitializedGUI;
                 windowIDs = sEditor.WindowIDs;
