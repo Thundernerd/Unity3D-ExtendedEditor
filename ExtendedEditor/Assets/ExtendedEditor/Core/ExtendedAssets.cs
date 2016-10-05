@@ -30,6 +30,7 @@ namespace TNRD.Editor {
         public void Initialize( string path ) {
 #if IS_LIBRARY
             resources = Assembly.GetExecutingAssembly().GetManifestResourceNames();
+            return;
 #else
             if ( !string.IsNullOrEmpty( path ) ) {
                 Path = path;
@@ -44,10 +45,14 @@ namespace TNRD.Editor {
                 }
             }
 
-            resources = Directory.GetFiles( Path, "*", SearchOption.AllDirectories )
-                .Where( f => !f.EndsWith( ".meta" ) )
-                .Select( f => f.Replace( "\\", "/" ) )
-                .ToArray();
+            if ( Directory.Exists( path ) ) {
+                resources = Directory.GetFiles( Path, "*", SearchOption.AllDirectories )
+                    .Where( f => !f.EndsWith( ".meta" ) )
+                    .Select( f => f.Replace( "\\", "/" ) )
+                    .ToArray();
+            } else {
+                resources = new string[0];
+            }
 #endif
         }
 
