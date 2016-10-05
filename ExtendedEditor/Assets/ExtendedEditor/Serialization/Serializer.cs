@@ -60,7 +60,6 @@ namespace TNRD.Editor.Serialization {
             return bytes;
         }
 
-        #region Writing
         private struct CSerializable {
             public SerializedBase Serializable;
             public object Value;
@@ -320,7 +319,6 @@ namespace TNRD.Editor.Serialization {
 
             return false;
         }
-        #endregion
 
         private class ByteSerializer {
 

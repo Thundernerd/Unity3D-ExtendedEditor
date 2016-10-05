@@ -34,8 +34,7 @@ namespace TNRD.Editor.Serialization {
 
             return Convert.ChangeType( value, type );
         }
-
-        #region Reading
+        
         private Dictionary<int, object> deserializedObjects = new Dictionary<int, object>();
 
         private object ReadClass( SerializedClass value ) {
@@ -155,17 +154,14 @@ namespace TNRD.Editor.Serialization {
                     return null;
             }
         }
-        #endregion
 
         private class ByteDeserializer {
 
             public static SerializedClass Deserialize( byte[] bytes ) {
-                var d = new ByteDeserializer();
-
                 var stream = new MemoryStream( bytes );
                 var reader = new BinaryReader( stream );
 
-                var obj = d.DeserializeClass( reader );
+                var obj = new ByteDeserializer().DeserializeClass( reader );
                 return obj;
             }
 
