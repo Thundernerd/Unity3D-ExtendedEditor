@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 ﻿using UnityEditor;
 using UnityEngine;
 
@@ -48,13 +49,8 @@ namespace TNRD.Editor.Utilities {
         /// </summary>
         /// <param name="content">The content to display</param>
         /// <param name="showTick">Should the item show a check in front of it</param>
-        /// <param name="enabled">Should the item be enabled or disabled</param>
-        public GenericMenuBuilder AddItem( string content, bool showTick, bool enabled = true ) {
-            if ( enabled )
-                Menu.AddItem( new GUIContent( content ), showTick, null );
-            else
-                Menu.AddDisabledItem( new GUIContent( content ) );
-
+        public GenericMenuBuilder AddItem( string content, bool showTick ) {
+            Menu.AddItem( new GUIContent( content ), showTick, null );
             return this;
         }
 
@@ -63,13 +59,8 @@ namespace TNRD.Editor.Utilities {
         /// </summary>
         /// <param name="content">The content to display</param>
         /// <param name="showTick">Should the item show a check in front of it</param>
-        /// <param name="enabled">Should the item be enabled or disabled</param>
-        public GenericMenuBuilder AddItem( GUIContent content, bool showTick, bool enabled = true ) {
-            if ( enabled )
-                Menu.AddItem( content, showTick, null );
-            else
-                Menu.AddDisabledItem( content );
-
+        public GenericMenuBuilder AddItem( GUIContent content, bool showTick ) {
+            Menu.AddItem( content, showTick, null );
             return this;
         }
 
@@ -79,13 +70,8 @@ namespace TNRD.Editor.Utilities {
         /// <param name="content">The content to display</param>
         /// <param name="showTick">Should the item show a check in front of it</param>
         /// <param name="func">The function to call when this item is clicked</param>
-        /// <param name="enabled">Should the item be enabled or disabled</param>
-        public GenericMenuBuilder AddItem( string content, bool showTick, GenericMenu.MenuFunction func, bool enabled = true ) {
-            if ( enabled )
-                Menu.AddItem( new GUIContent( content ), showTick, func );
-            else
-                Menu.AddDisabledItem( new GUIContent( content ) );
-
+        public GenericMenuBuilder AddItem( string content, bool showTick, GenericMenu.MenuFunction func ) {
+            Menu.AddItem( new GUIContent( content ), showTick, func );
             return this;
         }
 
@@ -95,13 +81,8 @@ namespace TNRD.Editor.Utilities {
         /// <param name="content">The content to display</param>
         /// <param name="showTick">Should the item show a check in front of it</param>
         /// <param name="func">The function to call when this item is clicked</param>
-        /// <param name="enabled">Should the item be enabled or disabled</param>
-        public GenericMenuBuilder AddItem( GUIContent content, bool showTick, GenericMenu.MenuFunction func, bool enabled = true ) {
-            if ( enabled )
-                Menu.AddItem( content, showTick, func );
-            else
-                Menu.AddDisabledItem( content );
-
+        public GenericMenuBuilder AddItem( GUIContent content, bool showTick, GenericMenu.MenuFunction func ) {
+            Menu.AddItem( content, showTick, func );
             return this;
         }
 
@@ -112,13 +93,8 @@ namespace TNRD.Editor.Utilities {
         /// <param name="showTick">Should the item show a check in front of it</param>
         /// <param name="func">The function to call when this item is clicked</param>
         /// <param name="data">The data to pass to the function</param>
-        /// <param name="enabled">Should the item be enabled or disabled</param>
-        public GenericMenuBuilder AddItem( string content, bool showTick, GenericMenu.MenuFunction2 func, object data, bool enabled = true ) {
-            if ( enabled )
-                Menu.AddItem( new GUIContent( content ), showTick, func, data );
-            else
-                Menu.AddDisabledItem( new GUIContent( content ) );
-
+        public GenericMenuBuilder AddItem( string content, bool showTick, GenericMenu.MenuFunction2 func, object data ) {
+            Menu.AddItem( new GUIContent( content ), showTick, func, data );
             return this;
         }
 
@@ -129,13 +105,8 @@ namespace TNRD.Editor.Utilities {
         /// <param name="showTick">Should the item show a check in front of it</param>
         /// <param name="func">The function to call when this item is clicked</param>
         /// <param name="data">The data to pass to the function</param>
-        /// <param name="enabled">Should the item be enabled or disabled</param>
-        public GenericMenuBuilder AddItem( GUIContent content, bool showTick, GenericMenu.MenuFunction2 func, object data, bool enabled = true ) {
-            if ( enabled )
+        public GenericMenuBuilder AddItem( GUIContent content, bool showTick, GenericMenu.MenuFunction2 func, object data) {
                 Menu.AddItem( content, showTick, func, data );
-            else
-                Menu.AddDisabledItem( content );
-
             return this;
         }
 
@@ -166,6 +137,13 @@ namespace TNRD.Editor.Utilities {
         }
 
         /// <summary>
+        /// Get number of items in the menu
+        /// </summary>
+        public int GetItemCount() {
+            return Menu.GetItemCount();
+        }
+
+        /// <summary>
         /// Shows the menu under the mouse when right-clicked
         /// </summary>
         public void ShowAsContext() {
@@ -173,3 +151,4 @@ namespace TNRD.Editor.Utilities {
         }
     }
 }
+#endif

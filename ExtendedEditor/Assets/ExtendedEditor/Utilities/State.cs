@@ -1,32 +1,27 @@
-﻿namespace TNRD {
+#if UNITY_EDITOR
+﻿namespace TNRD.Editor.Utilities {
 
-    /// <summary>
-    /// An object to easily save and query the current and previous value
-    /// </summary>
     public class State<T> {
 
-        /// <summary>
-        /// The current value
-        /// </summary>
         public T Current;
-
-        /// <summary>
-        /// The previous value
-        /// </summary>
         public T Previous;
 
-        /// <summary>
-        /// Updates the values
-        /// </summary>
-        /// <param name="state">The new value for the current state</param>
+        public State() { }
+
+        public State( T current ) {
+            Current = current;
+        }
+
+        public State( T current, T previous ) {
+            Current = current;
+            Previous = previous;
+        }
+
         public void Update( T state ) {
             Previous = Current;
             Current = state;
         }
 
-        /// <summary>
-        /// Updates the values
-        /// </summary>
         public void Update() {
             Previous = Current;
         }
@@ -43,32 +38,21 @@
             return v.Current.Equals( false );
         }
 
-        /// <summary>
-        /// Is the current state equal to true and the previous state equal to false
-        /// </summary>
         public bool IsPressed() {
             return Current.Equals( true ) && Previous.Equals( false );
         }
 
-        /// <summary>
-        /// Is the current state equal to false and the previous state equal to true
-        /// </summary>
         public bool IsReleased() {
             return Current.Equals( false ) && Previous.Equals( true );
         }
 
-        /// <summary>
-        /// Is the current state equal to true
-        /// </summary>
         public bool IsDown() {
             return Current.Equals( true );
         }
 
-        /// <summary>
-        /// Is the current state equal to false
-        /// </summary>
         public bool IsUp() {
             return Current.Equals( false );
         }
     }
 }
+#endif

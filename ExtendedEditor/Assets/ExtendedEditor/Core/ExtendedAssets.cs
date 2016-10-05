@@ -1,173 +1,159 @@
-﻿#if UNITY_EDITOR
+#if UNITY_EDITOR
 using System.Collections.Generic;
 using System.IO;
-using TNRD.Editor.Json;
+using System.Linq;
+#if IS_LIBRARY
+using System.Reflection;
+#endif
+using TNRD.Editor.Serialization;
+using UnityEditor;
 using UnityEngine;
 
-namespace TNRD.Editor.Core {
+namespace TNRD.Editor {
 
-    /// <summary>
-    /// Asset manager for the Extended Editor
-    /// </summary>
     public class ExtendedAssets {
 
-        [JsonIgnore]
+        [IgnoreSerialization]
         private Dictionary<string, Texture2D> textures;
+        [IgnoreSerialization]
+        private Dictionary<string, string> texts;
 
-        [JsonProperty]
-        /// <summary>
-        /// The path where the assets are stored
-        /// </summary>
+        private string[] resources;
+
         public string Path;
 
-        /// <summary>
-        /// Creates a new instance of ExtendedAssets
-        /// </summary>
         public ExtendedAssets() {
             textures = new Dictionary<string, Texture2D>();
+            texts = new Dictionary<string, string>();
         }
 
-        /// <summary>
-        /// Creates a new instance of ExtendedAssets
-        /// </summary>
-        /// <param name="path">The path to the asset folder</param>
-        public ExtendedAssets( string path ) {
-            textures = new Dictionary<string, Texture2D>();
-            Path = path;
-        }
-
-        public ExtendedAssets( ExtendedEditor editor ) {
-            textures = new Dictionary<string, Texture2D>();
-            var type = editor.GetType();
-            var files = Directory.GetFiles( Application.dataPath, string.Format( "*{0}.cs", type.Name ), SearchOption.AllDirectories );
-            if ( files.Length == 1 ) {
-                var f = files[0];
-                var fi = new FileInfo( f );
-                Path = System.IO.Path.Combine( fi.DirectoryName, "Assets/" );
-            }
-        }
-
-        /// <summary>
-        /// Creates a new instance of ExtendedAssets
-        /// </summary>
-        /// <param name="path">The path to the asset folder</param>
-        /// <param name="window">The window containing this asset manager</param>
-        public ExtendedAssets( string path, ExtendedWindow window ) {
-            if ( string.IsNullOrEmpty( path ) ) {
-                var type = window.Editor.GetType();
-                var files = Directory.GetFiles( Application.dataPath, string.Format( "*{0}.cs", type.Name ), SearchOption.AllDirectories );
-                if ( files.Length == 1 ) {
-                    var f = files[0];
-                    var fi = new FileInfo( f );
-                    this.Path = System.IO.Path.Combine( fi.DirectoryName, "Assets/" );
-                }
+        public void Initialize( string path ) {
+#if IS_LIBRARY
+            resources = Assembly.GetExecutingAssembly().GetManifestResourceNames();
+            return;
+#else
+            if ( !string.IsNullOrEmpty( path ) ) {
+                Path = path;
             } else {
-                this.Path = path.ToLower().StartsWith( "assets" ) ? path : string.Format( "Assets/{0}", path );
-            }
+                var stack = new System.Diagnostics.StackTrace( true );
+                if ( stack.FrameCount > 0 ) {
+                    var frame = stack.GetFrame( stack.FrameCount - 1 );
+                    var fname = System.IO.Path.GetFileName( frame.GetFileName() );
 
-            textures = new Dictionary<string, Texture2D>();
-        }
-
-        public Texture2D this[string key] {
-            get {
-                if ( textures.ContainsKey( key ) ) {
-                    return textures[key];
-                } else {
-                    return Load( key );
+                    Path = frame.GetFileName().Replace( '\\', '/' );
+                    Path = Path.Replace( fname, "Assets/" );
                 }
             }
+
+            if ( Directory.Exists( path ) ) {
+                resources = Directory.GetFiles( Path, "*", SearchOption.AllDirectories )
+                    .Where( f => !f.EndsWith( ".meta" ) )
+                    .Select( f => f.Replace( "\\", "/" ) )
+                    .ToArray();
+            } else {
+                resources = new string[0];
+            }
+#endif
         }
 
-        /// <summary>
-        /// Loads a texture from the asset path with the given key
-        /// </summary>
-        /// <param name="key">The name of the texture file without the extension</param>
-        /// <returns>Texture2D or null if the texture file does not exist</returns>
-        public Texture2D Load( string key ) {
-            return Load( key, Path );
+        private string GetPath( string key, string ext ) {
+#if IS_LIBRARY
+            var separator = ".";
+#else
+            var separator = "/";
+#endif
+
+            if ( !ext.StartsWith( "." ) ) {
+                ext = "." + ext;
+            }
+
+            if ( EditorGUIUtility.isProSkin ) {
+                var v = resources.Where( r => r.EndsWith( string.Format( "pro{0}{1}{2}", separator, key, ext ) ) ).FirstOrDefault();
+                if ( v != null ) {
+                    return v;
+                }
+            }
+
+            return resources.Where( r => !r.Contains( "pro" + separator ) && r.EndsWith( key + ext ) ).FirstOrDefault();
         }
 
-        /// <summary>
-        /// Loads a texture from the given location with the given key
-        /// </summary>
-        /// <param name="key">The name of the texture file without the extension</param>
-        /// <param name="location">The location to look for the texture file</param>
-        /// <returns>Texture2D or null if the texture file does not exist</returns>
-        public Texture2D Load( string key, string location ) {
+        public Texture2D Texture( string key ) {
+            return Texture( key, "png" );
+        }
+
+        public Texture2D Texture( string key, string ext ) {
             if ( textures.ContainsKey( key ) ) {
                 return textures[key];
             }
 
-            var path = System.IO.Path.Combine( location, key + ".png" );
-            if ( !File.Exists( path ) ) return null;
+            var path = GetPath( key, ext );
+            if ( string.IsNullOrEmpty( path ) )
+                return null;
 
             var tex = new Texture2D( 1, 1 );
             tex.hideFlags = HideFlags.HideAndDontSave;
 
+#if IS_LIBRARY
+            var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream( path );
+            byte[] bytes;
+            using ( var ms = new MemoryStream() ) {
+                var buffer = new byte[4096];
+                var count = 0;
+                while ( ( count = stream.Read( buffer, 0, buffer.Length ) ) != 0 ) {
+                    ms.Write( buffer, 0, count );
+                }
+                bytes = ms.ToArray();
+            }
+            tex.LoadImage( bytes );
+#else
             var bytes = File.ReadAllBytes( path );
             tex.LoadImage( bytes );
+#endif
 
             textures.Add( key, tex );
             return textures[key];
         }
 
-        /// <summary>
-        /// Converts a base 64 string into a texture and stores it in the local instance
-        /// </summary>
-        /// <param name="key">The key to store the texture with</param>
-        /// <param name="b64">The base 64 string representing an image</param>
-        /// <returns>Texture2D</returns>
-        public Texture2D FromBase64( string key, string b64 ) {
-            if ( textures.ContainsKey( key ) ) {
-                return textures[key];
-            }
-
-            var tex = new Texture2D( 1, 1 );
-            tex.hideFlags = HideFlags.HideAndDontSave;
-
-            var bytes = System.Convert.FromBase64String( b64 );
-            tex.LoadImage( bytes );
-
-            textures.Add( key, tex );
-            return textures[key];
+        public string Text( string key ) {
+            return Text( key, "txt" );
         }
 
-        /// <summary>
-        /// Destroys all the textures loaded for the given window
-        /// </summary>
-        /// <param name="window"></param>
-        public void Destroy( ExtendedWindow window ) {
-            foreach ( var item in textures ) {
-                window.Editor.DestroyAsset( item.Value );
+        public string Text( string key, string ext ) {
+            if ( texts.ContainsKey( key ) ) {
+                return texts[key];
             }
+
+            var path = GetPath( key, ext );
+            if ( string.IsNullOrEmpty( path ) )
+                return "";
+
+#if IS_LIBRARY
+            var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream( path );
+            var data = "";
+            using ( var reader = new StreamReader( stream ) ) {
+                data = reader.ReadToEnd();
+            }
+            return data;
+#else
+            var data = File.ReadAllText( path );
+            return data;
+#endif
         }
 
-        public static Texture2D FromPath( string path ) {
-            if ( !File.Exists( path ) ) return null;
+        public byte[] Blob( string key, string ext ) {
+            var path = GetPath( key, ext );
+            if ( string.IsNullOrEmpty( path ) )
+                return null;
 
-            var tex = new Texture2D( 1, 1 );
-            tex.hideFlags = HideFlags.HideAndDontSave;
-
+#if IS_LIBRARY
+            var stream = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream( path );
+            var bytes = new byte[stream.Length];
+            stream.Read( bytes, 0, (int)stream.Length );
+            return bytes;
+#else
             var bytes = File.ReadAllBytes( path );
-            tex.LoadImage( bytes );
-
-            return tex;
-        }
-
-
-        /// <summary>
-        /// Converts a base 64 string into a texture
-        /// </summary>
-        /// <param name="b64">The base 64 string representing an image</param>
-        /// <returns></returns>
-        public static Texture2D Base64( string b64 ) {
-            var tex = new Texture2D( 1, 1 );
-            tex.hideFlags = HideFlags.HideAndDontSave;
-
-            var bytes = System.Convert.FromBase64String( b64 );
-            tex.LoadImage( bytes );
-
-            return tex;
+            return bytes;
+#endif
         }
     }
 }

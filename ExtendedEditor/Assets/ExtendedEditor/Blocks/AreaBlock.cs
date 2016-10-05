@@ -1,24 +1,47 @@
 ﻿#if UNITY_EDITOR
 using System;
-using TNRD.Editor.Core;
+using UnityEngine;
+
+// Inspired by https://github.com/nickgravelyn/UnityToolbag/tree/master/EditorTools
 
 namespace TNRD.Editor.Blocks {
 
-    /// <summary>
-    /// 
-    /// </summary>
     public class AreaBlock : IDisposable {
 
-        /// <summary>
-        /// Creates a new instance of AreaBlock
-        /// </summary>
-        /// <param name="options">The options to apply to the area</param>
-        public AreaBlock( params ExtendedGUIOption[] options ) {
-            ExtendedGUI.BeginArea( options );
+        public AreaBlock( Rect screenRect ) {
+            GUILayout.BeginArea( screenRect );
+        }
+
+        public AreaBlock( Rect screenRect, string text ) {
+            GUILayout.BeginArea( screenRect, text );
+        }
+
+        public AreaBlock( Rect screenRect, Texture image ) {
+            GUILayout.BeginArea( screenRect, image );
+        }
+
+        public AreaBlock( Rect screenRect, GUIContent content ) {
+            GUILayout.BeginArea( screenRect, content );
+        }
+
+        public AreaBlock( Rect screenRect, GUIStyle style ) {
+            GUILayout.BeginArea( screenRect, style );
+        }
+
+        public AreaBlock( Rect screenRect, string text, GUIStyle style ) {
+            GUILayout.BeginArea( screenRect, text, style );
+        }
+
+        public AreaBlock( Rect screenRect, Texture image, GUIStyle style ) {
+            GUILayout.BeginArea( screenRect, image, style );
+        }
+
+        public AreaBlock( Rect screenRect, GUIContent content, GUIStyle style ) {
+            GUILayout.BeginArea( screenRect, content, style );
         }
 
         public void Dispose() {
-            ExtendedGUI.EndArea();
+            GUILayout.EndArea();
         }
     }
 }

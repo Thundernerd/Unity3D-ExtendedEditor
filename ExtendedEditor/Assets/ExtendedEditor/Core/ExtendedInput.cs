@@ -1,406 +1,332 @@
-﻿#if UNITY_EDITOR
-using System;
+#if UNITY_EDITOR
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace TNRD.Editor.Core {
+namespace TNRD.Editor {
 
-    /// <summary>
-    /// The input manager for every editor
-    /// </summary>
+    public static class DictionaryExtension {
+        public static void AddOrReplace<T, T1>( this Dictionary<T, T1> dict, T key, T1 value ) {
+            if ( dict.ContainsKey( key ) ) {
+                dict[key] = value;
+            } else {
+                dict.Add( key, value );
+            }
+        }
+    }
+
     public class ExtendedInput {
 
-        private Dictionary<KeyCode, State<bool>> kStates = new Dictionary<KeyCode, State<bool>>();
-        private Dictionary<EMouseButton, State<bool>> mStates = new Dictionary<EMouseButton, State<bool>>();
+        private InputState state = new InputState();
 
-        /// <summary>
-        /// The current mouse position in screen coordinates
-        /// </summary>
-        public Vector2 MousePosition;
-        /// <summary>
-        /// The current mouse position in world coordinates
-        /// </summary>
-        public Vector2 MouseWorldPosition {
-            get { return ExtendedWindow.ToWorldPosition( MousePosition ); }
-        }
+        public Vector2 MouseDelta { get { return state.MouseDelta; } }
+        public Vector2 DragDelta { get { return state.DragDelta; } }
+        public Vector2 MousePosition { get { return Event.current.mousePosition; } }
+        public Vector2 ScrollDelta { get { return state.ScrollDelta; } }
 
-        /// <summary>
-        /// The current mouse delta in the editor/window (including scrollwheel delta)
-        /// </summary>
-        public Vector2 MouseDelta { get; private set; }
+        public EventType Type { get { return Event.current.type; } }
+        private EventType previousType;
 
-        private Vector2 scrollDelta;
-
-        /// <summary>
-        /// The current scrollwheel delta
-        /// </summary>
-        public Vector2 ScrollDelta { get { return scrollDelta; } }
-
-        /// <summary>
-        /// Did a double click occur. Check which button with \"Button\"
-        /// </summary>
-        public bool IsDoubleClick { get; private set; }
-
-        /// <summary>
-        /// The mouse button that invoked a double click
-        /// </summary>
-        public EMouseButton Button { get; private set; }
-
-        /// <summary>
-        /// The current event that is being processed
-        /// </summary>
-        public EventType Type { get; private set; }
-
-        private long lastClick = 0;
-        private int lastButton = -1;
-
-        public ExtendedInput() {
-            MousePosition = new Vector2();
-            MouseDelta = new Vector2();
-        }
-
-        /// <summary>
-        /// Called 100 times per second
-        /// </summary>
-        public void Update() {
-            var kCopy = new Dictionary<KeyCode, State<bool>>( kStates );
-            foreach ( var item in kCopy ) {
-                var value = kCopy[item.Key];
-                value.Update();
-                kStates[item.Key] = value;
+        public void OnGUI() {
+            if ( Event.current.type == EventType.Layout && previousType != EventType.Repaint ) {
+                state.kPressedStates.Clear();
+                state.mPressedStates.Clear();
+            } else {
+                state.Update();
             }
 
-            var mCopy = new Dictionary<EMouseButton, State<bool>>( mStates );
-            foreach ( var item in mCopy ) {
-                var value = mCopy[item.Key];
-                value.Update();
-                mStates[item.Key] = value;
-            }
-
-            IsDoubleClick = false;
+            previousType = Type;
         }
 
-        /// <summary>
-        /// Handles the input events
-        /// </summary>
-        public void OnGUI( Event e ) {
-            if ( e == null ) return;
-
-            Type = e.type;
-
-            HandleKeys( e );
-            HandleMouse( e );
+        public bool KeyDown( KeyCode k ) {
+            if ( !Event.current.isKey ) return false;
+            if ( state.Consumed ) return false;
+            return state.GetValue( k );
         }
 
-        private void HandleKeys( Event e ) {
-            switch ( e.type ) {
-                case EventType.KeyDown:
-                    SetValue( e.keyCode, true );
-                    ShiftHack( e.shift );
-                    ControlHack( e.control );
-                    AltHack( e.alt );
-                    break;
-                case EventType.KeyUp:
-                    SetValue( e.keyCode, false );
-                    ShiftHack( e.shift );
-                    ControlHack( e.control );
-                    AltHack( e.alt );
-                    break;
-                case EventType.Repaint:
-                case EventType.Layout:
-                    ShiftHack( e.shift );
-                    break;
-                default:
-                    break;
-            }
-
-#if UNITY_EDITOR_OSX
-		if ( e.isKey ) {
-			if ( e.keyCode == KeyCode.DownArrow || e.keyCode == KeyCode.LeftArrow || e.keyCode == KeyCode.RightArrow || e.keyCode == KeyCode.UpArrow ) {
-				e.Use();
-			}
-		}
-#endif
+        public bool KeyUp( KeyCode k ) {
+            if ( !Event.current.isKey ) return false;
+            if ( state.Consumed ) return false;
+            return !state.GetValue( k );
         }
 
-        private void HandleMouse( Event e ) {
-            scrollDelta.x = scrollDelta.y = 0;
-
-            switch ( e.type ) {
-                case EventType.MouseDown:
-                    var click = DateTime.Now.Ticks;
-                    var button = e.button;
-
-                    if ( click - lastClick < 2500000 && button == lastButton ) {
-                        IsDoubleClick = true;
-                        Button = (EMouseButton)e.button;
-                    }
-
-                    lastClick = click;
-                    lastButton = button;
-
-                    SetValue( (EMouseButton)e.button, true );
-                    break;
-                case EventType.MouseUp:
-                    SetValue( (EMouseButton)e.button, false );
-                    break;
-                case EventType.ScrollWheel:
-                    scrollDelta = e.delta;
-                    break;
-                default:
-                    break;
-            }
-
-            MousePosition = e.mousePosition;
-            MouseDelta = e.delta;
+        public bool KeyPressed( KeyCode k ) {
+            if ( !Event.current.isKey ) return false;
+            if ( state.Consumed ) return false;
+            return state.kPressedStates.ContainsKey( k ) && state.kPressedStates[k];
         }
 
-        private void SetValue( EMouseButton button, bool value ) {
-            if ( !mStates.ContainsKey( button ) ) {
-                mStates.Add( button, new State<bool>() );
-            }
-
-            var state = mStates[button];
-            state.Current = value;
-            mStates[button] = state;
-        }
-        private void SetValue( KeyCode key, bool value ) {
-            if ( !kStates.ContainsKey( key ) ) {
-                kStates.Add( key, new State<bool>() );
-            }
-
-            var state = kStates[key];
-            state.Current = value;
-            kStates[key] = state;
+        public bool KeyReleased( KeyCode k ) {
+            if ( !Event.current.isKey ) return false;
+            if ( state.Consumed ) return false;
+            return state.kPressedStates.ContainsKey( k ) && !state.kPressedStates[k];
         }
 
-        private void ShiftHack( bool value ) {
-            SetValue( KeyCode.LeftShift, value );
-            SetValue( KeyCode.RightShift, value );
-        }
-        private void ControlHack( bool value ) {
-            SetValue( KeyCode.LeftControl, value );
-            SetValue( KeyCode.RightControl, value );
-        }
-        private void AltHack( bool value ) {
-            SetValue( KeyCode.LeftAlt, value );
-            SetValue( KeyCode.RightAlt, value );
+        public bool ButtonDown( EMouseButton b ) {
+            if ( !Event.current.isMouse ) return false;
+            if ( state.Consumed ) return false;
+            return state.GetValue( b );
         }
 
-        private bool PreInputCheck() {
-            return ( Type != EventType.Used && Type != EventType.Ignore ) && ( Type == EventType.KeyDown || Type == EventType.KeyUp || Type == EventType.MouseDown || Type == EventType.MouseUp || Type == EventType.MouseMove || Type == EventType.MouseDrag );
+        public bool ButtonUp( EMouseButton b ) {
+            if ( !Event.current.isMouse ) return false;
+            if ( state.Consumed ) return false;
+            return !state.GetValue( b );
         }
 
-        /// <summary>
-        /// Did the given mouse button get pressed this frame
-        /// </summary>
-        /// <param name="button">the mouse button to check</param>
-        public bool ButtonPressed( EMouseButton button ) {
-            if ( !PreInputCheck() ) return false;
-            if ( !mStates.ContainsKey( button ) ) return false;
-            return mStates[button].IsPressed();
+        public bool ButtonPressed( EMouseButton b ) {
+            if ( !Event.current.isMouse ) return false;
+            if ( state.Consumed ) return false;
+            return state.mPressedStates.ContainsKey( b ) && state.mPressedStates[b];
         }
 
-        /// <summary>
-        /// Did the given mouse button get released this frame
-        /// </summary>
-        /// <param name="button">the mouse button to check</param>
-        public bool ButtonReleased( EMouseButton button ) {
-            if ( !PreInputCheck() ) return false;
-            if ( !mStates.ContainsKey( button ) ) return false;
-            return mStates[button].IsReleased();
+        public bool ButtonReleased( EMouseButton b ) {
+            if ( !Event.current.isMouse ) return false;
+            if ( state.Consumed ) return false;
+            return state.mPressedStates.ContainsKey( b ) && !state.mPressedStates[b];
         }
 
-        /// <summary>
-        /// Is the given mouse button down
-        /// </summary>
-        /// <param name="button">the mouse button to check</param>
-        public bool ButtonDown( EMouseButton button ) {
-            if ( !PreInputCheck() ) return false;
-            if ( !mStates.ContainsKey( button ) ) return false;
-            return mStates[button].IsDown();
+        public void Use() {
+            state.Consumed = true;
         }
 
-        /// <summary>
-        /// Is the given mouse button up
-        /// </summary>
-        /// <param name="button">the mouse button to check</param>
-        public bool ButtonUp( EMouseButton button ) {
-            if ( !PreInputCheck() ) return false;
-            if ( !mStates.ContainsKey( button ) ) return false;
-            return mStates[button].IsUp();
-        }
+        private class InputState {
 
-        /// <summary>
-        /// Did the given key get pressed this frame
-        /// </summary>
-        /// <param name="key">the key to check</param>
-        public bool KeyPressed( KeyCode key ) {
-            if ( !PreInputCheck() ) return false;
-            if ( !kStates.ContainsKey( key ) ) return false;
-            return kStates[key].IsPressed();
-        }
+            public Dictionary<EMouseButton, bool> mouseStates = new Dictionary<EMouseButton, bool>();
+            public Dictionary<KeyCode, bool> keyStates = new Dictionary<KeyCode, bool>();
 
-        /// <summary>
-        /// Did one of the given keys get pressed this frame
-        /// </summary>
-        /// <param name="keys">the keys to check</param>
-        public bool KeyPressed( params KeyCode[] keys ) {
-            if ( !PreInputCheck() ) return false;
-            foreach ( var key in keys ) {
-                if ( kStates.ContainsKey( key ) ) {
-                    if ( kStates[key].IsPressed() ) {
-                        return true;
-                    }
+            public Dictionary<EMouseButton, bool> mPressedStates = new Dictionary<EMouseButton, bool>();
+            public Dictionary<KeyCode, bool> kPressedStates = new Dictionary<KeyCode, bool>();
+
+            public bool Consumed = false;
+
+            public Vector2 MousePosition = new Vector2();
+            public Vector2 MouseDelta = new Vector2();
+            public Vector2 DragDelta = new Vector2();
+            public Vector2 ScrollDelta = new Vector2();
+
+            public void Update() {
+                var evt = Event.current;
+
+                ScrollDelta = Vector2.zero;
+                if ( evt.isMouse ) {
+                    MousePosition = evt.mousePosition;
+                }
+
+                switch ( evt.type ) {
+                    case EventType.MouseDown:
+                        if ( !mouseStates.ContainsKey( (EMouseButton)evt.button ) || !mouseStates[(EMouseButton)evt.button] ) {
+                            mPressedStates.AddOrReplace( (EMouseButton)evt.button, true );
+                        }
+                        mouseStates.AddOrReplace( (EMouseButton)evt.button, true );
+                        break;
+                    case EventType.MouseUp:
+                        if ( mouseStates.ContainsKey( (EMouseButton)evt.button ) ) {
+                            if ( mouseStates[(EMouseButton)evt.button] ) {
+                                mPressedStates.AddOrReplace( (EMouseButton)evt.button, false );
+                            }
+                        }
+                        mouseStates.AddOrReplace( (EMouseButton)evt.button, false );
+                        break;
+                    case EventType.MouseMove:
+                        MouseDelta = evt.delta;
+                        break;
+                    case EventType.MouseDrag:
+                        mouseStates.AddOrReplace( (EMouseButton)evt.button, true );
+                        DragDelta = evt.delta;
+                        break;
+                    case EventType.KeyDown:
+                        if ( !keyStates.ContainsKey( evt.keyCode ) || !keyStates[evt.keyCode] ) {
+                            kPressedStates.AddOrReplace( evt.keyCode, true );
+                        }
+                        keyStates.AddOrReplace( evt.keyCode, true );
+
+                        if ( evt.shift ) {
+                            keyStates.AddOrReplace( KeyCode.LeftShift, true );
+                            keyStates.AddOrReplace( KeyCode.RightShift, true );
+                        }
+                        break;
+                    case EventType.KeyUp:
+                        if ( keyStates.ContainsKey( evt.keyCode ) ) {
+                            if ( keyStates[evt.keyCode] ) {
+                                kPressedStates.AddOrReplace( evt.keyCode, false );
+                            }
+                        }
+                        keyStates.AddOrReplace( evt.keyCode, false );
+
+                        if ( !evt.shift ) {
+                            keyStates.AddOrReplace( KeyCode.LeftShift, false );
+                            keyStates.AddOrReplace( KeyCode.RightShift, false );
+                        }
+                        break;
+                    case EventType.ScrollWheel:
+                        ScrollDelta = evt.delta;
+                        break;
+                    case EventType.DragUpdated:
+                        break;
+                    case EventType.DragPerform:
+                        break;
+                    case EventType.DragExited:
+                        break;
+                    case EventType.ContextClick:
+                        mouseStates.AddOrReplace( EMouseButton.Right, false );
+                        break;
                 }
             }
-            return false;
-        }
 
-        /// <summary>
-        /// Did all of the given keys get pressed this frame
-        /// </summary>
-        /// <param name="keys">the keys to check</param>
-        public bool KeysPressed( params KeyCode[] keys ) {
-            if ( !PreInputCheck() ) return false;
-            foreach ( var key in keys ) {
-                if ( !kStates.ContainsKey( key ) ) return false;
-                if ( !kStates[key].IsPressed() ) return false;
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// Did the given key get released this frame
-        /// </summary>
-        /// <param name="key">the key to check</param>
-        public bool KeyReleased( KeyCode key ) {
-            if ( !PreInputCheck() ) return false;
-            if ( !kStates.ContainsKey( key ) ) return false;
-            return kStates[key].IsReleased();
-        }
-
-        /// <summary>
-        /// Did one of the given keys get released this frame
-        /// </summary>
-        /// <param name="keys">the keys to check</param>
-        public bool KeyReleased( params KeyCode[] keys ) {
-            if ( !PreInputCheck() ) return false;
-            foreach ( var key in keys ) {
-                if ( kStates.ContainsKey( key ) ) {
-                    if ( kStates[key].IsReleased() ) {
-                        return true;
-                    }
+            public bool GetValue( KeyCode k ) {
+                if ( keyStates.ContainsKey( k ) ) {
+                    return keyStates[k];
+                } else {
+                    return false;
                 }
             }
-            return false;
-        }
 
-        /// <summary>
-        /// Did all of the given keys get released this frame
-        /// </summary>
-        /// <param name="keys">the keys to check</param>
-        public bool KeysReleased( params KeyCode[] keys ) {
-            if ( !PreInputCheck() ) return false;
-            foreach ( var key in keys ) {
-                if ( !kStates.ContainsKey( key ) ) return false;
-                if ( !kStates[key].IsReleased() ) return false;
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// Is the given key down
-        /// </summary>
-        /// <param name="key">the key to check</param>
-        public bool KeyDown( KeyCode key ) {
-            if ( !PreInputCheck() ) return false;
-            if ( !kStates.ContainsKey( key ) ) return false;
-            return kStates[key].IsDown();
-        }
-
-        /// <summary>
-        /// Is one of the given keys down
-        /// </summary>
-        /// <param name="keys">the keys to check</param>
-        public bool KeyDown( params KeyCode[] keys ) {
-            if ( !PreInputCheck() ) return false;
-            foreach ( var key in keys ) {
-                if ( kStates.ContainsKey( key ) ) {
-                    if ( kStates[key].IsDown() ) {
-                        return true;
-                    }
+            public bool GetValue( EMouseButton b ) {
+                if ( mouseStates.ContainsKey( b ) ) {
+                    return mouseStates[b];
+                } else {
+                    return false;
                 }
             }
-            return false;
-        }
 
-        /// <summary>
-        /// Are all of the given keys down
-        /// </summary>
-        /// <param name="keys">the keys to check</param>
-        public bool KeysDown( params KeyCode[] keys ) {
-            if ( !PreInputCheck() ) return false;
-            foreach ( var key in keys ) {
-                if ( !kStates.ContainsKey( key ) ) return false;
-                if ( !kStates[key].IsDown() ) return false;
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// Is the given key up
-        /// </summary>
-        /// <param name="key">the key to check</param>
-        public bool KeyUp( KeyCode key ) {
-            if ( !PreInputCheck() ) return false;
-            if ( !kStates.ContainsKey( key ) ) return false;
-            return kStates[key].IsUp(); ;
-        }
-
-        /// <summary>
-        /// Is one of the given keys up
-        /// </summary>
-        /// <param name="keys">the keys to check</param>
-        public bool KeyUp( params KeyCode[] keys ) {
-            if ( !PreInputCheck() ) return false;
-            foreach ( var key in keys ) {
-                if ( kStates.ContainsKey( key ) ) {
-                    if ( kStates[key].IsUp() ) {
-                        return true;
-                    }
+            private KeyCode[] MapCharacterToKeyCodes( char kchar ) {
+                kchar = char.ToLower( kchar );
+                switch ( kchar ) {
+                    case ' ':
+                        return new[] { KeyCode.Space };
+                    case '1':
+                        return new[] { KeyCode.Alpha1, KeyCode.Keypad1 };
+                    case '2':
+                        return new[] { KeyCode.Alpha2, KeyCode.Keypad2 };
+                    case '3':
+                        return new[] { KeyCode.Alpha3, KeyCode.Keypad3 };
+                    case '4':
+                        return new[] { KeyCode.Alpha4, KeyCode.Keypad4 };
+                    case '5':
+                        return new[] { KeyCode.Alpha5, KeyCode.Keypad5 };
+                    case '6':
+                        return new[] { KeyCode.Alpha6, KeyCode.Keypad6 };
+                    case '7':
+                        return new[] { KeyCode.Alpha7, KeyCode.Keypad7 };
+                    case '8':
+                        return new[] { KeyCode.Alpha8, KeyCode.Keypad8 };
+                    case '9':
+                        return new[] { KeyCode.Alpha9, KeyCode.Keypad9 };
+                    case '0':
+                        return new[] { KeyCode.Alpha0, KeyCode.Keypad0 };
+                    case 'a':
+                        return new[] { KeyCode.A };
+                    case 'b':
+                        return new[] { KeyCode.B };
+                    case 'c':
+                        return new[] { KeyCode.C };
+                    case 'd':
+                        return new[] { KeyCode.D };
+                    case 'e':
+                        return new[] { KeyCode.E };
+                    case 'f':
+                        return new[] { KeyCode.F };
+                    case 'g':
+                        return new[] { KeyCode.G };
+                    case 'h':
+                        return new[] { KeyCode.H };
+                    case 'i':
+                        return new[] { KeyCode.I };
+                    case 'j':
+                        return new[] { KeyCode.J };
+                    case 'k':
+                        return new[] { KeyCode.K };
+                    case 'l':
+                        return new[] { KeyCode.L };
+                    case 'm':
+                        return new[] { KeyCode.M };
+                    case 'n':
+                        return new[] { KeyCode.N };
+                    case 'o':
+                        return new[] { KeyCode.O };
+                    case 'p':
+                        return new[] { KeyCode.P };
+                    case 'q':
+                        return new[] { KeyCode.Q };
+                    case 'r':
+                        return new[] { KeyCode.R };
+                    case 's':
+                        return new[] { KeyCode.S };
+                    case 't':
+                        return new[] { KeyCode.T };
+                    case 'u':
+                        return new[] { KeyCode.U };
+                    case 'v':
+                        return new[] { KeyCode.V };
+                    case 'w':
+                        return new[] { KeyCode.W };
+                    case 'x':
+                        return new[] { KeyCode.X };
+                    case 'y':
+                        return new[] { KeyCode.Y };
+                    case 'z':
+                        return new[] { KeyCode.Z };
+                    case '-':
+                        return new[] { KeyCode.Minus, KeyCode.KeypadMinus };
+                    case '=':
+                        return new[] { KeyCode.Equals, KeyCode.KeypadEquals };
+                    case '_':
+                        return new[] { KeyCode.Underscore };
+                    case '+':
+                        return new[] { KeyCode.Plus, KeyCode.KeypadPlus };
+                    case '[':
+                        return new[] { KeyCode.LeftBracket };
+                    case ']':
+                        return new[] { KeyCode.RightBracket };
+                    case ';':
+                        return new[] { KeyCode.Semicolon };
+                    case '\'':
+                        return new[] { KeyCode.Quote };
+                    case ',':
+                        return new[] { KeyCode.Comma };
+                    case '.':
+                        return new[] { KeyCode.Period, KeyCode.KeypadPeriod };
+                    case '/':
+                        return new[] { KeyCode.Slash };
+                    case '\\':
+                        return new[] { KeyCode.Backslash };
+                    case '`':
+                        return new[] { KeyCode.BackQuote };
+                    case ':':
+                        return new[] { KeyCode.Colon };
+                    case '"':
+                        return new[] { KeyCode.DoubleQuote };
+                    case '<':
+                        return new[] { KeyCode.Less };
+                    case '>':
+                        return new[] { KeyCode.Greater };
+                    case '?':
+                        return new[] { KeyCode.Question };
+                    case '\n':
+                        return new[] { KeyCode.Return | KeyCode.KeypadEnter };
+                    case '\t':
+                        return new[] { KeyCode.Tab };
+                    case '!':
+                        return new[] { KeyCode.Exclaim };
+                    case '@':
+                        return new[] { KeyCode.At };
+                    case '#':
+                        return new[] { KeyCode.Hash };
+                    case '$':
+                        return new[] { KeyCode.Dollar };
+                    case '^':
+                        return new[] { KeyCode.Caret };
+                    case '&':
+                        return new[] { KeyCode.Ampersand };
+                    case '*':
+                        return new[] { KeyCode.Asterisk };
+                    case '(':
+                        return new[] { KeyCode.LeftParen };
+                    case ')':
+                        return new[] { KeyCode.RightParen };
                 }
-            }
-            return false;
-        }
 
-        /// <summary>
-        /// Are all of the given keys up
-        /// </summary>
-        /// <param name="keys">the keys to check</param>
-        public bool KeysUp( params KeyCode[] keys ) {
-            if ( !PreInputCheck() ) return false;
-            foreach ( var key in keys ) {
-                if ( !kStates.ContainsKey( key ) ) return false;
-                if ( !kStates[key].IsUp() ) return false;
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// Resets all the key and mousebutton states
-        /// </summary>
-        public void Reset() {
-            var keyStates = new Dictionary<KeyCode, State<bool>>( kStates );
-            foreach ( var item in keyStates ) {
-                SetValue( item.Key, false );
-                item.Value.Update();
-            }
-
-            var mouseStates = new Dictionary<EMouseButton, State<bool>>( mStates );
-            foreach ( var item in mouseStates ) {
-                SetValue( item.Key, false );
-                item.Value.Update();
+                return new KeyCode[0];
             }
         }
     }
