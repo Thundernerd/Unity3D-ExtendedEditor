@@ -1,5 +1,6 @@
 #if UNITY_EDITOR
 using System.Reflection;
+using TNRD.Editor.Blocks;
 using UnityEditor;
 using UnityEngine;
 
@@ -130,19 +131,10 @@ namespace TNRD.Editor {
 
         private static Color horizontalLineColor = new Color( 0.349f, 0.349f, 0.349f );
 
-        /// <summary>
-        /// Draws a horizontal line
-        /// </summary>
-        /// <param name="thickness">The thickness of the line</param>
         public static void HorizontalLine( float thickness = 1 ) {
             HorizontalLine( horizontalLineColor, thickness );
         }
 
-        /// <summary>
-        /// Draws a horizontal line
-        /// </summary>
-        /// <param name="color">The color of the line</param>
-        /// <param name="thickness">The thickness of the line</param>
         public static void HorizontalLine( Color color, float thickness = 1 ) {
             Rect position = GUILayoutUtility.GetRect( GUIContent.none, horizontalLineStyle, GUILayout.Height( thickness ) );
 
@@ -154,6 +146,95 @@ namespace TNRD.Editor {
             }
         }
 
+        #region Blocks
+        public AreaBlock Area( Rect screenRect ) {
+            return new AreaBlock( screenRect );
+        }
+
+        public AreaBlock Area( Rect screenRect, string text ) {
+            return new AreaBlock( screenRect, text );
+        }
+
+        public AreaBlock Area( Rect screenRect, Texture image ) {
+            return new AreaBlock( screenRect, image );
+        }
+
+        public AreaBlock Area( Rect screenRect, GUIContent content ) {
+            return new AreaBlock( screenRect, content );
+        }
+
+        public AreaBlock Area( Rect screenRect, GUIStyle style ) {
+            return new AreaBlock( screenRect, style );
+        }
+
+        public AreaBlock Area( Rect screenRect, string text, GUIStyle style ) {
+            return new AreaBlock( screenRect, text, style );
+        }
+
+        public AreaBlock Area( Rect screenRect, Texture image, GUIStyle style ) {
+            return new AreaBlock( screenRect, image, style );
+        }
+
+        public AreaBlock Area( Rect screenRect, GUIContent content, GUIStyle style ) {
+            return new AreaBlock( screenRect, content, style );
+        }
+
+        public DisabledGroupBlock DisabledGroup( bool disabled ) {
+            return new DisabledGroupBlock( disabled );
+        }
+
+        public HorizontalBlock Horizontal( params GUILayoutOption[] options ) {
+            return new HorizontalBlock( options );
+        }
+
+        public HorizontalBlock Horizontal( GUIStyle style, params GUILayoutOption[] options ) {
+            return new HorizontalBlock( style, options );
+        }
+
+        public IndentBlock Indent() {
+            return new IndentBlock();
+        }
+
+        public IndentBlock Indent( int level ) {
+            return new IndentBlock( level );
+        }
+
+        public ScrollViewBlock ScrollView( ref Vector2 scrollPosition, params GUILayoutOption[] options ) {
+            return new ScrollViewBlock( ref scrollPosition, options );
+        }
+
+        public ScrollViewBlock ScrollView( ref Vector2 scrollPosition, GUIStyle style, params GUILayoutOption[] options ) {
+            return new ScrollViewBlock( ref scrollPosition, style, options );
+        }
+
+        public ScrollViewBlock ScrollView( ref Vector2 scrollPosition, GUIStyle horizontalScrollbar, GUIStyle verticalScrollbar, params GUILayoutOption[] options ) {
+            return new ScrollViewBlock( ref scrollPosition, horizontalScrollbar, verticalScrollbar, options );
+        }
+
+        public ScrollViewBlock ScrollView( ref Vector2 scrollPosition, bool alwaysShowHorizontal, bool alwaysShowVertical, params GUILayoutOption[] options ) {
+            return new ScrollViewBlock( ref scrollPosition, alwaysShowHorizontal, alwaysShowVertical, options );
+        }
+
+        public ScrollViewBlock ScrollView( ref Vector2 scrollPosition, bool alwaysShowHorizontal, bool alwaysShowVertical, GUIStyle horizontalScrollbar, GUIStyle verticalScrollbar, GUIStyle background, params GUILayoutOption[] options ) {
+            return new ScrollViewBlock( ref scrollPosition, alwaysShowHorizontal, alwaysShowVertical, horizontalScrollbar, verticalScrollbar, background, options );
+        }
+
+        public ToggleGroupBlock ToggleGroup( string label, ref bool toggle ) {
+            return new ToggleGroupBlock( label, ref toggle );
+        }
+
+        public ToggleGroupBlock ToggleGroup( GUIContent label, ref bool toggle ) {
+            return new ToggleGroupBlock( label, ref toggle );
+        }
+
+        public VerticalBlock Vertical( params GUILayoutOption[] options ) {
+            return new VerticalBlock( options );
+        }
+
+        public VerticalBlock Vertical( GUIStyle style, params GUILayoutOption[] options ) {
+            return new VerticalBlock( style, options );
+        }
+        #endregion
     }
 }
 #endif
